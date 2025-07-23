@@ -1,0 +1,184 @@
+<mat-expansion-panel (opened)="panelOpenState = true"
+                     (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Equité
+        </mat-panel-title>
+        <mat-panel-description>
+            DESCRIPTION
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    <p>ibt ibt :{{ dat.resultat.ibtibt }}</p>
+    <p> tbse tbse :{{ dat.resultat.tbsetbse }}</p>
+    <p>tbse ibt : {{ dat.resultat.tbseibt }}</p>
+    <div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Moyenne Ménage</th>
+                <th>tqsqm</th>
+                <th>tsm</th>
+                <th>tqsqp</th>
+                <th>tsp</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of dat.resultat.nono;index as i;">
+                <th scope="row" *ngIf="i <= 9">{{ frede[i] }}</th>
+                <td>{{ item.tqsqm }}</td>
+                <td>{{ item.tsm }}</td>
+                <td>{{ item.tqsqp }}</td>
+                <td>{{ item.tsp }}</td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h2>4.3 L'impact sur les inégalités – l'indice de Gini</h2>
+        <h3>4.3.1 Indice de Gini </h3>
+        <p>Impact Inégalités de revenu – courbes de Lorenz:</p>
+        <h3>4.3.2 Décomposition de l'indice de Gini par groupes (3 dont Pauvreté et Grande Pauvreté)</h3>
+        <table class="dd">
+
+
+            <tbody>
+            <tr>
+                <td class="dd">.</td>
+                <td class="dd">Gini</td>
+                <td class="dd"> Intra</td>
+                <td class="dd">Inter</td>
+                <td class="dd"> Transvariation</td>
+
+            </tr>
+
+
+            <tr>
+                <td class="dd">IBT</td>
+                <td class="dd">{{ dat.resultat.k }}</td>
+                <td class="dd">{{ dat.resultat.kw }}</td>
+                <td class="dd">{{ dat.resultat.kb }}</td>
+                <td class="dd">{{ dat.resultat.kt }}</td>
+
+            </tr>
+            <tr>
+                <td class="dd">TBSE</td>
+                <td class="dd">{{ dat.resultat.tk }}</td>
+                <td class="dd">{{ dat.resultat.tkw }}</td>
+                <td class="dd">{{ dat.resultat.tkb }}</td>
+                <td class="dd">{{ dat.resultat.tkt }}</td>
+
+            </tr>
+            <tr>
+                <td class="dd">Delta</td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+
+            </tr>
+            </tbody>
+        </table>
+        Décomposition composante intra
+        <table class="dd">
+
+
+            <tbody>
+            <tr>
+                <td class="dd">IBT</td>
+                <td class="dd">% Pop</td>
+                <td class="dd"> % Masses</td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+
+            </tr>
+
+
+            <tr>
+                <td class="dd">Extreme Poor</td>
+                <td class="dd">{{ dat.resultat.f1 }}</td>
+                <td class="dd">{{ dat.resultat.a1 }}</td>
+                <td class="dd">{{ dat.resultat.k1 }}</td>
+                <td class="dd"></td>
+
+            </tr>
+            <tr>
+                <td class="dd">Poor</td>
+                <td class="dd">{{ dat.resultat.f2 }}</td>
+                <td class="dd">{{ dat.resultat.a2 }}</td>
+                <td class="dd">{{ dat.resultat.k2 }}</td>
+                <td class="dd"></td>
+
+            </tr>
+            <tr>
+                <td class="dd">Non Poor</td>
+                <td class="dd">{{ dat.resultat.f3 }}</td>
+                <td class="dd">{{ dat.resultat.a3 }}</td>
+                <td class="dd">{{ dat.resultat.k3 }}</td>
+                <td class="dd"></td>
+
+            </tr>
+            <tr>
+                <td class="dd">Ensemble</td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+
+            </tr>
+            </tbody>
+        </table>
+        <table class="dd">
+
+
+            <tbody>
+            <tr>
+                <td class="dd">TBSE</td>
+                <td class="dd">% Pop</td>
+                <td class="dd"> % Masses</td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+
+            </tr>
+
+
+            <tr>
+                <td class="dd">Extreme Poor</td>
+                <td class="dd">{{ dat.resultat.tf1 }}</td>
+                <td class="dd">{{ dat.resultat.ta1 }}</td>
+                <td class="dd">{{ dat.resultat.tk1 }}</td>
+                <td class="dd"></td>
+
+            </tr>
+            <tr>
+                <td class="dd">Poor</td>
+                <td class="dd">{{ dat.resultat.tf2 }}</td>
+                <td class="dd">{{ dat.resultat.ta2 }}</td>
+                <td class="dd">{{ dat.resultat.tk2 }}</td>
+                <td class="dd"></td>
+
+            </tr>
+            <tr>
+                <td class="dd">Non Poor</td>
+                <td class="dd">{{ dat.resultat.tf3 }}</td>
+                <td class="dd">{{ dat.resultat.ta3 }}</td>
+                <td class="dd">{{ dat.resultat.tk3 }}</td>
+                <td class="dd"></td>
+
+            </tr>
+            <tr>
+                <td class="dd">Ensemble</td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+                <td class="dd"></td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</mat-expansion-panel>

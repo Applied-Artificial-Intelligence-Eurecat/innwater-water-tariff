@@ -1,0 +1,35 @@
+{{dat.id}}
+<div>
+    Score : {{dat.resultat.score2}}
+    
+  </div>
+  <div>
+    <p>profit : {{dat.resultat.profit}}  {{dat.resultat.profit_message}}</p>
+
+Eau potable
+    <ul>
+    <li *ngFor="let item of dat.saisie.user.tabpep; index as i;">
+        prix tranche {{i+1}} : {{item}}
+    </li>
+</ul>
+<ul>
+    <li *ngFor="let item of dat.saisie.user.tabsep; index as i;">
+        K{{i}} : {{item}}
+    </li>
+</ul>
+Assaini
+<ul>
+    <li *ngFor="let item of dat.saisie.user.tabpa; index as i;">
+        prix tranche {{i+1}} : {{item}}
+    </li>
+</ul>
+<ul>
+    <li *ngFor="let item of dat.saisie.user.tabsa; index as i;">
+        K{{i}} : {{item}}
+    </li>
+</ul>
+    <button mat-button class="menu-button" (click)="goodbye()">
+        
+        <span>C'est bon pour moi</span>
+      </button>
+  </div>

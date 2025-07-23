@@ -1,0 +1,54 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+:root {
+  --primary-color: rgba(86, 85, 168, 1); /* Custom primary color */
+  --primary-light: #7986cb; /* Material Indigo 300 */
+  --primary-dark: #303f9f; /* Material Indigo 700 */
+  --accent-color: #ff4081; /* Material Pink A200 */
+  --green-color: #4caf50; /* Material Green 500 */
+  --green-hover: #388e3c; /* Material Green 700 */
+  --light-bg: #f5f5f5; /* Material Grey 100 */
+  --border-color: #e0e0e0; /* Material Grey 300 */
+  --text-primary: rgba(0, 0, 0, 0.87); /* Material Dark Text */
+  --text-secondary: rgba(0, 0, 0, 0.6); /* Material Dark Secondary Text */
+}
+
+/* Basic grid layout (Bootstrap-like) */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding-right: 15px;
+  padding-left: 15px;
+  box-sizing: border-box;
+}
+
+.col-md-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  box-sizing: border-box;
+}
+
+/* Responsive adjustments for grid layout */
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .col-md-6, .col-md-12 {
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
+  }
+}

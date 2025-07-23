@@ -1,0 +1,72 @@
+/* Styles for mat-tables */
+table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.mat-mdc-header-cell {
+  font-weight: bold;
+  background-color: #f5f5f5;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.mat-mdc-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f0f0f0;
+}
+
+.mat-mdc-cell, .mat-mdc-header-cell {
+  padding: 8px 16px;
+  text-align: center;
+}
+
+/* Add some spacing between tables */
+.mat-elevation-z8 {
+  margin-bottom: 20px;
+}
+
+/* Styles for the incidence table */
+.mat-mdc-header-cell[colspan] {
+  text-align: center;
+  background-color: #e0e0e0;
+}
+
+.mat-mdc-header-cell[rowspan] {
+  vertical-align: middle;
+}
+
+/* Ensure the table headers are properly aligned */
+.mat-mdc-header-row:first-of-type .mat-mdc-header-cell {
+  border-bottom: none;
+}
+
+.mat-mdc-header-row:not(:first-of-type) .mat-mdc-header-cell {
+  border-top: none;
+}
+
+/* Grid layout is now defined in global styles.css */
+
+/* Component-specific responsive adjustments */
+@media (max-width: 768px) {
+  /* Add margin to columns in this component */
+  .col-md-6 {
+    margin-bottom: 20px;
+  }
+
+  /* Keep Gini tables side by side */
+  .gini-tables-row {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+
+  /* Make Gini tables columns 50% width */
+  .gini-tables-row .col-md-6 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+    width: 50%;
+    padding: 0 5px;
+  }
+}

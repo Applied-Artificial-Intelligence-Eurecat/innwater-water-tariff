@@ -1,0 +1,14 @@
+<form [formGroup]="loginForm">
+<div class="container">
+  <p> Log in into your account :</p>
+    <mat-form-field appearance="fill">
+      <mat-label>Email address</mat-label>
+      <input matInput formControlName="emailControl">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" >
+      </mat-form-field>
+      <button type="submit" [disabled]="!loginForm.valid" (click)="submit()" mat-raised-button color="primary">Login</button>
+  </div>
+</form>

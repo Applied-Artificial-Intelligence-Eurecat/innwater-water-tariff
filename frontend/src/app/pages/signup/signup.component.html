@@ -1,0 +1,20 @@
+<form [formGroup]="sigupForm">
+
+<div class="container">
+    <p>Create an account :</p>
+    <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Email address</mat-label>
+        <input matInput formControlName="emailControl">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input type="password" matInput formControlName="password" >
+        </mat-form-field>
+    <button type="submit"[disabled]="!sigupForm.valid"  (click)="submit()" mat-raised-button color="primary">Create </button>
+
+</div>
+</form>

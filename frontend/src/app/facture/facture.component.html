@@ -1,0 +1,195 @@
+ <!--
+<table mat-table [dataSource]="dataSour" class="mat-elevation-z8">
+
+  
+
+    <ng-container matColumnDef="K0">
+      <th mat-header-cell *matHeaderCellDef> K0 </th>
+      <td mat-cell *matCellDef="let element"> {{element.K0}} </td>
+    </ng-container>
+
+ 
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+
+  <td><span [class.color]='item.U_car > 0 ' >{{ item.U_car }}</span></td>
+          <td [class.color]='item.U_par > 0 '>{{ item.U_par }}</td>
+-->
+<p>
+  <button mat-button class="menu-button" routerLink="/last">
+      
+    <span>retour</span>
+  </button>
+
+</p>
+  <mat-tab-group>
+    <mat-tab label="a"> 
+      <div>
+    
+        <table>
+          <thead>
+            <tr>
+              <th>Menage</th>
+              <th>Revenu</th>
+              <th>Taille</th>
+              <th>enfant</th>
+              <th>K_ibt</th>
+              
+              <th>K_captive</th>
+              <th>K_tbse</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of dat.resultat.resultat;index as i;" >
+              <th>{{ i+1}}</th>
+              <td>{{ item.revenu }}</td>
+              <td>{{ item.tailleMenage }}</td>
+              <td>{{ item.enfant }}</td>
+              <td>{{ item.consT4 }}</td>
+              
+              <td>{{ item.consminT4 }}</td>
+              <td>{{ item.TBSE }}</td>
+              
+              
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+    
+    <mat-tab label="contribution captive"> 
+      <table mat-table [dataSource]="dat.resultat.contribminTab">
+        <ng-container [matColumnDef]="col" *ngFor="let col of dat.resultat.headcontribminTab">
+          <th mat-header-cell *matHeaderCellDef>
+            {{col}}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{element[col]}}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="dat.resultat.headcontribminTab"></tr>
+        <tr mat-row *matRowDef="let row; columns: dat.resultat.headcontribminTab;"></tr>
+      </table>
+    </mat-tab>
+    <mat-tab label="Contribution conso"> 
+      <table mat-table [dataSource]="dat.resultat.contribTab">
+        <ng-container [matColumnDef]="col" *ngFor="let col of dat.resultat.headcontribTab">
+          <th mat-header-cell *matHeaderCellDef>
+            {{col}}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{element[col]}}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="dat.resultat.headcontribTab"></tr>
+        <tr mat-row *matRowDef="let row; columns: dat.resultat.headcontribTab;"></tr>
+      </table>
+       </mat-tab>
+       <mat-tab label="Contribution conso pas base"> 
+        <table mat-table [dataSource]="dat.resultat.contribcTab">
+          <ng-container [matColumnDef]="col" *ngFor="let col of dat.resultat.headcontribcTab">
+            <th mat-header-cell *matHeaderCellDef>
+              {{col}}
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{element[col]}}
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="dat.resultat.headcontribcTab"></tr>
+          <tr mat-row *matRowDef="let row; columns: dat.resultat.headcontribcTab;"></tr>
+        </table>
+         </mat-tab>
+         <mat-tab label="volume conso base"> 
+          <table mat-table [dataSource]="dat.resultat.contribvmTab">
+            <ng-container [matColumnDef]="col" *ngFor="let col of dat.resultat.headcontribvmTab">
+              <th mat-header-cell *matHeaderCellDef>
+                {{col}}
+              </th>
+              <td mat-cell *matCellDef="let element">
+                {{element[col]}}
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="dat.resultat.headcontribvpTab"></tr>
+            <tr mat-row *matRowDef="let row; columns: dat.resultat.headcontribvpTab;"></tr>
+          </table>
+           </mat-tab>
+           <mat-tab label="volume conso pas base"> 
+            <table mat-table [dataSource]="dat.resultat.contribvpTab">
+              <ng-container [matColumnDef]="col" *ngFor="let col of dat.resultat.headcontribvpTab">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{col}}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{element[col]}}
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="dat.resultat.headcontribvpTab"></tr>
+              <tr mat-row *matRowDef="let row; columns: dat.resultat.headcontribvpTab;"></tr>
+              
+            </table>
+          </mat-tab>
+             <mat-tab label="volume matrice"> 
+             <table>
+              <tr>
+                <td></td>
+                <td>D+</td>
+                <td>D-</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>T+</td>
+                <td>{{dat.resultat.Q0m}}</td>
+                <td>{{dat.resultat.QQ0m}}</td>
+                <td>Q+ = {{dat.resultat.Qm}}</td>
+              </tr>
+              <tr>
+                <td>T-</td>
+                <td>{{dat.resultat.Q0p}}</td>
+                <td>{{dat.resultat.QQ0p}}</td>
+                <td>Q- = {{dat.resultat.Qp}} </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Q0 = {{dat.resultat.Q0}}</td>
+                <td>Q-Q0= {{dat.resultat.QQ0}}</td>
+                <td>Q= {{dat.resultat.Q}} </td>
+              </tr>
+            </table>
+            <div>
+              TPR : {{dat.resultat.tpr}}
+            </div>
+            <div>
+              FNR : {{dat.resultat.fnr}}
+            </div>
+            <div>
+              FPR : {{dat.resultat.tnr}}
+            </div>
+            <div>
+              TNR : {{dat.resultat.fpr}}
+            </div>
+            <div>
+              VPP : {{dat.resultat.vpp}}
+            </div>
+            <div>
+              VPN : {{dat.resultat.vpn}}
+            </div>
+            <div>
+              FDR : {{dat.resultat.fdr}}
+            </div>
+            <div>
+              FOR : {{dat.resultat.fOr}}
+            </div>
+            <div>
+              Prevalence : {{dat.resultat.prev}}
+            </div>
+          </mat-tab>
+        
+  </mat-tab-group>
+  
+
+
+
+

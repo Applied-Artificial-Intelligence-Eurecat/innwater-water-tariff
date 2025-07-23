@@ -1,0 +1,413 @@
+<p>
+  <button mat-button class="menu-button" routerLink="/evaluation">
+      
+    <span>retour</span>
+  </button>
+
+</p>
+<!--
+<mat-tab-group>
+    <mat-tab label="Indicateur"><div> 
+      <mat-accordion>
+        <mat-expansion-panel (opened)="panelOpenState = true"
+                             (closed)="panelOpenState = false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Agreg
+            </mat-panel-title>
+            <mat-panel-description>
+              DESCRIPTION
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <p>moyenne consommation tbse :{{dat.resultat.consoKtbsemean}}</p>
+          std consommation tbse  :{{dat.resultat.consoKtbsestd}}
+          <br>                   
+          coeff variation tbse:               {{dat.resultat.consoKtbsecoeff}}  
+          <br> 
+          <p>moyenne consommation tarif bien perçu :{{dat.resultat.consoK0mean}}</p>
+          std consommation tarif bien perçu   :{{dat.resultat.consoK0std}}
+          <br>                   
+          coeff variation tarif bien perçu :               {{dat.resultat.consoK0coeff}}  
+          <br>    
+          moyenne consommation tarif pas bien perçu  :{{dat.resultat.consoK1mean}}
+          <br>
+          std consommation tarif pas bien perçu   :{{dat.resultat.consoK1std}}      
+          <br>             
+          coeff variation tarif pas bien perçu :               {{dat.resultat.consoK1coeff}}  
+          <br>
+          moyenne facture prix bien perçu :{{dat.resultat.tarif_k0mean}}
+          <br>
+          std facture prix bien perçu   :{{dat.resultat.tarif_k0std}}   
+          <br>                
+          coeff variation facture prix bien perçu:               {{dat.resultat.tarif_k0coeff}} 
+          <br>     
+          moyenne facture prix pas bien perçu  :{{dat.resultat.tarif_k1mean}}
+          <br>
+          std facture prix pas bien perçu   :{{dat.resultat.tarif_k1std}}     
+          <br>              
+          coeff variation facture prix pas bien perçu :               {{dat.resultat.tarif_k1coeff}}  
+          <br>
+          pourcentage surconsomation  :               {{dat.resultat.surconsoper}}  
+          <br>
+          surconsomation moyenne :               {{dat.resultat.surconsomean}}  
+          <br>      
+          surconsomation var :               {{dat.resultat.surconsovar}}  
+          <br>        
+          surconsomation std :               {{dat.resultat.surconsostd}}  
+          <br>
+          surconsomation tete mean :               {{dat.resultat.surconsotetemean}}  
+          <br>
+          surconsomation tete var :               {{dat.resultat.surconsotetevar}}  
+          <br>
+          surconsomation tete std:               {{dat.resultat.surconsotetestd}}  
+          <br>
+          surconsomation tete coeff :               {{dat.resultat.surconsotetecoeff}}  
+          <br>
+          mauvaise gestion mean :               {{dat.resultat.surconsopaymean}}  
+          <br>
+          mauvaise gestionstd :               {{dat.resultat.surconsopaystd}}  
+          <br>
+          mauvaise gestion var :               {{dat.resultat.surconsopayvar}}  
+          <br>
+          mauvaise gestion coeff :               {{dat.resultat.surconsopaycoeff}}  
+          <br>
+    
+          <table>
+            <tr>
+              <td></td>
+              <td>D+</td>
+              <td>D-</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>T+</td>
+              <td>{{dat.resultat.Q0m}}</td>
+              <td>{{dat.resultat.QQ0m}}</td>
+              <td>Q+ = {{dat.resultat.Qm}}</td>
+            </tr>
+            <tr>
+              <td>T-</td>
+              <td>{{dat.resultat.Q0p}}</td>
+              <td>{{dat.resultat.QQ0p}}</td>
+              <td>Q- = {{dat.resultat.Qp}} </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Q0 = {{dat.resultat.Q0}}</td>
+              <td>Q-Q0= {{dat.resultat.QQ0}}</td>
+              <td>Q= {{dat.resultat.Q}} </td>
+            </tr>
+          </table>
+        </mat-expansion-panel>
+        <mat-expansion-panel (opened)="panelOpenState = true"
+        (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+    <mat-panel-title>
+    surconsommation par décile de revenu
+    </mat-panel-title>
+    <mat-panel-description>
+    DESCRIPTION
+    </mat-panel-description>
+    </mat-expansion-panel-header>
+    
+    <mat-accordion *ngFor="let item of dat.resultat.decileSar;index as i;">
+    <mat-expansion-panel (opened)="panelOpenState = true"
+    (closed)="panelOpenState = false">
+  <mat-expansion-panel-header>
+  <mat-panel-title>
+    Décile {{i+1}}
+  </mat-panel-title>
+  <mat-panel-description>
+  
+  </mat-panel-description>
+  </mat-expansion-panel-header>
+            
+            
+            <p>Moyenne: {{item.impar}}</p>
+            <p>Ecart type  {{item.stdpar}}</p>
+            <p>Variance : {{item.varpar}}</p>
+            <p>Mediane : {{item.medpar}}</p>
+            
+            
+  </mat-expansion-panel>
+  </mat-accordion>
+  
+    </mat-expansion-panel>
+    <mat-expansion-panel (opened)="panelOpenState = true"
+    (closed)="panelOpenState = false">
+<mat-expansion-panel-header>
+<mat-panel-title>
+Mauvaise gestion par  décile de revenu
+</mat-panel-title>
+<mat-panel-description>
+DESCRIPTION
+</mat-panel-description>
+</mat-expansion-panel-header>
+
+<mat-accordion *ngFor="let item of dat.resultat.decileCSar;index as i;">
+<mat-expansion-panel (opened)="panelOpenState = true"
+(closed)="panelOpenState = false">
+<mat-expansion-panel-header>
+<mat-panel-title>
+Décile {{i+1}}
+</mat-panel-title>
+<mat-panel-description>
+
+</mat-panel-description>
+</mat-expansion-panel-header>
+        
+        
+        <p>Moyenne: {{item.impar}}</p>
+        <p>Ecart type  {{item.stdpar}}</p>
+        <p>Variance : {{item.varpar}}</p>
+        <p>Mediane : {{item.medpar}}</p>
+        
+        
+</mat-expansion-panel>
+</mat-accordion>
+
+</mat-expansion-panel>
+<mat-expansion-panel (opened)="panelOpenState = true"
+    (closed)="panelOpenState = false">
+<mat-expansion-panel-header>
+<mat-panel-title>
+Mauvaise gestion par  décile de revenu par tête
+</mat-panel-title>
+<mat-panel-description>
+DESCRIPTION
+</mat-panel-description>
+</mat-expansion-panel-header>
+
+<mat-accordion *ngFor="let item of dat.resultat.decileTeteCSar;index as i;">
+<mat-expansion-panel (opened)="panelOpenState = true"
+(closed)="panelOpenState = false">
+<mat-expansion-panel-header>
+<mat-panel-title>
+Décile {{i+1}}
+</mat-panel-title>
+<mat-panel-description>
+
+</mat-panel-description>
+</mat-expansion-panel-header>
+        
+        
+        <p>Moyenne: {{item.impar}}</p>
+        <p>Ecart type  {{item.stdpar}}</p>
+        <p>Variance : {{item.varpar}}</p>
+        <p>Mediane : {{item.medpar}}</p>
+        
+        
+</mat-expansion-panel>
+</mat-accordion>
+
+</mat-expansion-panel>
+  <mat-expansion-panel (opened)="panelOpenState = true"
+  (closed)="panelOpenState = false">
+  <mat-expansion-panel-header>
+  <mat-panel-title>
+  Surconsommation par décile revenu par tête
+  </mat-panel-title>
+  <mat-panel-description>
+  DESCRIPTION
+  </mat-panel-description>
+  </mat-expansion-panel-header>
+  <mat-accordion *ngFor="let item of dat.resultat.decileTeteSar;index as i;">
+  <mat-expansion-panel (opened)="panelOpenState = true"
+  (closed)="panelOpenState = false">
+  <mat-expansion-panel-header>
+  <mat-panel-title>
+  Décile {{i+1}}
+  </mat-panel-title>
+  <mat-panel-description>
+  
+  </mat-panel-description>
+  </mat-expansion-panel-header>
+          
+          
+          <p>Moyenne : {{item.impar}}</p>
+          <p>Ecart type : {{item.stdpar}}</p>
+          <p>Variance : {{item.varpar}}</p>
+          <p>Mediane : {{item.medpar}}</p>
+          
+          
+  </mat-expansion-panel>
+  </mat-accordion>
+  </mat-expansion-panel>
+      </mat-accordion>
+      
+  
+  
+  </div> </mat-tab>
+      <mat-tab label="Table"> <div>
+      
+
+        </div> </mat-tab>
+      
+      
+    </mat-tab-group>
+  -->
+    Surconsommation par décile de revenu
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Moyenne</th>
+          <th>Mediane</th>
+          <th>Std</th>
+          
+          
+        </tr>
+      </thead>
+      
+      <tbody>
+        
+        
+        <tr *ngFor="let item of dat.resultat.decileSar;index as i;" >
+          <th>D{{i+1}}</th>
+          <td>{{ item.impar }}</td>
+          <td>{{ item.medpar }}</td>
+          <td>{{ item.stdpar }}</td>
+          
+          
+          
+        </tr>
+      </tbody>
+    </table>
+    Surconsommation par décile de revenu par tête
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Moyenne</th>
+          <th>Mediane</th>
+          <th>Std</th>
+          
+          
+        </tr>
+      </thead>
+      
+      <tbody>
+        
+        
+        <tr *ngFor="let item of dat.resultat.decileTeteSar;index as i;" >
+          <th>D{{i+1}}</th>
+          <td>{{ item.impar }}</td>
+          <td>{{ item.medpar }}</td>
+          <td>{{ item.stdpar }}</td>
+          
+          
+          
+        </tr>
+      </tbody>
+    </table>
+    Surconsommation par décile de niveau de vie
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Moyenne</th>
+          <th>Mediane</th>
+          <th>Std</th>
+          
+          
+        </tr>
+      </thead>
+      
+      <tbody>
+        
+        
+        <tr *ngFor="let item of dat.resultat.decileUcSar;index as i;" >
+          <th>D{{i+1}}</th>
+          <td>{{ item.impar }}</td>
+          <td>{{ item.medpar }}</td>
+          <td>{{ item.stdpar }}</td>
+        
+          
+          
+          
+        </tr>
+      </tbody>
+    </table>
+
+    Coût de mauvaise gestion par  décile de revenu
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Moyenne</th>
+          <th>Mediane</th>
+          <th>Std</th>
+          
+          
+        </tr>
+      </thead>
+      
+      <tbody>
+        
+        
+        <tr *ngFor="let item of dat.resultat.decileCSar;index as i;" >
+          <th>D{{i+1}}</th>
+          <td>{{ item.impar }}</td>
+          <td>{{ item.medpar }}</td>
+          <td>{{ item.stdpar }}</td>
+          
+          
+          
+        </tr>
+      </tbody>
+    </table>
+
+    Coût de mauvaise gestion par décile de revenu par tête
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Moyenne</th>
+          <th>Mediane</th>
+          <th>Std</th>
+          
+          
+        </tr>
+      </thead>
+      
+      <tbody>
+        
+        
+        <tr *ngFor="let item of dat.resultat.decileTeteCSar;index as i;" >
+          <th>D{{i+1}}</th>
+          <td>{{ item.impar }}</td>
+          <td>{{ item.medpar }}</td>
+          <td>{{ item.stdpar }}</td>
+          
+          
+          
+        </tr>
+      </tbody>
+    </table>
+    Coût de mauvaise gestion par décile de niveau de vie
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Moyenne</th>
+          <th>Mediane</th>
+          <th>Std</th>
+          
+          
+        </tr>
+      </thead>
+      
+      <tbody>
+        
+        
+        <tr *ngFor="let item of dat.resultat.decileUcCSar;index as i;" >
+          <th>D{{i+1}}</th>
+          <td>{{ item.impar }}</td>
+          <td>{{ item.medpar }}</td>
+          <td>{{ item.stdpar }}</td>
+          
+          
+          
+        </tr>
+      </tbody>
+    </table>

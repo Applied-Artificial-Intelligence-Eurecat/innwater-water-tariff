@@ -1,0 +1,41 @@
+table {
+  font-size: 12px; /* Réduction de la police */
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 6px 10px; /* Ajout d'un peu d'espace pour la lisibilité */
+  text-align: center; /* Alignement centré */
+  border: 1px solid #ddd; /* Ajout de bordures légères */
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9; /* Alternance de couleur pour les lignes */
+}
+
+tr:hover {
+  background-color: #f1f1f1; /* Mise en surbrillance au survol */
+}
+
+.container {
+  max-width: 95%;
+  margin: auto;
+}
+
+
+.tables-container {
+  display: flex;  /* Permet d'afficher les éléments en ligne */
+  gap: 20px;  /* Ajoute un espace entre les tableaux */
+  flex-wrap: wrap;  /* Permet de passer à la ligne si l'écran est trop petit */
+}
+
+.table-wrapper {
+  flex: 1;  /* Permet aux tableaux de prendre la même largeur */
+  min-width: 300px;  /* Largeur minimale pour éviter un écrasement */
+}

@@ -1,0 +1,20 @@
+<div class="table-container">
+  <table class="simulation-table" *ngIf="dat && dat.all">
+    <thead>
+      <tr>
+        <th>Simulation Name</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of dat.all; index as i;">
+        <td>{{item.nom}}</td>
+        <td>{{item.date || 'N/A'}}</td>
+        <td>
+          <button class="view-btn" [routerLink]="['/simulation', item.nom]">View Details</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

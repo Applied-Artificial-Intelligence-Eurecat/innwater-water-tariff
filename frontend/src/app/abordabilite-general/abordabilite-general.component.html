@@ -1,0 +1,423 @@
+<mat-expansion-panel (opened)="panelOpenState = true"
+                     (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Abordabilité
+        </mat-panel-title>
+        <mat-panel-description>
+            DESCRIPTION
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <div class="row median-statistics-row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getGeneralMedianStatisticsCarData()" class="mat-elevation-z8">
+                <!-- Row Label Column -->
+                <ng-container matColumnDef="rowLabel">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.rowLabel }}</td>
+                </ng-container>
+
+                <!-- CAR IBT Column -->
+                <ng-container matColumnDef="carIbt">
+                    <th mat-header-cell *matHeaderCellDef> CAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carIbt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- CAR TBSE Column -->
+                <ng-container matColumnDef="carTbse">
+                    <th mat-header-cell *matHeaderCellDef> CAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carTbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- Delta CAR Column -->
+                <ng-container matColumnDef="deltaCar">
+                    <th mat-header-cell *matHeaderCellDef> Delta CAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaCar | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="generalMedianStatisticsCarColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: generalMedianStatisticsCarColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getGeneralMedianStatisticsData()" class="mat-elevation-z8">
+                <!-- Row Label Column -->
+                <ng-container matColumnDef="rowLabel">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.rowLabel }}</td>
+                </ng-container>
+
+                <!-- PAR IBT Column -->
+                <ng-container matColumnDef="parIbt">
+                    <th mat-header-cell *matHeaderCellDef> PAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parIbt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- PAR TBSE Column -->
+                <ng-container matColumnDef="parTbse">
+                    <th mat-header-cell *matHeaderCellDef> PAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parTbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- Delta PAR Column -->
+                <ng-container matColumnDef="deltaPar">
+                    <th mat-header-cell *matHeaderCellDef> Delta PAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaPar | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="generalMedianStatisticsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: generalMedianStatisticsColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row other-statistics-row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getOtherGeneralStatisticsCarData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef>Metric</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- CAR IBT Column -->
+                <ng-container matColumnDef="carIbt">
+                    <th mat-header-cell *matHeaderCellDef>CAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carIbt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- CAR TBSE Column -->
+                <ng-container matColumnDef="carTbse">
+                    <th mat-header-cell *matHeaderCellDef>CAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carTbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="otherGeneralStatisticsCarColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: otherGeneralStatisticsCarColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getOtherGeneralStatisticsData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef>Metric</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- PAR IBT Column -->
+                <ng-container matColumnDef="parIbt">
+                    <th mat-header-cell *matHeaderCellDef>PAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parIbt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- PAR TBSE Column -->
+                <ng-container matColumnDef="parTbse">
+                    <th mat-header-cell *matHeaderCellDef>PAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parTbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="otherGeneralStatisticsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: otherGeneralStatisticsColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <h2>Mesures Abordabilité</h2>
+    <h3>Incidence</h3>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>En %</h4>
+            <table mat-table [dataSource]="getParIncidenceData()" class="mat-elevation-z8">
+                <!-- Category Column -->
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef>Headcount ratio</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.category }}</td>
+                </ng-container>
+
+                <!-- PAR IBT Column -->
+                <ng-container matColumnDef="parIbt">
+                    <th mat-header-cell *matHeaderCellDef>PAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parIbt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- PAR TBSE Column -->
+                <ng-container matColumnDef="parTbse">
+                    <th mat-header-cell *matHeaderCellDef>PAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parTbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- Delta PAR Column -->
+                <ng-container matColumnDef="deltaPar">
+                    <th mat-header-cell *matHeaderCellDef>Delta PAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaPar | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="parIncidenceColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: parIncidenceColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h4>En points de pourcentage</h4>
+            <table mat-table [dataSource]="getCarIncidenceData()" class="mat-elevation-z8">
+                <!-- Category Column -->
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.category }}</td>
+                </ng-container>
+
+                <!-- CAR IBT Column -->
+                <ng-container matColumnDef="carIbt">
+                    <th mat-header-cell *matHeaderCellDef>CAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carIbt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- CAR TBSE Column -->
+                <ng-container matColumnDef="carTbse">
+                    <th mat-header-cell *matHeaderCellDef>CAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carTbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- Delta CAR Column -->
+                <ng-container matColumnDef="deltaCar">
+                    <th mat-header-cell *matHeaderCellDef>Delta CAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaCar | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="carIncidenceColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: carIncidenceColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <h3>Intensité</h3>
+    <p>(Déficit d'abordabilité, en euros par trimestre)</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getDeficitApparentParData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef>Déficit Apparent</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- PAR IBT Column -->
+                <ng-container matColumnDef="parIbt">
+                    <th mat-header-cell *matHeaderCellDef>PAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parIbt }}</td>
+                </ng-container>
+
+                <!-- PAR TBSE Column -->
+                <ng-container matColumnDef="parTbse">
+                    <th mat-header-cell *matHeaderCellDef>PAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parTbse }}</td>
+                </ng-container>
+
+                <!-- Delta PAR Column -->
+                <ng-container matColumnDef="deltaPar">
+                    <th mat-header-cell *matHeaderCellDef>Delta PAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaPar }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="deficitApparentParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: deficitApparentParColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getDeficitApparentCarData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- CAR IBT Column -->
+                <ng-container matColumnDef="carIbt">
+                    <th mat-header-cell *matHeaderCellDef>CAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carIbt }}</td>
+                </ng-container>
+
+                <!-- CAR TBSE Column -->
+                <ng-container matColumnDef="carTbse">
+                    <th mat-header-cell *matHeaderCellDef>CAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carTbse }}</td>
+                </ng-container>
+
+                <!-- Delta CAR Column -->
+                <ng-container matColumnDef="deltaCar">
+                    <th mat-header-cell *matHeaderCellDef>Delta CAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaCar }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="deficitApparentCarColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: deficitApparentCarColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getDeficitEffectifParData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef>Déficit Effectif</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- PAR IBT Column -->
+                <ng-container matColumnDef="parIbt">
+                    <th mat-header-cell *matHeaderCellDef>PAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parIbt }}</td>
+                </ng-container>
+
+                <!-- PAR TBSE Column -->
+                <ng-container matColumnDef="parTbse">
+                    <th mat-header-cell *matHeaderCellDef>PAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.parTbse }}</td>
+                </ng-container>
+
+                <!-- Delta PAR Column -->
+                <ng-container matColumnDef="deltaPar">
+                    <th mat-header-cell *matHeaderCellDef>Delta PAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaPar }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="deficitEffectifParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: deficitEffectifParColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getDeficitEffectifCarData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- CAR IBT Column -->
+                <ng-container matColumnDef="carIbt">
+                    <th mat-header-cell *matHeaderCellDef>CAR IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carIbt }}</td>
+                </ng-container>
+
+                <!-- CAR TBSE Column -->
+                <ng-container matColumnDef="carTbse">
+                    <th mat-header-cell *matHeaderCellDef>CAR TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.carTbse }}</td>
+                </ng-container>
+
+                <!-- Delta CAR Column -->
+                <ng-container matColumnDef="deltaCar">
+                    <th mat-header-cell *matHeaderCellDef>Delta CAR</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.deltaCar }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="deficitEffectifCarColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: deficitEffectifCarColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <h3>Inegalité</h3>
+
+    <div class="row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getInegaliteParData()" class="mat-elevation-z8">
+                <!-- Ensemble Column -->
+                <ng-container matColumnDef="ensemble">
+                    <th mat-header-cell *matHeaderCellDef>Ensemble</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.ensemble }}</td>
+                </ng-container>
+
+                <!-- IBT Column -->
+                <ng-container matColumnDef="ibt">
+                    <th mat-header-cell *matHeaderCellDef>IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.ibt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- TBSE Column -->
+                <ng-container matColumnDef="tbse">
+                    <th mat-header-cell *matHeaderCellDef>TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.tbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="inegaliteParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: inegaliteParColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getInegaliteCarData()" class="mat-elevation-z8">
+                <!-- IBT Column -->
+                <ng-container matColumnDef="ibt">
+                    <th mat-header-cell *matHeaderCellDef>IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.ibt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- TBSE Column -->
+                <ng-container matColumnDef="tbse">
+                    <th mat-header-cell *matHeaderCellDef>TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.tbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="inegaliteCarColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: inegaliteCarColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <p>Pour la population des Ménages faisant face à un problème (d'abordabilité).</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>En %</h4>
+            <table mat-table [dataSource]="getAbordabiliteProblemParData()" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="metric">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric }}</td>
+                </ng-container>
+
+                <!-- IBT Column -->
+                <ng-container matColumnDef="ibt">
+                    <th mat-header-cell *matHeaderCellDef>IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.ibt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- TBSE Column -->
+                <ng-container matColumnDef="tbse">
+                    <th mat-header-cell *matHeaderCellDef>TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.tbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="abordabiliteProblemParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: abordabiliteProblemParColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="getAbordabiliteProblemCarData()" class="mat-elevation-z8">
+                <!-- IBT Column -->
+                <ng-container matColumnDef="ibt">
+                    <th mat-header-cell *matHeaderCellDef>IBT</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.ibt | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <!-- TBSE Column -->
+                <ng-container matColumnDef="tbse">
+                    <th mat-header-cell *matHeaderCellDef>TBSE</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.tbse | number: '1.1-1' }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="abordabiliteProblemCarColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: abordabiliteProblemCarColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <button mat-button class="menu-button" routerLink="/affordability">
+        <span>Plus d'info</span>
+    </button>
+
+
+</mat-expansion-panel>

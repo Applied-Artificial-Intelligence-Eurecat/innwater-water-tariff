@@ -1,0 +1,59 @@
+<div class="chat-container" [class.open]="isOpen">
+  <div class="chat-header">
+    <h3>{{ 'Chat Support' }}</h3>
+    <div class="header-buttons">
+      <button class="header-button clear-button" (click)="clearMessages()" aria-label="Clear messages">
+        <mat-icon>delete_sweep</mat-icon>
+      </button>
+      <button class="header-button close-button" (click)="closeChat()" aria-label="Close chat">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-messages">
+    <div *ngFor="let message of messages; let i = index"
+         class="message"
+         [ngClass]="{'user-message': message.sender === 'user', 'system-message': message.sender === 'system'}">
+      <div class="message-content">
+        <p *ngIf="message.sender === 'user'">{{ message.text }}</p>
+        <markdown *ngIf="message.sender === 'system'" [data]="message.text"></markdown>
+        <!-- Add expander for the welcome message (first system message) -->
+        <div *ngIf="i === 0 && message.sender === 'system'" class="more-info">
+          <button class="more-info-toggle" (click)="toggleMoreInfo()">
+            <mat-icon class="toggle-icon">{{ showMoreInfo ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+            {{ 'More info' }}
+          </button>
+          <div *ngIf="showMoreInfo" class="more-info-content">
+            <p><strong>{{ 'What can I do?' }}</strong></p>
+            <p>{{ 'I can do text' }}</p>
+            <p><strong>{{ 'Keep in mind' }}</strong></p>
+            <p>{{ 'Keep in mind text' }}</p>
+            <p><strong>{{ 'chat.more_info_content.privacy_note' }}</strong></p>
+            <p>{{ 'chat.more_info_content.privacy_note_text' }}</p>
+          </div>
+        </div>
+        <small class="message-time">{{ message.timestamp | date:'short' }}</small>
+      </div>
+    </div>
+    <div *ngIf="isLoading" class="loading-indicator">
+      <mat-spinner diameter="36" color="primary"></mat-spinner>
+      <p>{{ 'Loading...' }}</p>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <mat-form-field appearance="outline" class="message-input">
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="newMessage"
+        [placeholder]="'Type a message...'"
+        (keyup.enter)="sendMessage()"
+      >
+    </mat-form-field>
+    <button mat-fab color="primary" class="send-button" (click)="sendMessage()" aria-label="Send message">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+</div>

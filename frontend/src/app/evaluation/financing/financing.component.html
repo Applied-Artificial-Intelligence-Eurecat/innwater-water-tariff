@@ -1,0 +1,137 @@
+<mat-expansion-panel (opened)="panelOpenState = true"
+                     (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Qualité du financement - Récupération des coûts
+        </mat-panel-title>
+        <mat-panel-description>
+            DESCRIPTION
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    Par décile de revenu des ménages
+    <table>
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>D1</th>
+            <th>D2</th>
+            <th>D3</th>
+            <th>D4</th>
+            <th>D5</th>
+            <th>D6</th>
+            <th>D7</th>
+            <th>D8</th>
+            <th>D9</th>
+            <th>D10</th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+
+
+        <tr *ngFor="let item of dat.resultat.dcileCR;index as i;">
+            <th scope="row" *ngIf="i <= 9">{{ fred[i] }}</th>
+            <td>{{ item.D1 }}</td>
+            <td>{{ item.D2 }}</td>
+            <td>{{ item.D3 }}</td>
+            <td>{{ item.D4 }}</td>
+            <td>{{ item.D5 }}</td>
+            <td>{{ item.D6 }}</td>
+            <td>{{ item.D7 }}</td>
+            <td>{{ item.D8 }}</td>
+            <td>{{ item.D9 }}</td>
+            <td>{{ item.D10 }}</td>
+            <td>{{ item.Total }}</td>
+
+
+        </tr>
+        </tbody>
+    </table>
+    <br><br>
+    Par décile de niveau de vie des ménages
+    <table>
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>D1</th>
+            <th>D2</th>
+            <th>D3</th>
+            <th>D4</th>
+            <th>D5</th>
+            <th>D6</th>
+            <th>D7</th>
+            <th>D8</th>
+            <th>D9</th>
+            <th>D10</th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+
+
+        <tr *ngFor="let item of dat.resultat.dcileCRU;index as i;">
+            <th scope="row" *ngIf="i <= 9">{{ fred[i] }}</th>
+            <td>{{ item.D1 }}</td>
+            <td>{{ item.D2 }}</td>
+            <td>{{ item.D3 }}</td>
+            <td>{{ item.D4 }}</td>
+            <td>{{ item.D5 }}</td>
+            <td>{{ item.D6 }}</td>
+            <td>{{ item.D7 }}</td>
+            <td>{{ item.D8 }}</td>
+            <td>{{ item.D9 }}</td>
+            <td>{{ item.D10 }}</td>
+            <td>{{ item.Total }}</td>
+
+
+        </tr>
+        </tbody>
+    </table>
+
+
+    Structure de financement - Taux de couverture
+    <table>
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>fixed</th>
+            <th>variable</th>
+            <th>Total</th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+
+
+        <tr>
+            <th>Revenues</th>
+            <td>{{ dat.resultat.rfixeq0 | currency:'EUR' }}</td>
+            <td>{{ dat.resultat.rvarq0| currency:'EUR' }}</td>
+            <td>{{ dat.resultat.rtot| currency:'EUR' }}</td>
+
+
+        </tr>
+        <tr>
+            <th>Costs</th>
+            <td>{{ dat.resultat.cfixe | currency:'EUR' }}</td>
+            <td>{{ dat.resultat.cvar | currency:'EUR' }}</td>
+            <td>{{ dat.resultat.ctot | currency:'EUR' }}</td>
+
+
+        </tr>
+        <tr>
+            <th>Profit</th>
+            <td>{{ dat.resultat.p0 | currency:'EUR' }}</td>
+            <td>{{ dat.resultat.p1 | currency:'EUR' }}</td>
+            <td>{{ dat.resultat.pro1| currency:'EUR' }}</td>
+
+
+        </tr>
+        </tbody>
+    </table>
+
+
+</mat-expansion-panel>

@@ -1,0 +1,61 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  /* Masquer les colonnes IBT */
+  .hidden-column {
+    display: none;
+  }
+  
+  /* Fond orange pastel pour les cellules IBT */
+  .ibt-column {
+    background-color: #ffd8b1; /* Couleur orange pastel */
+  }
+
+  .pastel-orange-bg {
+    background-color: #ffcc99; /* Couleur orange pastel */
+  }
+
+  /* Masquer les valeurs IBT tout en gardant la colonne visible */
+.ibt-column {
+    background-color: #ffd8b1; /* Orange pastel */
+    color: transparent; /* Cache le texte */
+    text-shadow: 0 0 0 #ffd8b1; /* Empêche de surligner pour voir */
+  }
+
+
+  /* Style pour centrer le bouton dans sa div */
+.button-container {
+    display: flex;
+    justify-content: center;  /* Centrer horizontalement */
+    align-items: center;      /* Centrer verticalement */
+    margin-bottom: 20px;      /* Optionnel: un peu d'espace sous le bouton */
+  }
+  
+  /* Style pour le bouton */
+  .button-container button {
+    padding: 10px 20px;  /* Ajouter de l'espace autour du texte du bouton */
+    font-size: 16px;      /* Taille de la police */
+    cursor: pointer;     /* Ajouter un curseur de type 'pointer' */
+    background-color: #4CAF50; /* Couleur de fond du bouton */
+    color: white;         /* Couleur du texte du bouton */
+    border: none;         /* Enlever la bordure */
+    border-radius: 5px;   /* Arrondir les coins */
+  }
+  
+  .button-container button:hover {
+    background-color: #45a049;  /* Changer la couleur du bouton au survol */
+  }

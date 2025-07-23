@@ -1,0 +1,27 @@
+<div *ngFor="let item of dat.all; index as i; ">
+    <div>Numero user : {{item.saisie.saisie.user.userid}}</div>
+    <div>Score : {{item.resultat.resultat.score2}}</div>
+    
+    Eau potable
+    <ul>
+    <li *ngFor="let z of item.saisie.saisie.user.tabpep; index as i;">
+        prix tranche {{i+1}} : {{z}}
+    </li>
+</ul>
+<ul>
+    <li *ngFor="let e of item.saisie.saisie.user.tabsep; index as i;">
+        K{{i}} : {{e}}
+    </li>
+</ul>
+Assaini
+<ul>
+    <li *ngFor="let r of item.saisie.saisie.user.tabpa; index as i;">
+        prix tranche {{i+1}} : {{r}}
+    </li>
+</ul>
+<ul>
+    <li *ngFor="let t of item.saisie.saisie.user.tabsa; index as i;">
+        K{{i}} : {{t}}
+    </li>
+</ul>
+</div>

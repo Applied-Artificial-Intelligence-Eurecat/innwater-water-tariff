@@ -1,0 +1,42 @@
+<div class="simulation-details-container">
+  <h2>Simulation Details</h2>
+  
+  <div *ngIf="loading" class="loading-indicator">
+    <p>Loading simulation data...</p>
+  </div>
+  
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+    <button class="back-btn" routerLink="/home">Back to Home</button>
+  </div>
+  
+  <div *ngIf="!loading && !error && simulationData" class="simulation-content">
+    <div class="simulation-header">
+      <h3>{{ simulationData.nom || 'Unnamed Simulation' }}</h3>
+      <p *ngIf="simulationData.date">Date: {{ simulationData.date }}</p>
+      <p *ngIf="simulationData.id">ID: {{ simulationData.id }}</p>
+    </div>
+    
+    <div class="simulation-results" *ngIf="simulationData.resultat">
+      <h4>Results</h4>
+      <p *ngIf="simulationData.resultat.score !== undefined">Score: {{ simulationData.resultat.score }}</p>
+      <p *ngIf="simulationData.resultat.profit !== undefined">
+        Profit: {{ simulationData.resultat.profit }}
+        <span *ngIf="simulationData.resultat.profit_message">
+          ({{ simulationData.resultat.profit_message }})
+        </span>
+      </p>
+    </div>
+    
+    <div class="simulation-actions">
+      <button class="back-btn" routerLink="/home">Back to Home</button>
+      <button class="eval-btn" routerLink="/evaluation">Evaluation</button>
+      <button class="facture-btn" routerLink="/facture">Factures</button>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && !error && !simulationData" class="no-data">
+    <p>No simulation data found for ID: {{ simulationId }}</p>
+    <button class="back-btn" routerLink="/home">Back to Home</button>
+  </div>
+</div>

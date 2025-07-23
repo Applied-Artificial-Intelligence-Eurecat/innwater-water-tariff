@@ -1,0 +1,668 @@
+<div>
+    <h3>Affordability General Statistics</h3>
+    <h3><B>Descriptive statistics by group</B></h3>
+    <div class="row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="tfParData" class="mat-elevation-z8">
+                <!-- Statistique Column -->
+                <ng-container matColumnDef="statistique">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let item"> {{ item.statistique }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_G1 Column -->
+                <ng-container matColumnDef="PAR_IBT_G1">
+                    <th mat-header-cell *matHeaderCellDef> G1 (EP)</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_G1 | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_G2 Column -->
+                <ng-container matColumnDef="PAR_IBT_G2">
+                    <th mat-header-cell *matHeaderCellDef> G2 (EPA)</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_G2 | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSEG1 Column -->
+                <ng-container matColumnDef="PAR_TBSEG1">
+                    <th mat-header-cell *matHeaderCellDef> G1 (EP)</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSEG1 | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_G2 Column -->
+                <ng-container matColumnDef="PAR_TBSE_G2">
+                    <th mat-header-cell *matHeaderCellDef> G2 (EPA)</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_G2 | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- Delta_PAR_G1 Column -->
+                <ng-container matColumnDef="Delta_PAR_G1">
+                    <th mat-header-cell *matHeaderCellDef> G1</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.Delta_PAR_G1 | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- Delta_PAR_G2 Column -->
+                <ng-container matColumnDef="Delta_PAR_G2">
+                    <th mat-header-cell *matHeaderCellDef> G2</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.Delta_PAR_G2 | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- Header for statistique -->
+                <ng-container matColumnDef="statistique_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="1"></th>
+                </ng-container>
+
+                <!-- Header for PAR IBT -->
+                <ng-container matColumnDef="PAR_IBT_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="2"> PAR IBT</th>
+                </ng-container>
+
+                <!-- Header for PAR TBSE -->
+                <ng-container matColumnDef="PAR_TBSE_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="2"> PAR TBSE</th>
+                </ng-container>
+
+                <!-- Header for DELTA PAR -->
+                <ng-container matColumnDef="DELTA_PAR_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="2"> DELTA PAR</th>
+                </ng-container>
+
+                <!-- Define the header rows -->
+                <tr mat-header-row *matHeaderRowDef="tfParHeaderColumns"></tr>
+                <tr mat-header-row *matHeaderRowDef="tfParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: tfParColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="carMetricsData" class="mat-elevation-z8">
+                <!-- Metric Column -->
+                <ng-container matColumnDef="Metric">
+                    <th mat-header-cell *matHeaderCellDef> Métrique</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.metric_type }}</td>
+                </ng-container>
+
+                <!-- CAR_IBT_G1 Column -->
+                <ng-container matColumnDef="CAR_IBT_G1">
+                    <th mat-header-cell *matHeaderCellDef> G1</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.g1_car_ibt | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- CAR_IBT_G2 Column -->
+                <ng-container matColumnDef="CAR_IBT_G2">
+                    <th mat-header-cell *matHeaderCellDef> G2</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.g2_car_ibt | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- CAR_TBSE_G1 Column -->
+                <ng-container matColumnDef="CAR_TBSE_G1">
+                    <th mat-header-cell *matHeaderCellDef> G1</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.g1_car_tbse | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- CAR_TBSE_G2 Column -->
+                <ng-container matColumnDef="CAR_TBSE_G2">
+                    <th mat-header-cell *matHeaderCellDef> G2</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.g2_car_tbse | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- Header for Metric -->
+                <ng-container matColumnDef="Metric_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="1"></th>
+                </ng-container>
+
+                <!-- Header for CAR IBT -->
+                <ng-container matColumnDef="CAR_IBT_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="2"> CAR IBT</th>
+                </ng-container>
+
+                <!-- Header for CAR TBSE -->
+                <ng-container matColumnDef="CAR_TBSE_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="2"> CAR TBSE</th>
+                </ng-container>
+
+                <!-- Define the header rows -->
+                <tr mat-header-row *matHeaderRowDef="carMetricsHeaderColumns"></tr>
+                <tr mat-header-row *matHeaderRowDef="carMetricsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: carMetricsColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <h3><B>Detailed descriptive statistics by group and tariff (TBSE / IBT)</B></h3>
+    <table mat-table [dataSource]="statParData" class="mat-elevation-z8">
+        <!-- Metric Column -->
+        <ng-container matColumnDef="Metric">
+            <th mat-header-cell *matHeaderCellDef> Métrique</th>
+            <td mat-cell *matCellDef="let item"> {{ item.Metric }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT_G1 Column -->
+        <ng-container matColumnDef="PAR_IBT_G1">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT G1</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_G1 | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT_G2 Column -->
+        <ng-container matColumnDef="PAR_IBT_G2">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT G2</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_G2 | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSEG1 Column -->
+        <ng-container matColumnDef="PAR_TBSEG1">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE G1</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSEG1 | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSE_G2 Column -->
+        <ng-container matColumnDef="PAR_TBSE_G2">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE G2</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_G2 | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="statParColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: statParColumns;"></tr>
+    </table>
+
+
+    <h3><B> I - A Incidence (Headcount ratios)</B></h3>
+    <div class="row">
+        <div class="col-md-6">
+            <table mat-table [dataSource]="incidenceParData" class="mat-elevation-z8">
+                <!-- f_i_pourcent Column -->
+                <ng-container matColumnDef="f_i_pourcent">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="1" [attr.rowspan]="1">f_i (en %)</th>
+                    <td mat-cell *matCellDef="let item">
+                        <span *ngIf="item.f_i_pourcent === 'EP'">EP (Non assaini)</span>
+                        <span *ngIf="item.f_i_pourcent === 'EPA'">EPA (Assaini)</span>
+                        <span *ngIf="item.f_i_pourcent === 'Ensemble'">Ensemble</span>
+                    </td>
+                </ng-container>
+
+                <!-- PAR_IBT_Menages Column -->
+                <ng-container matColumnDef="PAR_IBT_Menages">
+                    <th mat-header-cell *matHeaderCellDef> Ménages</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Menages | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_Individus Column -->
+                <ng-container matColumnDef="PAR_IBT_Individus">
+                    <th mat-header-cell *matHeaderCellDef> Individus</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Individus | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_Enfants Column -->
+                <ng-container matColumnDef="PAR_IBT_Enfants">
+                    <th mat-header-cell *matHeaderCellDef> Enfants</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Enfants | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_Menages Column -->
+                <ng-container matColumnDef="PAR_TBSE_Menages">
+                    <th mat-header-cell *matHeaderCellDef> Ménages</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Menages | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_Individus Column -->
+                <ng-container matColumnDef="PAR_TBSE_Individus">
+                    <th mat-header-cell *matHeaderCellDef> Individus</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Individus | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_Enfants Column -->
+                <ng-container matColumnDef="PAR_TBSE_Enfants">
+                    <th mat-header-cell *matHeaderCellDef> Enfants</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Enfants | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- Header for PAR IBT -->
+                <ng-container matColumnDef="PAR_IBT_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3"> PAR IBT</th>
+                </ng-container>
+
+                <!-- Header for PAR TBSE -->
+                <ng-container matColumnDef="PAR_TBSE_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3"> PAR TBSE</th>
+                </ng-container>
+
+                <!-- Define the header rows -->
+                <tr mat-header-row *matHeaderRowDef="['f_i_pourcent', 'PAR_IBT_header', 'PAR_TBSE_header']"></tr>
+                <tr mat-header-row *matHeaderRowDef="incidenceParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: incidenceParColumns;"></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table mat-table [dataSource]="convertIncidenceCarToTableData()" class="mat-elevation-z8">
+                <!-- f_i_pourcent Column -->
+                <ng-container matColumnDef="f_i_pourcent">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="1" [attr.rowspan]="1">f_i (en %)</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.f_i_pourcent }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_Menages Column -->
+                <ng-container matColumnDef="PAR_IBT_Menages">
+                    <th mat-header-cell *matHeaderCellDef> Ménages</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Menages | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_Individus Column -->
+                <ng-container matColumnDef="PAR_IBT_Individus">
+                    <th mat-header-cell *matHeaderCellDef> Individus</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Individus | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_IBT_Enfants Column -->
+                <ng-container matColumnDef="PAR_IBT_Enfants">
+                    <th mat-header-cell *matHeaderCellDef> Enfants</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Enfants | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_Menages Column -->
+                <ng-container matColumnDef="PAR_TBSE_Menages">
+                    <th mat-header-cell *matHeaderCellDef> Ménages</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Menages | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_Individus Column -->
+                <ng-container matColumnDef="PAR_TBSE_Individus">
+                    <th mat-header-cell *matHeaderCellDef> Individus</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Individus | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- PAR_TBSE_Enfants Column -->
+                <ng-container matColumnDef="PAR_TBSE_Enfants">
+                    <th mat-header-cell *matHeaderCellDef> Enfants</th>
+                    <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Enfants | number: '1.2-2' }}</td>
+                </ng-container>
+
+                <!-- Header for PAR IBT -->
+                <ng-container matColumnDef="PAR_IBT_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3"> CAR IBT</th>
+                </ng-container>
+
+                <!-- Header for PAR TBSE -->
+                <ng-container matColumnDef="PAR_TBSE_header">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3"> CAR TBSE</th>
+                </ng-container>
+
+                <!-- Define the header rows -->
+                <tr mat-header-row *matHeaderRowDef="['f_i_pourcent', 'PAR_IBT_header', 'PAR_TBSE_header']"></tr>
+                <tr mat-header-row *matHeaderRowDef="incidenceParColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: incidenceParColumns;"></tr>
+            </table>
+        </div>
+    </div>
+
+    <h3><B> I - B Intensité (Déficit d'abordabilité, en euros par trimestre) </B></h3>
+    <h4>Déficit Apparent</h4>
+    <table mat-table [dataSource]="deficitApparent" class="mat-elevation-z8">
+        <!-- ID Projet Column -->
+        <ng-container matColumnDef="id_projet">
+            <th mat-header-cell *matHeaderCellDef> ID Projet</th>
+            <td mat-cell *matCellDef="let item"> {{ item.id_projet }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT Column -->
+        <ng-container matColumnDef="PAR_IBT">
+            <th mat-header-cell *matHeaderCellDef> f_i (%)</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT_Moyenne Column -->
+        <ng-container matColumnDef="PAR_IBT_Moyenne">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT Moyenne</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Moyenne | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT_Variance Column -->
+        <ng-container matColumnDef="PAR_IBT_Variance">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT Variance</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Variance | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSE_Moyenne Column -->
+        <ng-container matColumnDef="PAR_TBSE_Moyenne">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE Moyenne</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Moyenne | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSE_Variance Column -->
+        <ng-container matColumnDef="PAR_TBSE_Variance">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE Variance</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Variance | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- Delta Column -->
+        <ng-container matColumnDef="Delta">
+            <th mat-header-cell *matHeaderCellDef> Delta Global</th>
+            <td mat-cell *matCellDef="let item"> {{ item.Delta | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- Delta_Moyennes_Menages Column -->
+        <ng-container matColumnDef="Delta_Moyennes_Menages">
+            <th mat-header-cell *matHeaderCellDef> Delta Moyennes Ménages</th>
+            <td mat-cell *matCellDef="let item"> {{ item.Delta_Moyennes_Menages | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="deficitApparentColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: deficitApparentColumns;"></tr>
+    </table>
+    <h4>Déficit Effectif</h4>
+    <table mat-table [dataSource]="deficitEffectif" class="mat-elevation-z8">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID</th>
+            <td mat-cell *matCellDef="let item"> {{ item.id }}</td>
+        </ng-container>
+
+        <!-- Project ID Column -->
+        <ng-container matColumnDef="id_projet">
+            <th mat-header-cell *matHeaderCellDef> Project ID</th>
+            <td mat-cell *matCellDef="let item"> {{ item.id_projet }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT Column -->
+        <ng-container matColumnDef="PAR_IBT">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT f_i (%)</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT_Moyenne Column -->
+        <ng-container matColumnDef="PAR_IBT_Moyenne">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT Moyenne</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Moyenne | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_IBT_Variance Column -->
+        <ng-container matColumnDef="PAR_IBT_Variance">
+            <th mat-header-cell *matHeaderCellDef> PAR IBT Variance</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_IBT_Variance | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSE Column -->
+        <ng-container matColumnDef="PAR_TBSE">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE f_i (%)</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSE_Moyenne Column -->
+        <ng-container matColumnDef="PAR_TBSE_Moyenne">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE Moyenne</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Moyenne | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- PAR_TBSE_Variance Column -->
+        <ng-container matColumnDef="PAR_TBSE_Variance">
+            <th mat-header-cell *matHeaderCellDef> PAR TBSE Variance</th>
+            <td mat-cell *matCellDef="let item"> {{ item.PAR_TBSE_Variance | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- g_j_PAR_IBT Column -->
+        <ng-container matColumnDef="g_j_PAR_IBT">
+            <th mat-header-cell *matHeaderCellDef> g_j (%) PAR IBT</th>
+            <td mat-cell *matCellDef="let item"> {{ item.g_j_PAR_IBT | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- g_j_PAR_TBSE Column -->
+        <ng-container matColumnDef="g_j_PAR_TBSE">
+            <th mat-header-cell *matHeaderCellDef> g_j (%) PAR TBSE</th>
+            <td mat-cell *matCellDef="let item"> {{ item.g_j_PAR_TBSE | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- Delta Column -->
+        <ng-container matColumnDef="Delta">
+            <th mat-header-cell *matHeaderCellDef> Delta Global</th>
+            <td mat-cell *matCellDef="let item"> {{ item.Delta | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <!-- Delta_Moyennes_Menages Column -->
+        <ng-container matColumnDef="Delta_Moyennes_Menages">
+            <th mat-header-cell *matHeaderCellDef> Delta Moyennes Ménages</th>
+            <td mat-cell *matCellDef="let item"> {{ item.Delta_Moyennes_Menages | number: '1.2-2' }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="deficitEffectifColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: deficitEffectifColumns;"></tr>
+    </table>
+
+</div>
+<br>
+<h3><B>I - C Inégalité (Concentration de l'Inabordabilité)</B></h3>
+<div class="row gini-tables-row">
+    <div class="col-md-6">
+        <h4>Gini PAR IBT</h4>
+        <table mat-table [dataSource]="this.filter(giniData, 'PAR IBT')" class="mat-elevation-z8">
+            <!-- Component Column -->
+            <ng-container matColumnDef="component">
+                <th mat-header-cell *matHeaderCellDef> Component</th>
+                <td mat-cell *matCellDef="let item"> {{ item.indicateur.split('_')[1] }}</td>
+            </ng-container>
+
+            <!-- Value Column -->
+            <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef> Value</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G1 | number:'1.4-4' }}</td>
+            </ng-container>
+
+            <!-- Percentage Column -->
+            <ng-container matColumnDef="percentage">
+                <th mat-header-cell *matHeaderCellDef> En % (de l'indice de Gini Population)</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G2 | number:'1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="giniIBTColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: giniIBTColumns;"></tr>
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Gini PAR TBSE</h4>
+        <table mat-table [dataSource]="this.filter(giniData, 'PAR TBSE')" class="mat-elevation-z8">
+            <!-- Component Column -->
+            <ng-container matColumnDef="component">
+                <th mat-header-cell *matHeaderCellDef> Component</th>
+                <td mat-cell *matCellDef="let item"> {{ item.indicateur.split('_')[1] }}</td>
+            </ng-container>
+
+            <!-- Value Column -->
+            <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef> Value</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G1 | number:'1.4-4' }}</td>
+            </ng-container>
+
+            <!-- Percentage Column -->
+            <ng-container matColumnDef="percentage">
+                <th mat-header-cell *matHeaderCellDef> En % (de l'indice de Gini Population)</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G2 | number:'1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="giniTBSEColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: giniTBSEColumns;"></tr>
+        </table>
+    </div>
+</div>
+
+<br>
+<h4>CAR Inequality</h4>
+<div class="row">
+    <div class="col-md-12">
+        <table mat-table [dataSource]="carInequalityData" class="mat-elevation-z8">
+            <!-- Variable Column -->
+            <ng-container matColumnDef="variable">
+                <th mat-header-cell *matHeaderCellDef> Variable</th>
+                <td mat-cell *matCellDef="let item"> {{ item.variable }}</td>
+            </ng-container>
+
+            <!-- G1_car_ibt Column -->
+            <ng-container matColumnDef="G1_car_ibt">
+                <th mat-header-cell *matHeaderCellDef> G1 CAR IBT</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G1_car_ibt | number:'1.4-4' }}</td>
+            </ng-container>
+
+            <!-- G2_car_ibt Column -->
+            <ng-container matColumnDef="G2_car_ibt">
+                <th mat-header-cell *matHeaderCellDef> G2 CAR IBT</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G2_car_ibt | number:'1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="carInequalityColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: carInequalityColumns;"></tr>
+        </table>
+    </div>
+</div>
+
+<br>
+<h3><B>I - D Symmetric Matrix of Gini Indices (in %)</B></h3>
+<div class="row">
+    <div class="col-md-12">
+        <table mat-table [dataSource]="getGiniSymMatrixTableData()" class="mat-elevation-z8">
+            <!-- Row Label Column -->
+            <ng-container matColumnDef="rowLabel">
+                <th mat-header-cell *matHeaderCellDef> Component</th>
+                <td mat-cell *matCellDef="let item"> {{ item.rowLabel }}</td>
+            </ng-container>
+
+            <!-- G1_PAR_TBSE Column -->
+            <ng-container matColumnDef="G1_PAR_TBSE">
+                <th mat-header-cell *matHeaderCellDef> G1</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G1_PAR_TBSE | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- G2_PAR_TBSE Column -->
+            <ng-container matColumnDef="G2_PAR_TBSE">
+                <th mat-header-cell *matHeaderCellDef> G2</th>
+                <td mat-cell *matCellDef="let item"> {{ item.G2_PAR_TBSE | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="giniSymMatrixColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: giniSymMatrixColumns;"></tr>
+        </table>
+    </div>
+</div>
+
+<br>
+<h3><B>Matrice des poids - calcul</B></h3>
+<div class="row">
+    <div class="col-md-12">
+        <table mat-table [dataSource]="tfInegParGiniPdsData" class="mat-elevation-z8">
+            <!-- Groupe Column -->
+            <ng-container matColumnDef="groupe">
+                <th mat-header-cell *matHeaderCellDef> Groupe</th>
+                <td mat-cell *matCellDef="let item"> {{ item.groupe }}</td>
+            </ng-container>
+
+            <!-- f_j Column -->
+            <ng-container matColumnDef="f_j">
+                <th mat-header-cell *matHeaderCellDef> f_j</th>
+                <td mat-cell *matCellDef="let item"> {{ item.f_j | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- f_j_cumul Column -->
+            <ng-container matColumnDef="f_j_cumul">
+                <th mat-header-cell *matHeaderCellDef> f_j_cumul</th>
+                <td mat-cell *matCellDef="let item"> {{ item.f_j_cumul | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- alpha_j Column -->
+            <ng-container matColumnDef="alpha_j">
+                <th mat-header-cell *matHeaderCellDef> alpha_j</th>
+                <td mat-cell *matCellDef="let item"> {{ item.alpha_j | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- alpha_j_cumul Column -->
+            <ng-container matColumnDef="alpha_j_cumul">
+                <th mat-header-cell *matHeaderCellDef> alpha_j_cumul</th>
+                <td mat-cell *matCellDef="let item"> {{ item.alpha_j_cumul | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tfInegParGiniPdsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tfInegParGiniPdsColumns;"></tr>
+        </table>
+    </div>
+</div>
+
+<br>
+<h3><B>Matrice des contributions (en points de pourcentage) - IBT</B></h3>
+<div class="row">
+    <div class="col-md-12">
+        <table mat-table [dataSource]="getTfInegParGiniCtrIBTTableData()" class="mat-elevation-z8">
+            <!-- Row Label Column -->
+            <ng-container matColumnDef="rowLabel">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let item"> {{ item.rowLabel }}</td>
+            </ng-container>
+
+            <!-- G1_PAR IBT Value Column -->
+            <ng-container matColumnDef="g1ParIbtValue">
+                <th mat-header-cell *matHeaderCellDef> G1_PAR IBT</th>
+                <td mat-cell *matCellDef="let item"> {{ item.g1ParIbtValue | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- G2_PAR IBT Value Column -->
+            <ng-container matColumnDef="g2ParIbtValue">
+                <th mat-header-cell *matHeaderCellDef> G2_PAR IBT</th>
+                <td mat-cell *matCellDef="let item"> {{ item.g2ParIbtValue | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tfInegParGiniCtrIBTColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tfInegParGiniCtrIBTColumns;"></tr>
+        </table>
+    </div>
+</div>
+
+<br>
+<h3><B>Matrice des contributions (en points de pourcentage) - TBSE</B></h3>
+<div class="row">
+    <div class="col-md-12">
+        <table mat-table [dataSource]="getTfInegParGiniCtrTableData()" class="mat-elevation-z8">
+            <!-- Row Label Column -->
+            <ng-container matColumnDef="rowLabel">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let item"> {{ item.rowLabel }}</td>
+            </ng-container>
+
+            <!-- G1_PAR TBSE Value Column -->
+            <ng-container matColumnDef="g1ParTbseValue">
+                <th mat-header-cell *matHeaderCellDef> G1_PAR TBSE</th>
+                <td mat-cell *matCellDef="let item"> {{ item.g1ParTbseValue | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- G2_PAR TBSE Value Column -->
+            <ng-container matColumnDef="g2ParTbseValue">
+                <th mat-header-cell *matHeaderCellDef> G2_PAR TBSE</th>
+                <td mat-cell *matCellDef="let item"> {{ item.g2ParTbseValue | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tfInegParGiniCtrColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tfInegParGiniCtrColumns;"></tr>
+        </table>
+    </div>
+</div>
+
+<br>
+<h3><B>Matrice des contributions (en pourcentage de l'indice de Gini ensemble)</B></h3>
+<div class="row">
+    <div class="col-md-12">
+        <table mat-table [dataSource]="getTfInegParGiniPctTableData()" class="mat-elevation-z8">
+            <!-- Row Label Column -->
+            <ng-container matColumnDef="rowLabel">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let item"> {{ item.rowLabel }}</td>
+            </ng-container>
+
+            <!-- G1 Value Column -->
+            <ng-container matColumnDef="g1Value">
+                <th mat-header-cell *matHeaderCellDef> G1</th>
+                <td mat-cell *matCellDef="let item"> {{ item.g1Value | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <!-- G2 Value Column -->
+            <ng-container matColumnDef="g2Value">
+                <th mat-header-cell *matHeaderCellDef> G2</th>
+                <td mat-cell *matCellDef="let item"> {{ item.g2Value | number: '1.4-4' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tfInegParGiniPctColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tfInegParGiniPctColumns;"></tr>
+        </table>
+    </div>
+</div>

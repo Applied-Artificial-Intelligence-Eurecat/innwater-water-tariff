@@ -1,0 +1,12 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: scroll;
+  }
+  td { border: 1px solid Black; }
+
+  .color {
+    color: white;
+    font-weight: bold;
+    background-color: red;
+  }

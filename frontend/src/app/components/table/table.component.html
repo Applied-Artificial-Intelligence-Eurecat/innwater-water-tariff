@@ -1,0 +1,202 @@
+<app-scatter-plot></app-scatter-plot>
+
+<app-pen-parade-chart></app-pen-parade-chart>
+<h1>0 - Statistiques descriptives PAR et CAR</h1>
+<table>
+    <thead>
+      <tr>
+        <th> </th>
+        <th colspan="3">En %</th>
+        <th colspan="3">En points de pourcentage</th>
+      </tr>
+      <tr>
+        <th>Catégorie</th>
+        <th>PAR IBT</th>
+        <th>PAR TBSE</th>
+        <th>Delta PAR</th>
+        <th>CAR IBT</th>
+        <th>CAR TBSE</th>
+        <th>Delta CAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of tableData">
+        <td>{{ row.category }}</td>
+        <!-- PAR IBT - Hidden with pastel orange background -->
+        <td class="pastel-orange-bg"></td>
+        <!-- PAR TBSE -->
+        <td>{{ row.parTbse }}</td>
+        <!-- Delta PAR - Hidden with pastel orange background -->
+        <td class="pastel-orange-bg"></td>
+        <!-- CAR IBT - Hidden with pastel orange background -->
+        <td class="pastel-orange-bg"></td>
+        <!-- CAR TBSE -->
+        <td>{{ row.carTbse }}</td>
+        <!-- Delta CAR - Hidden with pastel orange background -->
+        <td class="pastel-orange-bg"></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h1>I - Mesures Abordabilité</h1>
+  <h2>I - A Incidence </h2>
+
+  <!-- Premier tableau -->
+<table>
+    <!-- Structure du premier tableau -->
+  </table>
+  
+  <!-- Deuxième tableau -->
+  <table>
+    <thead>
+      <tr>
+        <th> </th>
+        <th colspan="3">En %</th>
+        <th colspan="3">En points de pourcentage</th>
+      </tr>
+      <tr>
+        <th>Headcount ratio</th>
+        <th>PAR IBT</th>
+        <th>PAR TBSE</th>
+        <th>Delta PAR</th>
+        <th>CAR IBT</th>
+        <th>CAR TBSE</th>
+        <th>Delta CAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of tableData2">
+        <td>{{ row.category }}</td>
+        <td class="ibt-column">{{ row.parIbt }}</td>
+        <td>{{ row.parTbse }}</td>
+        <td class="ibt-column">{{ row.deltaPar }}</td>
+        <td class="ibt-column" >{{ row.carIbt }}</td>
+        <td>{{ row.carTbse }}</td>
+        <td class="ibt-column">{{ row.deltaCar }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <h2>I - B Intensité (Déficit d'abordabilité, en euros par trimestre)</h2>
+  <h3>Déficit Apparent</h3>
+  <!-- Troisième tableau -->
+  <table>
+    <thead>
+      <tr>
+        <th> </th>
+        <th colspan="3">En %</th>
+        <th colspan="3">En points de pourcentage</th>
+      </tr>
+      <tr>
+        <th>Déficit Apparent</th>
+        <th>PAR IBT</th>
+        <th>PAR TBSE</th>
+        <th>Delta PAR</th>
+        <th>CAR IBT</th>
+        <th>CAR TBSE</th>
+        <th>Delta CAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of tableData3">
+        <td>{{ row.category }}</td>
+        <td class="ibt-column">{{ row.parIbt }}</td>
+        <td>{{ row.parTbse }}</td>
+        <td class="ibt-column" >{{ row.deltaPar !== null ? row.deltaPar : '' }}</td>
+        <td class="ibt-column">{{ row.carIbt }}</td>
+        <td>{{ row.carTbse }}</td>
+        <td class="ibt-column">{{ row.deltaCar !== null ? row.deltaCar : '' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <h3> Déficit Effectif</h3>
+  <!-- Quatrième tableau -->
+  <table>
+    <thead>
+      <tr>
+        <th> </th>
+        <th colspan="3">En %</th>
+        <th colspan="3">En points de pourcentage</th>
+      </tr>
+      <tr>
+        <th>Déficit Effectif</th>
+        <th>PAR IBT</th>
+        <th>PAR TBSE</th>
+        <th>Delta PAR</th>
+        <th>CAR IBT</th>
+        <th>CAR TBSE</th>
+        <th>Delta CAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of tableData4">
+        <td>{{ row.category }}</td>
+        <td class="ibt-column">{{ row.parIbt }}</td>
+        <td>{{ row.parTbse }}</td>
+        <td class="ibt-column" >{{ row.deltaPar !== null ? row.deltaPar : '' }}</td>
+        <td class="ibt-column">{{ row.carIbt }}</td>
+        <td>{{ row.carTbse }}</td>
+        <td class="ibt-column">{{ row.deltaCar !== null ? row.deltaCar : '' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+<h1>Concentration de l'Inabordabilité </h1>
+  <h2>Ensemble</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Ensemble</th>
+      <th>IBT</th>
+      <th>TBSE</th>
+      <th></th>
+      <th >IBT</th>
+      <th>TBSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of tableData5">
+      <td>{{ row.ensemble }}</td>
+      <td class="ibt-column">{{ row.ibt1 }}</td>
+      <td>{{ row.tbse1 }}</td>
+      <td></td>
+      <td class="ibt-column">{{ row.ibt2 }}</td>
+      <td>{{ row.tbse2 }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Pour la population des Ménages faisant face à un problème (d'abordabilité)</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>En %</th>
+      <th>IBT</th>
+      <th>TBSE</th>
+      <th></th>
+      <th >IBT</th>
+      <th>TBSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of tableData6">
+      <td>{{ row.indicateur }}</td>
+      <td class="ibt-column">{{ row.ibt1 }}</td>
+      <td>{{ row.tbse1 }}</td>
+      <td></td>
+      <td class="ibt-column">{{ row.ibt2 }}</td>
+      <td>{{ row.tbse2 }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="button-container">
+  <button (click)="redirectToDataDisplay()">Lancement de la simulation</button>
+</div>
+
+<div class="button-container">
+    <button (click)="redirectToParam()">Revenir au paramétrage</button>
+  </div>

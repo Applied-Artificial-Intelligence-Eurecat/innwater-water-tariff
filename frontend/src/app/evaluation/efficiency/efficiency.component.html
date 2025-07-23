@@ -1,0 +1,32 @@
+<mat-expansion-panel (opened)="panelOpenState = true"
+                         (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Efficacité
+            </mat-panel-title>
+            <mat-panel-description>
+                DESCRIPTION
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div>
+            <p>Surplus agreg TBSE CC</p>
+            <p>mean : {{dat.resultat.awx}}</p>
+            <p>var : {{dat.resultat.awxx}}</p>
+            <p>std : {{dat.resultat.awxxx}}</p>
+
+        </div>
+        <div>
+            <p>Surplus consomateur TBSE</p>
+            <p>mean : {{dat.resultat.wx}}</p>
+            <p>var : {{dat.resultat.wxx}}</p>
+            <p>std : {{dat.resultat.wxxx}}</p>
+        </div>
+
+
+        <button mat-button class="menu-button" routerLink="/not-found">
+
+            <span>Plus d'info</span>
+        </button>
+
+
+    </mat-expansion-panel>

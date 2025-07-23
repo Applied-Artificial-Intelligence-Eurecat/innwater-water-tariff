@@ -1,0 +1,622 @@
+
+<h1>0 - Statistiques descriptives PAR et CAR</h1>
+<div>
+    <h2>Population</h2>
+    <table border="1">
+        <tr>
+          <th colspan="3">Nombre Abonnés (Ménages)</th>
+        </tr>
+        <tr>
+          <th>Non assaini</th>
+          <th>Assaini</th>
+          <th>Total</th>
+        </tr>
+        <tr>
+          <td>{{ data.nb_menages.nonAssaini }}</td>
+          <td>{{ data.nb_menages.assaini }}</td>
+          <td>{{ data.nb_menages.total }}</td>
+        </tr>
+      </table>
+
+    <!-- <h2>En %</h2> -->
+    <table>
+      <thead>
+        <tr>
+          <th>Métrique</th>
+          <th>PAR IBT G1</th>
+          <th>PAR IBT G2</th>
+          <th>PAR TBSE G1</th>
+          <th>PAR TBSE G2</th>
+          <th>Delta PAR G1</th>
+          <th>Delta PAR G2</th>
+          <th>CAR IBT G1</th>
+          <th>CAR IBT G2</th>
+          <th>CAR TBSE G1</th>
+          <th>CAR TBSE G2</th>
+          <th>Delta CAR G1</th>
+          <th>Delta CAR G2</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Moyenne</td>
+          <td>{{ data.moyenne.parIBT.g1 }}</td>
+          <td>{{ data.moyenne.parIBT.g2 }}</td>
+          <td>{{ data.moyenne.parTBSE.g1 }}</td>
+          <td>{{ data.moyenne.parTBSE.g2 }}</td>
+          <td>{{ data.moyenne.deltaPAR.g1 }}</td>
+          <td>{{ data.moyenne.deltaPAR.g2 }}</td>
+          <td>{{ data.moyenne.carIBT.g1 }}</td>
+          <td>{{ data.moyenne.carIBT.g2 }}</td>
+          <td>{{ data.moyenne.carTBSE.g1 }}</td>
+          <td>{{ data.moyenne.carTBSE.g2 }}</td>
+          <td>{{ data.moyenne.deltaCAR.g1 }}</td>
+          <td>{{ data.moyenne.deltaCAR.g2 }}</td>
+        </tr>
+        <tr>
+          <td>Médiane</td>
+          <td>{{ data.mediane.parIBT.g1 }}</td>
+          <td>{{ data.mediane.parIBT.g2 }}</td>
+          <td>{{ data.mediane.parTBSE.g1 }}</td>
+          <td>{{ data.mediane.parTBSE.g2 }}</td>
+          <td>{{ data.mediane.deltaPAR.g1 }}</td>
+          <td>{{ data.mediane.deltaPAR.g2 }}</td>
+          <td>{{ data.mediane.carIBT.g1 }}</td>
+          <td>{{ data.mediane.carIBT.g2 }}</td>
+          <td>{{ data.mediane.carTBSE.g1 }}</td>
+          <td>{{ data.mediane.carTBSE.g2 }}</td>
+          <td>{{ data.mediane.deltaCAR.g1 }}</td>
+          <td>{{ data.mediane.deltaCAR.g2 }}</td>
+        </tr>
+        <!-- Ajoutez les autres lignes de données de la même manière... -->
+
+        <tr>
+            <td>Min</td>
+            <td>{{ data.min.parIBT.g1 }}</td>
+            <td>{{ data.min.parIBT.g2 }}</td>
+            <td>{{ data.min.parTBSE.g1 }}</td>
+            <td>{{ data.min.parTBSE.g2 }}</td>
+            <td>{{ data.min.deltaPAR.g1 }}</td>
+            <td>{{ data.min.deltaPAR.g2 }}</td>
+            <td>{{ data.min.carIBT.g1 }}</td>
+            <td>{{ data.min.carIBT.g2 }}</td>
+            <td>{{ data.min.carTBSE.g1 }}</td>
+            <td>{{ data.min.carTBSE.g2 }}</td>
+            <td>{{ data.min.deltaCAR.g1 }}</td>
+            <td>{{ data.min.deltaCAR.g2 }}</td>
+        </tr>
+
+
+        <tr>
+            <td>Max</td>
+            <td>{{ data.max.parIBT.g1 }}</td>
+            <td>{{ data.max.parIBT.g2 }}</td>
+            <td>{{ data.max.parTBSE.g1 }}</td>
+            <td>{{ data.max.parTBSE.g2 }}</td>
+            <td>{{ data.max.deltaPAR.g1 }}</td>
+            <td>{{ data.max.deltaPAR.g2 }}</td>
+            <td>{{ data.max.carIBT.g1 }}</td>
+            <td>{{ data.max.carIBT.g2 }}</td>
+            <td>{{ data.max.carTBSE.g1 }}</td>
+            <td>{{ data.max.carTBSE.g2 }}</td>
+            <td>{{ data.max.deltaCAR.g1 }}</td>
+            <td>{{ data.max.deltaCAR.g2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Q1</td>
+            <td>{{ data.q1.parIBT.g1 }}</td>
+            <td>{{ data.q1.parIBT.g2 }}</td>
+            <td>{{ data.q1.parTBSE.g1 }}</td>
+            <td>{{ data.q1.parTBSE.g2 }}</td>
+            <td>{{ data.q1.deltaPAR.g1 }}</td>
+            <td>{{ data.q1.deltaPAR.g2 }}</td>
+            <td>{{ data.q1.carIBT.g1 }}</td>
+            <td>{{ data.q1.carIBT.g2 }}</td>
+            <td>{{ data.q1.carTBSE.g1 }}</td>
+            <td>{{ data.q1.carTBSE.g2 }}</td>
+            <td>{{ data.q1.deltaCAR.g1 }}</td>
+            <td>{{ data.q1.deltaCAR.g2 }}</td>
+          </tr>
+
+
+          <tr>
+            <td>Q3</td>
+            <td>{{ data.q3.parIBT.g1 }}</td>
+            <td>{{ data.q3.parIBT.g2 }}</td>
+            <td>{{ data.q3.parTBSE.g1 }}</td>
+            <td>{{ data.q3.parTBSE.g2 }}</td>
+            <td>{{ data.q3.deltaPAR.g1 }}</td>
+            <td>{{ data.q3.deltaPAR.g2 }}</td>
+            <td>{{ data.q3.carIBT.g1 }}</td>
+            <td>{{ data.q3.carIBT.g2 }}</td>
+            <td>{{ data.q3.carTBSE.g1 }}</td>
+            <td>{{ data.q3.carTBSE.g2 }}</td>
+            <td>{{ data.q3.deltaCAR.g1 }}</td>
+            <td>{{ data.q3.deltaCAR.g2 }}</td>
+          </tr>
+
+
+          <tr>
+            <td>D1</td>
+            <td>{{ data.D1.parIBT.g1 }}</td>
+            <td>{{ data.D1.parIBT.g2 }}</td>
+            <td>{{ data.D1.parTBSE.g1 }}</td>
+            <td>{{ data.D1.parTBSE.g2 }}</td>
+            <td>{{ data.D1.deltaPAR.g1 }}</td>
+            <td>{{ data.D1.deltaPAR.g2 }}</td>
+            <td>{{ data.D1.carIBT.g1 }}</td>
+            <td>{{ data.D1.carIBT.g2 }}</td>
+            <td>{{ data.D1.carTBSE.g1 }}</td>
+            <td>{{ data.D1.carTBSE.g2 }}</td>
+            <td>{{ data.D1.deltaCAR.g1 }}</td>
+            <td>{{ data.D1.deltaCAR.g2 }}</td>
+          </tr>
+
+          <tr>
+            <td>D9</td>
+            <td>{{ data.D9.parIBT.g1 }}</td>
+            <td>{{ data.D9.parIBT.g2 }}</td>
+            <td>{{ data.D9.parTBSE.g1 }}</td>
+            <td>{{ data.D9.parTBSE.g2 }}</td>
+            <td>{{ data.D9.deltaPAR.g1 }}</td>
+            <td>{{ data.D9.deltaPAR.g2 }}</td>
+            <td>{{ data.D9.carIBT.g1 }}</td>
+            <td>{{ data.D9.carIBT.g2 }}</td>
+            <td>{{ data.D9.carTBSE.g1 }}</td>
+            <td>{{ data.D9.carTBSE.g2 }}</td>
+            <td>{{ data.D9.deltaCAR.g1 }}</td>
+            <td>{{ data.D9.deltaCAR.g2 }}</td>
+          </tr>
+
+
+          <tr>
+            <td>F (Moyenne)</td>
+            <td>{{ data.F.parIBT.g1 }}</td>
+            <td>{{ data.F.parIBT.g2 }}</td>
+            <td>{{ data.F.parTBSE.g1 }}</td>
+            <td>{{ data.F.parTBSE.g2 }}</td>
+            <td>{{ data.F.deltaPAR.g1 }}</td>
+            <td>{{ data.F.deltaPAR.g2 }}</td>
+            <td>{{ data.F.carIBT.g1 }}</td>
+            <td>{{ data.F.carIBT.g2 }}</td>
+            <td>{{ data.F.carTBSE.g1 }}</td>
+            <td>{{ data.F.carTBSE.g2 }}</td>
+            <td>{{ data.F.deltaCAR.g1 }}</td>
+            <td>{{ data.F.deltaCAR.g2 }}</td>
+          </tr>
+
+
+          <tr>
+            <td>Variance</td>
+            <td>{{ data.Variance.parIBT.g1 }}</td>
+            <td>{{ data.Variance.parIBT.g2 }}</td>
+            <td>{{ data.Variance.parTBSE.g1 }}</td>
+            <td>{{ data.Variance.parTBSE.g2 }}</td>
+            <td>{{ data.Variance.deltaPAR.g1 }}</td>
+            <td>{{ data.Variance.deltaPAR.g2 }}</td>
+            <td>{{ data.Variance.carIBT.g1 }}</td>
+            <td>{{ data.Variance.carIBT.g2 }}</td>
+            <td>{{ data.Variance.carTBSE.g1 }}</td>
+            <td>{{ data.Variance.carTBSE.g2 }}</td>
+            <td>{{ data.Variance.deltaCAR.g1 }}</td>
+            <td>{{ data.Variance.deltaCAR.g2 }}</td>
+          </tr>
+
+          <tr>
+            <td>Écart-type</td>
+            <td>{{ data.EcartType.parIBT.g1 }}</td>
+            <td>{{ data.EcartType.parIBT.g2 }}</td>
+            <td>{{ data.EcartType.parTBSE.g1 }}</td>
+            <td>{{ data.EcartType.parTBSE.g2 }}</td>
+            <td>{{ data.EcartType.deltaPAR.g1 }}</td>
+            <td>{{ data.EcartType.deltaPAR.g2 }}</td>
+            <td>{{ data.EcartType.carIBT.g1 }}</td>
+            <td>{{ data.EcartType.carIBT.g2 }}</td>
+            <td>{{ data.EcartType.carTBSE.g1 }}</td>
+            <td>{{ data.EcartType.carTBSE.g2 }}</td>
+            <td>{{ data.EcartType.deltaCAR.g1 }}</td>
+            <td>{{ data.EcartType.deltaCAR.g2 }}</td>
+          </tr>
+          
+      </tbody>
+    </table>
+
+<h1>I - Mesures Abordabilité </h1>
+<h2>I - A Incidence (Headcount ratios) </h2>
+
+<table>
+    <thead>
+      <tr>
+        <th rowspan="2">f_i (en %)</th>
+        <th colspan="3">PAR IBT</th>
+        <th colspan="3">PAR TBSE</th>
+        <th colspan="3">CAR IBT</th>
+        <th colspan="3">CAR TBSE</th>
+        <th colspan="3">Delta PAR</th>
+        <th colspan="3">Delta CAR</th>
+      </tr>
+      <tr>
+        <!-- Colonnes pour PAR IBT -->
+        <th>Ménages</th>
+        <th>Individus</th>
+        <th>Enfants</th>
+        <!-- Colonnes pour PAR TBSE -->
+        <th>Ménages</th>
+        <th>Individus</th>
+        <th>Enfants</th>
+        <!-- Colonnes pour CAR IBT -->
+        <th>Ménages</th>
+        <th>Individus</th>
+        <th>Enfants</th>
+        <!-- Colonnes pour CAR TBSE -->
+        <th>Ménages</th>
+        <th>Individus</th>
+        <th>Enfants</th>
+        <!-- Colonnes pour Delta PAR -->
+        <th>Ménages</th>
+        <th>Individus</th>
+        <th>Enfants</th>
+        <!-- Colonnes pour Delta CAR -->
+        <th>Ménages</th>
+        <th>Individus</th>
+        <th>Enfants</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ data.EP.fi }}</td>
+        <!-- PAR IBT -->
+        <td>{{ data.EP.parIBT.menages }}</td>
+        <td>{{ data.EP.parIBT.individus }}</td>
+        <td>{{ data.EP.parIBT.enfants }}</td>
+        <!-- PAR TBSE -->
+        <td>{{ data.EP.parTBSE.menages }}</td>
+        <td>{{ data.EP.parTBSE.individus }}</td>
+        <td>{{ data.EP.parTBSE.enfants }}</td>
+        <!-- CAR IBT -->
+        <td>{{ data.EP.carIBT.menages }}</td>
+        <td>{{ data.EP.carIBT.individus }}</td>
+        <td>{{ data.EP.carIBT.enfants }}</td>
+        <!-- CAR TBSE -->
+        <td>{{ data.EP.carTBSE.menages }}</td>
+        <td>{{ data.EP.carTBSE.individus }}</td>
+        <td>{{ data.EP.carTBSE.enfants }}</td>
+        <!-- Delta PAR -->
+        <td>{{ data.EP.deltaPAR.menages }}</td>
+        <td>{{ data.EP.deltaPAR.individus }}</td>
+        <td>{{ data.EP.deltaPAR.enfants }}</td>
+        <!-- Delta CAR -->
+        <td>{{ data.EP.deltaCAR.menages }}</td>
+        <td>{{ data.EP.deltaCAR.individus }}</td>
+        <td>{{ data.EP.deltaCAR.enfants }}</td>
+      </tr>
+
+      <tr>
+        <td>{{ data.EPA.fi }}</td>
+        <!-- PAR IBT -->
+        <td>{{ data.EPA.parIBT.menages }}</td>
+        <td>{{ data.EPA.parIBT.individus }}</td>
+        <td>{{ data.EPA.parIBT.enfants }}</td>
+        <!-- PAR TBSE -->
+        <td>{{ data.EPA.parTBSE.menages }}</td>
+        <td>{{ data.EPA.parTBSE.individus }}</td>
+        <td>{{ data.EPA.parTBSE.enfants }}</td>
+        <!-- CAR IBT -->
+        <td>{{ data.EPA.carIBT.menages }}</td>
+        <td>{{ data.EPA.carIBT.individus }}</td>
+        <td>{{ data.EPA.carIBT.enfants }}</td>
+        <!-- CAR TBSE -->
+        <td>{{ data.EPA.carTBSE.menages }}</td>
+        <td>{{ data.EPA.carTBSE.individus }}</td>
+        <td>{{ data.EPA.carTBSE.enfants }}</td>
+        <!-- Delta PAR -->
+        <td>{{ data.EPA.deltaPAR.menages }}</td>
+        <td>{{ data.EPA.deltaPAR.individus }}</td>
+        <td>{{ data.EPA.deltaPAR.enfants }}</td>
+        <!-- Delta CAR -->
+        <td>{{ data.EPA.deltaCAR.menages }}</td>
+        <td>{{ data.EPA.deltaCAR.individus }}</td>
+        <td>{{ data.EPA.deltaCAR.enfants }}</td>
+      </tr>
+
+      <tr>
+        <td>{{ data.Ensemble.fi }}</td>
+        <!-- PAR IBT -->
+        <td>{{ data.Ensemble.parIBT.menages }}</td>
+        <td>{{ data.Ensemble.parIBT.individus }}</td>
+        <td>{{ data.Ensemble.parIBT.enfants }}</td>
+        <!-- PAR TBSE -->
+        <td>{{ data.Ensemble.parTBSE.menages }}</td>
+        <td>{{ data.Ensemble.parTBSE.individus }}</td>
+        <td>{{ data.Ensemble.parTBSE.enfants }}</td>
+        <!-- CAR IBT -->
+        <td>{{ data.Ensemble.carIBT.menages }}</td>
+        <td>{{ data.Ensemble.carIBT.individus }}</td>
+        <td>{{ data.Ensemble.carIBT.enfants }}</td>
+        <!-- CAR TBSE -->
+        <td>{{ data.Ensemble.carTBSE.menages }}</td>
+        <td>{{ data.Ensemble.carTBSE.individus }}</td>
+        <td>{{ data.Ensemble.carTBSE.enfants }}</td>
+        <!-- Delta PAR -->
+        <td>{{ data.Ensemble.deltaPAR.menages }}</td>
+        <td>{{ data.Ensemble.deltaPAR.individus }}</td>
+        <td>{{ data.Ensemble.deltaPAR.enfants }}</td>
+        <!-- Delta CAR -->
+        <td>{{ data.Ensemble.deltaCAR.menages }}</td>
+        <td>{{ data.Ensemble.deltaCAR.individus }}</td>
+        <td>{{ data.Ensemble.deltaCAR.enfants }}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+
+  <br>
+ <h2>
+  I - B Intensité (Déficit d'abordabilité, en euros par trimestre)
+ </h2> 
+ <h3>Déficit Apparent</h3>
+<!--- FIN tableau -->
+<table border="1"> 
+  <thead>
+    <tr>
+      <th rowspan="2"> </th>
+      <th rowspan="2">f_i (en %)</th>
+      <th colspan="4">PAR IBT</th>
+      <th colspan="4">PAR TBSE</th>
+      <th rowspan="2">Delta PAR</th>
+      <th rowspan="2">g_j (en %)</th>
+      <th colspan="4">CAR IBT</th>
+      <th colspan="4">CAR TBSE</th>
+      <th rowspan="2">Delta CAR</th>
+    </tr>
+    <tr>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>EP (Non assaini)</td>
+      <td>{{ data.EPBIntensite.fi }}</td>
+      <td>{{ data.EPBIntensite.parIBT.Moyenne }}</td>
+      <td>{{ data.EPBIntensite.parIBT.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPBIntensite.parIBT.Var_Inter }}</td>
+      <td>{{ data.EPBIntensite.parTBSE.Moyenne }}</td>
+      <td>{{ data.EPBIntensite.parTBSE.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPBIntensite.parTBSE.Var_Inter }}</td>
+      <td>{{ data.EPBIntensite.deltaPAR.delta_value }}</td>
+      <td>{{ data.EPBIntensite.fiCAR }}</td>
+      <td>{{ data.EPBIntensite.carIBT.Moyenne }}</td>
+      <td>{{ data.EPBIntensite.carIBT.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPBIntensite.carIBT.Var_Inter }}</td>
+      <td>{{ data.EPBIntensite.carTBSE.Moyenne }}</td>
+      <td>{{ data.EPBIntensite.carTBSE.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPBIntensite.carTBSE.Var_Inter }}</td>
+      <td>{{ data.EPBIntensite.deltaCAR.delta_value }}</td>
+    </tr>
+
+    <tr>
+      <td>EPA (Assaini)</td>
+      <td>{{ data.EPAIntensite.fi }}</td>
+      <td>{{ data.EPAIntensite.parIBT.Moyenne }}</td>
+      <td>{{ data.EPAIntensite.parIBT.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensite.parIBT.Var_Intra }}</td>
+      <td>{{ data.EPAIntensite.parTBSE.Moyenne }}</td>
+      <td>{{ data.EPAIntensite.parTBSE.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensite.parTBSE.Var_Intra }}</td>
+      <td>{{ data.EPAIntensite.deltaPAR.delta_value }}</td>
+      <td>{{ data.EPAIntensite.fiCAR }}</td>
+      <td>{{ data.EPAIntensite.carIBT.Moyenne }}</td>
+      <td>{{ data.EPAIntensite.carIBT.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensite.carIBT.Var_Intra }}</td>
+      <td>{{ data.EPAIntensite.carTBSE.Moyenne }}</td>
+      <td>{{ data.EPAIntensite.carTBSE.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensite.carTBSE.Var_Intra }}</td>
+      <td>{{ data.EPAIntensite.deltaCAR.delta_value }}</td>
+    </tr>
+
+    <tr>
+      <td>Ensemble</td>
+      <td>{{ data.EPBIntensiteEnseble.fi }}</td>
+      <td>{{ data.EPBIntensiteEnseble.parIBT.Moyenne }}</td>
+      <td>{{ data.EPBIntensiteEnseble.parIBT.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EPBIntensiteEnseble.parIBT.Rap_Corr }}</td>
+      <td>{{ data.EPBIntensiteEnseble.parTBSE.Moyenne }}</td>
+      <td>{{ data.EPBIntensiteEnseble.parTBSE.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EPBIntensiteEnseble.parTBSE.Rap_Corr }}</td>
+      <td>{{ data.EPBIntensiteEnseble.deltaPAR.delta_value }}</td>
+      <td>{{ data.EPBIntensiteEnseble.fiCAR }}</td>
+      <td>{{ data.EPBIntensiteEnseble.carIBT.Moyenne }}</td>
+      <td>{{ data.EPBIntensiteEnseble.carIBT.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EPBIntensiteEnseble.carIBT.Rap_Corr }}</td>
+      <td>{{ data.EPBIntensiteEnseble.carTBSE.Moyenne }}</td>
+      <td>{{ data.EPBIntensiteEnseble.carTBSE.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EPBIntensiteEnseble.carTBSE.Rap_Corr }}</td>
+      <td>{{ data.EPBIntensiteEnseble.deltaCAR.delta_value }}</td>
+    </tr>
+  </tbody>
+</table>
+<!--- FIN tableau -->
+<br>
+<h3>Déficit Effectif</h3>
+<table border="1"> 
+  <thead>
+    <tr>
+      <th rowspan="2"> </th>
+      <th rowspan="2">f_i (en %)</th>
+      <th colspan="4">PAR IBT</th>
+      <th colspan="4">PAR TBSE</th>
+      <th rowspan="2">Delta PAR</th>
+      <th rowspan="2">g_j (en %)</th>
+      <th colspan="4">CAR IBT</th>
+      <th colspan="4">CAR TBSE</th>
+      <th rowspan="2">Delta CAR</th>
+    </tr>
+    <tr>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+      <th>Moyenne</th>
+      <th>Variance</th>
+      <th>Type</th>
+      <th>Valeur</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>EP (Non assaini)</td>
+      <td>{{ data.EPIntensiteEffectif.fi }}</td>
+      <td>{{ data.EPIntensiteEffectif.parIBT.Moyenne }}</td>
+      <td>{{ data.EPIntensiteEffectif.parIBT.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPIntensiteEffectif.parIBT.Var_Inter }}</td>
+      <td>{{ data.EPIntensiteEffectif.parTBSE.Moyenne }}</td>
+      <td>{{ data.EPIntensiteEffectif.parTBSE.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPIntensiteEffectif.parTBSE.Var_Inter }}</td>
+      <td>{{ data.EPIntensiteEffectif.deltaPAR.delta_value }}</td>
+      <td>{{ data.EPIntensiteEffectif.fiCAR }}</td>
+      <td>{{ data.EPIntensiteEffectif.carIBT.Moyenne }}</td>
+      <td>{{ data.EPIntensiteEffectif.carIBT.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPIntensiteEffectif.carIBT.Var_Inter }}</td>
+      <td>{{ data.EPIntensiteEffectif.carTBSE.Moyenne }}</td>
+      <td>{{ data.EPIntensiteEffectif.carTBSE.Variance }}</td>
+      <td>Var Inter</td>
+      <td>{{ data.EPIntensiteEffectif.carTBSE.Var_Inter }}</td>
+      <td>{{ data.EPIntensiteEffectif.deltaCAR.delta_value }}</td>
+    </tr>
+
+    <tr>
+      <td>EPA (Assaini)</td>
+      <td>{{ data.EPAIntensiteEffectif.fi }}</td>
+      <td>{{ data.EPAIntensiteEffectif.parIBT.Moyenne }}</td>
+      <td>{{ data.EPAIntensiteEffectif.parIBT.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensiteEffectif.parIBT.Var_Intra }}</td>
+      <td>{{ data.EPAIntensiteEffectif.parTBSE.Moyenne }}</td>
+      <td>{{ data.EPAIntensiteEffectif.parTBSE.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensiteEffectif.parTBSE.Var_Intra }}</td>
+      <td>{{ data.EPAIntensiteEffectif.deltaPAR.delta_value }}</td>
+      <td>{{ data.EPAIntensiteEffectif.fiCAR }}</td>
+      <td>{{ data.EPAIntensiteEffectif.carIBT.Moyenne }}</td>
+      <td>{{ data.EPAIntensiteEffectif.carIBT.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensiteEffectif.carIBT.Var_Intra }}</td>
+      <td>{{ data.EPAIntensiteEffectif.carTBSE.Moyenne }}</td>
+      <td>{{ data.EPAIntensiteEffectif.carTBSE.Variance }}</td>
+      <td>Var Intra</td>
+      <td>{{ data.EPAIntensiteEffectif.carTBSE.Var_Intra }}</td>
+      <td>{{ data.EPAIntensiteEffectif.deltaCAR.delta_value }}</td>
+    </tr>
+
+    <tr>
+      <td>Ensemble</td>
+      <td>{{ data.EnsembleIntensiteEffectif.fi }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.parIBT.Moyenne }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.parIBT.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EnsembleIntensiteEffectif.parIBT.Rap_Corr }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.parTBSE.Moyenne }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.parTBSE.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EnsembleIntensiteEffectif.parTBSE.Rap_Corr }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.deltaPAR.delta_value }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.fiCAR }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.carIBT.Moyenne }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.carIBT.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EnsembleIntensiteEffectif.carIBT.Rap_Corr }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.carTBSE.Moyenne }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.carTBSE.Variance }}</td>
+      <td>Rap. Corr.</td>
+      <td>{{ data.EnsembleIntensiteEffectif.carTBSE.Rap_Corr }}</td>
+      <td>{{ data.EnsembleIntensiteEffectif.deltaCAR.delta_value }}</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<!-- Fin tableau deficit apparent -->
+<div class="tables-container">
+  <div class="table-wrapper" *ngFor="let table of tables">
+    <h3>{{ table.title }}</h3>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Catégorie</th>
+          <th>Valeur</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of table.data">
+          <td>{{ row.label }}</td>
+          <td>{{ row.value }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<br>
+<h2>I - C Inégalité (Concentration de l'Inabordabilité)</h2>
+
+<div class="tables-container">
+  <div class="table-wrapper" *ngFor="let table of tablesGini">
+    <h3>{{ table.title }}</h3>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Catégorie</th>
+          <th>Valeur</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of table.data">
+          <td>{{ row.label }}</td>
+          <td>{{ row.value }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!--<h3>Matrice (symétrique) des indices de Gini (en %)</h3> -->
+  

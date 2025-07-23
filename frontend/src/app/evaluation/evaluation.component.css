@@ -1,0 +1,18 @@
+table {
+    width: 70%;
+    border-collapse: collapse;
+    overflow: scroll;
+  }
+td { border: 1px solid Black; }
+table.dd {
+  width: 60%;
+  
+  overflow: scroll;
+}
+td.dd { border: none  }
+
+  .color {
+    color: white;
+    font-weight: bold;
+    background-color: red;
+  }

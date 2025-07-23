@@ -1,0 +1,28 @@
+services:
+  frontend:
+    hostname: msm-frontend
+    container_name: msm-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # The frontend needs to connect to the backend API
+    environment:
+      - API_URL=http://msm-backend:5000
+    # Depend on the backend service
+    depends_on:
+      - backend
+    networks:
+      - proxy-network
+
+  backend:
+    hostname: msm-backend-car
+    container_name: msm-backend
+    image: backend_realease3:tag
+    restart: unless-stopped
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true

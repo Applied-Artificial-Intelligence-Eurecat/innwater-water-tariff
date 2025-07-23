@@ -1,0 +1,326 @@
+<mat-expansion-panel (opened)="panelOpenState = true"
+                     (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Caractère incitatif
+        </mat-panel-title>
+        <mat-panel-description>
+            DESCRIPTION
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    <div>
+        <h2>2.1 Consommation</h2>
+        <div>
+            <table class="dd">
+
+
+                <tbody>
+                <tr>
+                    <td class="dd">Consommation par abonné, en m3/trimestre</td>
+                    <td class="dd">IBT</td>
+                    <td class="dd">IBT PP</td>
+                    <td class="dd"> TBSE</td>
+
+
+                </tr>
+
+
+                <tr>
+                    <td class="dd">Moyenne</td>
+                    <td class="dd">{{ dat.resultat.consoK1mean }}</td>
+                    <td class="dd">{{ dat.resultat.consoK0mean }}</td>
+                    <td class="dd">{{ dat.resultat.consoKtbsemean }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Médiane</td>
+                    <td class="dd">{{ dat.resultat.consoK1med }}</td>
+                    <td class="dd">{{ dat.resultat.consoK0med }}</td>
+                    <td class="dd">{{ dat.resultat.consoKtbsemed }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Ecart-type</td>
+                    <td class="dd">{{ dat.resultat.consoK1std }}</td>
+                    <td class="dd">{{ dat.resultat.consoK0std }}</td>
+                    <td class="dd">{{ dat.resultat.consoKtbsestd }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Coefficient de variation</td>
+                    <td class="dd">{{ dat.resultat.consoK1coeff }}</td>
+                    <td class="dd">{{ dat.resultat.consoK0coeff }}</td>
+                    <td class="dd">{{ dat.resultat.consoKtbsecoeff }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Gini</td>
+                    <td class="dd">{{ dat.resultat.consoK1gini }}</td>
+                    <td class="dd">{{ dat.resultat.consoK0gini }}</td>
+                    <td class="dd">{{ dat.resultat.consoKtbsegini }}</td>
+
+
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+
+            <h4>Sur-consommations effectives (en m3 / trimestre)</h4>
+            <p>Surconsommation moyenne par abonné (effective) : {{ dat.resultat.surconsomean }} &nbsp;&ensp;
+                Surconsommation moyenne par tête (membre de la famille) : {{ dat.resultat.surconsotetemean }}</p>
+
+        </div>
+    </div>
+    <div>
+        <h2>2.2 Coûts de mauvaise Gestion</h2>
+        <h3>Montant de la Facture </h3>
+        <div>
+            <table class="dd">
+
+
+                <tbody>
+                <tr>
+                    <td class="dd">Montant Factures, en euros par trimestre.</td>
+                    <td class="dd">IBT</td>
+                    <td class="dd">IBT PP</td>
+                    <td class="dd"> TBSE</td>
+
+
+                </tr>
+
+
+                <tr>
+                    <td class="dd">Moyenne</td>
+                    <td class="dd">{{ dat.resultat.tarif_k1mean }}</td>
+                    <td class="dd">{{ dat.resultat.tarif_k0mean }}</td>
+                    <td class="dd">{{ dat.resultat.tariftbsemean }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Médiane</td>
+                    <td class="dd">{{ dat.resultat.tarif_k1med }}</td>
+                    <td class="dd">{{ dat.resultat.tarif_k0med }}</td>
+                    <td class="dd">{{ dat.resultat.tariftbsemed }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Ecart-type</td>
+                    <td class="dd">{{ dat.resultat.tarif_k1std }}</td>
+                    <td class="dd">{{ dat.resultat.tarif_k0std }}</td>
+                    <td class="dd">{{ dat.resultat.tariftbsestd }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Coefficient de variation</td>
+                    <td class="dd">{{ dat.resultat.tarif_k1coeff }}</td>
+                    <td class="dd">{{ dat.resultat.tarif_k0coeff }}</td>
+                    <td class="dd">{{ dat.resultat.tariftbsecoeff }}</td>
+
+
+                </tr>
+                <tr>
+                    <td class="dd">Gini</td>
+                    <td class="dd">{{ dat.resultat.tarif_k1gini }}</td>
+                    <td class="dd">{{ dat.resultat.tarif_k0gini }}</td>
+                    <td class="dd">{{ dat.resultat.tariftbsegini }}</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+
+
+            <h3>Mauvaise gestion : </h3>
+            <table class="dd">
+
+
+                <tbody>
+                <tr>
+                    <td class="dd">Sur-dépenses effectives, en euros par trimestre</td>
+                    <td class="dd">par abonné</td>
+                    <td class="dd">par tête</td>
+
+
+                </tr>
+
+
+                <tr>
+                    <td class="dd">Moyenne</td>
+                    <td class="dd">{{ dat.resultat.surconsopaymean }}</td>
+                    <td class="dd">{{ dat.resultat.surconsotetemean }}</td>
+
+                </tr>
+                <tr>
+                    <td class="dd">Médiane</td>
+                    <td class="dd">{{ dat.resultat.surconsopaymed }}</td>
+                    <td class="dd">{{ dat.resultat.surconsotetemed }}</td>
+
+                </tr>
+                <tr>
+                    <td class="dd">Ecart-type</td>
+                    <td class="dd">{{ dat.resultat.surconsopaystd }}</td>
+                    <td class="dd">{{ dat.resultat.surconsotetestd }}</td>
+
+                </tr>
+                <tr>
+                    <td class="dd">Coefficient de variation</td>
+                    <td class="dd">{{ dat.resultat.surconsopaycoeff }}</td>
+                    <td class="dd">{{ dat.resultat.surconsotetecoeff }}</td>
+
+                </tr>
+                <tr>
+                    <td class="dd">Gini</td>
+                    <td class="dd">{{ dat.resultat.surconsopaygini }}</td>
+                    <td class="dd">{{ dat.resultat.surconsotetegini }}</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div>
+        <h2>2.3 Calibration – erreurs d'inclusion et d'exclusion en volume</h2>
+        <h3> 2.3.1 Matrice de Confusion </h3>
+        <div>
+            <table>
+                <tr>
+                    <td></td>
+                    <td>D+</td>
+                    <td>D-</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>T+</td>
+                    <td>{{ dat.resultat.Q0m }}</td>
+                    <td>{{ dat.resultat.QQ0m }}</td>
+                    <td>Q+ = {{ dat.resultat.Qm }}</td>
+                </tr>
+                <tr>
+                    <td>T-</td>
+                    <td>{{ dat.resultat.Q0p }}</td>
+                    <td>{{ dat.resultat.QQ0p }}</td>
+                    <td>Q- = {{ dat.resultat.Qp }}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Q0 = {{ dat.resultat.Q0 }}</td>
+                    <td>Q-Q0= {{ dat.resultat.QQ0 }}</td>
+                    <td>Q= {{ dat.resultat.Q }}</td>
+                </tr>
+            </table>
+            <h3>2.3.2 Indicateurs de base</h3>
+            <div>
+                Sensibilité (TPR) : {{ dat.resultat.tpr }}
+            </div>
+            <div>
+                Miss rate (FNR) : {{ dat.resultat.fnr }}
+            </div>
+            <div>
+                Anti-spécificité (FPR) : {{ dat.resultat.tnr }}
+            </div>
+            <div>
+                Spécificité (TNR) : {{ dat.resultat.fpr }}
+            </div>
+            <div>
+                Précision (VPP) : {{ dat.resultat.vpp }}
+            </div>
+            <div>
+                VPN : {{ dat.resultat.vpn }}
+            </div>
+            <div>
+                FDR : {{ dat.resultat.fdr }}
+            </div>
+            <div>
+                FOR : {{ dat.resultat.fOr }}
+            </div>
+            <div>
+                Prevalence : {{ dat.resultat.prev }}
+            </div>
+            <h3>2.3.3 Espace Roc (et autres indicateurs)</h3>
+            <div>
+                LR+ : {{ dat.resultat.lrp }} ; LR- : {{ dat.resultat.lrm }} ; DOR : {{ dat.resultat.dor }}
+            </div>
+            <div>
+                ACC (Exactitude) : {{ dat.resultat.acc }}; ACC Ajusté : {{ dat.resultat.accs }}
+            </div>
+            <div>
+                J de Youden : {{ dat.resultat.j }}
+            </div>
+            <div>
+                Kappa score : {{ dat.resultat.kappa }}; Ratio de Cohen : {{ dat.resultat.cohen }}
+            </div>
+        </div>
+    </div>
+
+
+    <!--
+    <p>moyenne consommation tbse :</p>
+    std consommation tbse  :
+    <br>
+    coeff variation tbse:
+    <br>
+    <p>moyenne consommation tarif bien perçu :</p>
+    std consommation tarif bien perçu   :
+    <br>
+    coeff variation :
+    <br>
+    moyenne consommation tarif pas bien perçu  :
+    <br>
+    std consommation tarif pas bien perçu   :
+    <br>
+    coeff variation tarif pas bien perçu :
+    <br>
+    moyenne facture prix bien perçu :
+    <br>
+    std facture prix bien perçu   :
+    <br>
+    coeff variation facture prix bien perçu :
+    <br>
+    moyenne facture prix pas bien perçu   :
+    <br>
+    std facture prix pas bien perçu    :
+    <br>
+    coeff variation facture pas bien perçu  :
+    <br>
+    pourcentage surconsomation  :
+    <br>
+    surconsomation moyenne :
+    <br>
+    surconsomation var :               {{dat.resultat.surconsovar}}
+    <br>
+    surconsomation std :               {{dat.resultat.surconsostd}}
+    <br>
+    surconsomation tete mean :
+    <br>
+    surconsomation tete var :               {{dat.resultat.surconsotetevar}}
+    <br>
+    surconsomation tete std:               {{dat.resultat.surconsotetestd}}
+    <br>
+    surconsomation tete coeff :               {{dat.resultat.surconsotetecoeff}}
+    <br>
+    mauvaise gestion mean :               {{dat.resultat.surconsopaymean}}
+    <br>
+    mauvaise gestionstd :               {{dat.resultat.surconsopaystd}}
+    <br>
+    mauvaise gestion var :               {{dat.resultat.surconsopayvar}}
+    <br>
+    mauvaise gestion coeff :               {{dat.resultat.surconsopaycoeff}}
+    <br>
+
+    -->
+    <button mat-button class="menu-button" routerLink="/incitatif">
+
+        <span>Plus d'info</span>
+    </button>
+</mat-expansion-panel>
+    

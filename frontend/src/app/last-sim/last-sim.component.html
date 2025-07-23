@@ -1,0 +1,28 @@
+<p>
+    <button mat-button class="menu-button" routerLink="/evaluation">
+        
+      <span>Evaluation</span>
+    </button>
+  
+  </p>
+  <button mat-button class="menu-button" routerLink="/facture">      
+      <span>Factures</span>
+    </button>
+
+<div>
+  Score : {{dat.resultat.score}}
+  
+</div>
+<div>
+  <p>profit : {{dat.resultat.profit}}  {{dat.resultat.profit_message}}</p>
+  
+  
+  
+ 
+</div>
+Score : {{dat.resultat.score2}}
+{{dat.id}}
+  <button mat-button class="menu-button" (click)="alert()">      
+    <span>Enregistrer</span>
+  </button>
+<canvas  id="MyChart" >{{ chart }}</canvas>

@@ -22,7 +22,7 @@ class User(Base):
 
 class Project(Base):
     __tablename__ = "projects"
-    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
     user_id = Column(Integer, ForeignKey("users.id"))
@@ -39,7 +39,7 @@ class Simulation(Base):
     status = Column(Enum(StatusEnum), default=StatusEnum.created)
     feedback = Column(Text)
 
-    project_id = Column(Integer, ForeignKey("projects.id"))
+    project_id = Column(Integer, ForeignKey("projects.project_id"))
     project = relationship("Project", back_populates="simulations")
 
     primitives = relationship("Primitives", uselist=False, back_populates="simulation")
@@ -102,8 +102,8 @@ class Population(Base):
     id = Column(Integer, primary_key=True)
     root_database = Column(String)
     database_path = Column(String)
-    eps = Column(String)
-    std = Column(String)
+    eps = Column(Float)
+    std = Column(Float)
 
     simulation_id = Column(Integer, ForeignKey("simulations.id"))
     simulation = relationship("Simulation", back_populates="population")

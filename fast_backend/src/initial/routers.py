@@ -35,3 +35,5 @@ async def create_and_save_simulation(payload: SimulationPayload, db: Session = D
     user = db.query(User.email).filter(User.email == payload.userid).first()
     if user is None:
         return HTTPException(status_code=404, detail="User not found")
+
+    return None

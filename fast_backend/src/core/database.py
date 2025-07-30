@@ -6,6 +6,8 @@ from sqlalchemy.orm import sessionmaker
 # Get database path from environment variable or use default
 DATABASE_URL = f"sqlite:///{os.getenv('DATABASE_PATH', 'default_database.db')}"
 
+print("database in:", DATABASE_URL)
+
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 

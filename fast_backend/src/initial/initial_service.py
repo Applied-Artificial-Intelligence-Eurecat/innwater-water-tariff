@@ -1,122 +1,93 @@
-from typing import Optional
-
-from sqlalchemy.orm import Session
-
-from src.core.models import (
-    Simulation, Primitives, Population, DemandConfiguration,
-    IBTEauPotable, BlockEauPotable, IBTSanitation, BlockSanitation,
-    StatusEnum, Project
-)
-from src.initial.schemas import SimulationPayload
+from src.core.models import IBTEauPotable, BlockEauPotable, IBTSanitation, BlockSanitation, DemandConfiguration, \
+    Population, CostsPotableWater, CostsSanitation, EnvironmentalCosts, TaxCosts, SocialCosts, Primitives
 
 
-async def save_simulation_schema(schema: SimulationPayload, db: Session) -> Optional[int]:
-    """
-    Takes a simulation schema and saves it to the database.
-    
-    Args:
-        schema: The simulation payload containing all simulation data
-        db: Database session
-        
-    Returns:
-        int: The ID of the newly created simulation record, or None if the operation failed
-    """
-    try:
-        # Get the project for the user
-        project: Optional[Project] = db.query(Project).filter(Project.user_id == schema.userid).first()
-        if not project:
-            # Handle case where project doesn't exist
-            return None
+async def create_ibt_parameters(db, payload, simulation):
+    ibt_potable_water = IBTEauPotable(
+        abonnement=payload.tariff.drinking_water.subscription,
+        simulation_id=simulation.id
+    )
+    db.add(ibt_potable_water)
+    for potable_water_block in payload.tariff.drinking_water.usage_tiers:
+        db.add(BlockEauPotable(
+            seuil=potable_water_block.threshold,
+            price=potable_water_block.price,
+            ibt_id=ibt_potable_water.id,
+        ))
+    ibt_sanitation = IBTSanitation(
+        abonnement=payload.tariff.sanitation.subscription,
+        simulation_id=simulation.id
+    )
+    db.add(ibt_sanitation)
+    for sanitation_block in payload.tariff.sanitation.usage_tiers:
+        db.add(BlockSanitation(
+            seuil=sanitation_block.threshold,
+            price=sanitation_block.price,
+            ibt_id=ibt_sanitation.id,
+        ))
 
-        # Create new simulation record
-        simulation = Simulation(
-            name=schema.launch.simulation_name,
-            number_of_periods=schema.launch.periods,
-            status=StatusEnum.created,
-            project_id=int(project.project_id),
-        )
-        db.add(simulation)
-        db.flush()  # Flush to get the simulation ID
 
-        # Save primitives
-        if schema.primitives:
-            primitives = Primitives(
-                environmental_costs=schema.primitives.environment.fixed_costs_per_year if schema.primitives.environment else None,
-                social_data=str(schema.primitives.social_data.model_dump_json()) if schema.primitives.social_data else None,
-                fiscalite=str(schema.primitives.taxation.model_dump_json()) if schema.primitives.taxation else None,
-                simulation_id=simulation.id
-            )
-            db.add(primitives)
+async def create_demand(db, payload, simulation):
+    demand_configuration = DemandConfiguration(
+        a=payload.demand.coefficients.a0,
+        b=payload.demand.coefficients.a1,
+        c=payload.demand.coefficients.a2,
+        d=payload.demand.coefficients.a3,
+        e=payload.demand.coefficients.a4,
+        f=payload.demand.coefficients.a5,
+        g=payload.demand.coefficients.a6,
+        perception_parameter=payload.demand.k,
+        pool=payload.demand.has_pool,
+        garden=payload.demand.has_garden,
+        simulation_id=simulation.id
+    )
+    db.add(demand_configuration)
 
-        # Save population
-        if schema.population:
-            population = Population(
-                eps=schema.population.eps,
-                std=schema.population.std,
-                simulation_id=simulation.id
-            )
-            db.add(population)
 
-        # Save demand configuration
-        if schema.demand:
-            demand_config = DemandConfiguration(
-                a=schema.demand.coefficients.a0 if schema.demand.coefficients else None,
-                b=schema.demand.coefficients.a1 if schema.demand.coefficients else None,
-                c=schema.demand.coefficients.a2 if schema.demand.coefficients else None,
-                d=schema.demand.coefficients.a3 if schema.demand.coefficients else None,
-                e=schema.demand.coefficients.a4 if schema.demand.coefficients else None,
-                f=schema.demand.coefficients.a5 if schema.demand.coefficients else None,
-                g=schema.demand.coefficients.a6 if schema.demand.coefficients else None,
-                perception_parameter=schema.demand.k,
-                piscine=schema.demand.has_pool,
-                jardin=schema.demand.has_garden,
-                simulation_id=simulation.id
-            )
-            db.add(demand_config)
+async def create_population(db, payload, simulation):
+    population = Population(
+        eps=payload.population.eps,
+        std=payload.population.std,
+        root_database=payload.population.root_database,
+        database_path=payload.population.database_path,
+        simulation_id=simulation.id
+    )
+    db.add(population)
 
-        # Save tariff information - Drinking Water
-        if schema.tariff and schema.tariff.drinking_water:
-            ibt_eau = IBTEauPotable(
-                abonnement=str(schema.tariff.drinking_water.subscription),
-                simulation_id=simulation.id
-            )
-            db.add(ibt_eau)
-            db.flush()  # Flush to get the IBT ID
 
-            # Save blocks for drinking water
-            if schema.tariff.drinking_water.usage_tiers:
-                for tier in schema.tariff.drinking_water.usage_tiers:
-                    block = BlockEauPotable(
-                        seuil=tier.threshold,
-                        price=tier.price,
-                        ibt_id=ibt_eau.id
-                    )
-                    db.add(block)
-
-        # Save tariff information - Sanitation
-        if schema.tariff and schema.tariff.sanitation:
-            ibt_sanitation = IBTSanitation(
-                abonnement=str(schema.tariff.sanitation.subscription),
-                simulation_id=simulation.id
-            )
-            db.add(ibt_sanitation)
-            db.flush()  # Flush to get the IBT ID
-
-            # Save blocks for sanitation
-            if schema.tariff.sanitation.usage_tiers:
-                for tier in schema.tariff.sanitation.usage_tiers:
-                    block = BlockSanitation(
-                        seuil=tier.threshold,
-                        price=tier.price,
-                        ibt_id=ibt_sanitation.id
-                    )
-                    db.add(block)
-
-        # Commit all changes
-        db.commit()
-        return simulation.id
-
-    except Exception as e:
-        db.rollback()
-        print(f"Error saving simulation schema to database: {str(e)}")
-        return None
+async def create_primitives(db, payload, simulation):
+    potable_water_costs = CostsPotableWater(fixed_costs=payload.primitives.drinking_water.fixed_costs,
+                                            variable_costs=payload.primitives.drinking_water.variable_costs,
+                                            subscribers_number=payload.primitives.drinking_water.number_of_subscribers)
+    db.add(potable_water_costs)
+    sanitation_costs = CostsSanitation(fixed_costs=payload.primitives.sanitation.fixed_costs,
+                                       variable_costs=payload.primitives.sanitation.variable_costs,
+                                       subscribers_number=payload.primitives.sanitation.number_of_subscribers)
+    db.add(sanitation_costs)
+    environmental_costs = EnvironmentalCosts(
+        fixed_costs=payload.primitives.environment.fixed_costs,
+        variable_costs=payload.primitives.environment.variable_costs
+    )
+    db.add(environmental_costs)
+    tax_costs = TaxCosts(
+        vat_drinking_water=payload.primitives.taxation.drinking_water.vat,
+        fee_drinking_water=payload.primitives.taxation.drinking_water.fee,
+        vat_sanitation=payload.primitives.taxation.sanitation.vat,
+        fee_sanitation=payload.primitives.taxation.sanitation.fee
+    )
+    db.add(tax_costs)
+    social_costs = SocialCosts(car_threshold=payload.primitives.social_data.car_threshold,
+                               par_threshold=payload.primitives.social_data.par_threshold,
+                               poverty_threshold=payload.primitives.social_data.poverty,
+                               extreme_poverty_threshold=payload.primitives.social_data.extreme_poverty
+                               )
+    db.add(social_costs)
+    primitives = Primitives(
+        potable_water_cost_key=potable_water_costs.id,
+        sanitation_cost_key=sanitation_costs.id,
+        environmental_cost_key=environmental_costs.id,
+        tax_cost_key=tax_costs.id,
+        social_cost_key=social_costs.id,
+        simulation_id=simulation.id
+    )
+    db.add(primitives)

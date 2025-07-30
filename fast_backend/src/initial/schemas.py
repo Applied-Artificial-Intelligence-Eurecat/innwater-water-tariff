@@ -1,5 +1,28 @@
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional
+from fastapi.security import OAuth2PasswordRequestForm
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
+class UserCreate(BaseModel):
+    email: EmailStr = Field(..., description="User email address", example="user@example.com")
+    password: str = Field(..., description="User password", example="strongpassword123")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "password": "strongpassword123"
+            }
+        }
 
 
 # Add examples for Population Model
@@ -320,7 +343,6 @@ class LaunchModel(BaseModel):
 
 # Main simulation payload model with a complete example
 class SimulationPayload(BaseModel):
-    userid: str = Field(..., description="Unique identifier for the user", example="user123")
     primitives: PrimitivesModel
     population: PopulationModel
     tariff: TariffModel = Field(..., alias="tarification")
@@ -332,7 +354,6 @@ class SimulationPayload(BaseModel):
         validate_by_name = True
         json_schema_extra = {
             "example": {
-                "userid": "user123",
                 "primitives": {
                     "drinking_water": {
                         "fixed_costs": 100000.0,

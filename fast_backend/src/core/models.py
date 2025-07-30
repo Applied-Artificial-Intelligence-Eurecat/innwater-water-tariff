@@ -1,8 +1,10 @@
 import enum
 
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Enum, Text, Boolean
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
+
 from src.core.database import Base
+
 
 class StatusEnum(enum.Enum):
     created = "Created"
@@ -39,7 +41,7 @@ class Simulation(Base):
     status = Column(Enum(StatusEnum), default=StatusEnum.created)
     feedback = Column(Text)
 
-    project_id = Column(Integer, ForeignKey("projects.project_id"))
+    project_id = Column(Integer, ForeignKey("projects.project_id"), default=0)
     project = relationship("Project", back_populates="simulations")
 
     primitives = relationship("Primitives", uselist=False, back_populates="simulation")
@@ -53,12 +55,15 @@ class Primitives(Base):
     __tablename__ = "primitives"
     id = Column(Integer, primary_key=True)
 
-    environmental_costs = Column(Float)
-    social_data = Column(String)
-    fiscalite = Column(String)  # Taxation
+    potable_water_cost_key = Column(Integer, ForeignKey("costs_potable_water.id"))
+    sanitation_cost_key = Column(Integer, ForeignKey("costs_sanitation.id"))
+    environmental_cost_key = Column(Integer, ForeignKey("environmental_costs.id"))
+    social_cost_key = Column(Integer, ForeignKey("social_costs.id"))
+    tax_cost_key = Column(Integer, ForeignKey("tax_costs.id"))
 
     simulation_id = Column(Integer, ForeignKey("simulations.id"))
     simulation = relationship("Simulation", back_populates="primitives")
+
 
 
 class CostsPotableWater(Base):
@@ -86,6 +91,14 @@ class EnvironmentalCosts(Base):
     fixed_costs = Column(Float)
     variable_costs = Column(Float)
 
+class TaxCosts(Base):
+    __tablename__ = "tax_costs"
+    id = Column(Integer, primary_key=True)
+
+    vat_drinking_water = Column(Float)
+    fee_drinking_water = Column(Float)
+    vat_sanitation = Column(Float)
+    fee_sanitation = Column(Float)
 
 class SocialCosts(Base):
     __tablename__ = "social_costs"
@@ -121,8 +134,8 @@ class DemandConfiguration(Base):
     g = Column(Float)
 
     perception_parameter = Column(Float)
-    piscine = Column(Boolean)
-    jardin = Column(Boolean)
+    pool = Column(Boolean)
+    garden = Column(Boolean)
 
     simulation_id = Column(Integer, ForeignKey("simulations.id"))
     simulation = relationship("Simulation", back_populates="demand_config")
@@ -131,7 +144,7 @@ class DemandConfiguration(Base):
 class IBTEauPotable(Base):
     __tablename__ = "ibt_eau_potable"
     id = Column(Integer, primary_key=True)
-    abonnement = Column(String)
+    abonnement = Column(Float)
 
     simulation_id = Column(Integer, ForeignKey("simulations.id"))
     simulation = relationship("Simulation", back_populates="ibt_eau_potable")
@@ -152,7 +165,7 @@ class BlockEauPotable(Base):
 class IBTSanitation(Base):
     __tablename__ = "ibt_sanitation"
     id = Column(Integer, primary_key=True)
-    abonnement = Column(String)
+    abonnement = Column(Float)
 
     simulation_id = Column(Integer, ForeignKey("simulations.id"))
     simulation = relationship("Simulation", back_populates="ibt_sanitation")

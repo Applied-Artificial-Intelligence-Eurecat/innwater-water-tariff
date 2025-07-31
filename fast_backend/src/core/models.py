@@ -63,6 +63,11 @@ class Primitives(Base):
 
     simulation_id = Column(Integer, ForeignKey("simulations.id"))
     simulation = relationship("Simulation", back_populates="primitives")
+    cost_potable_water = relationship("CostsPotableWater", back_populates="primitives")
+    cost_sanitation = relationship("CostsSanitation", back_populates="primitives")
+    environmental_costs = relationship("EnvironmentalCosts", back_populates="primitives")
+    social_costs = relationship("SocialCosts", back_populates="primitives")
+    tax_costs = relationship("TaxCosts", back_populates="primitives")
 
 
 
@@ -74,22 +79,29 @@ class CostsPotableWater(Base):
     variable_costs = Column(Float)
     subscribers_number = Column(Integer)
 
+    primitives = relationship("Primitives", back_populates="cost_potable_water")
+
 
 class CostsSanitation(Base):
     __tablename__ = "costs_sanitation"
     id = Column(Integer, primary_key=True)
-
+    cost_key = Column(Integer, ForeignKey("costs_sanitation.id"))
     fixed_costs = Column(Float)
     variable_costs = Column(Float)
     subscribers_number = Column(Integer)
+
+    primitives = relationship("Primitives", back_populates="cost_sanitation")
 
 
 class EnvironmentalCosts(Base):
     __tablename__ = "environmental_costs"
     id = Column(Integer, primary_key=True)
+    cost_key = Column(Integer, ForeignKey("environmental_costs.id"))
 
     fixed_costs = Column(Float)
     variable_costs = Column(Float)
+
+    primitives = relationship("Primitives", back_populates="environmental_costs")
 
 class TaxCosts(Base):
     __tablename__ = "tax_costs"
@@ -100,6 +112,8 @@ class TaxCosts(Base):
     vat_sanitation = Column(Float)
     fee_sanitation = Column(Float)
 
+    primitives = relationship("Primitives", back_populates="tax_costs")
+
 class SocialCosts(Base):
     __tablename__ = "social_costs"
     id = Column(Integer, primary_key=True)
@@ -108,6 +122,8 @@ class SocialCosts(Base):
     par_threshold = Column(Float)
     poverty_threshold = Column(Float)
     extreme_poverty_threshold = Column(Float)
+
+    primitives = relationship("Primitives", back_populates="social_costs")
 
 
 class Population(Base):

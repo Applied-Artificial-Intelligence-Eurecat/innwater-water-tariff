@@ -1,13 +1,19 @@
-<h2>General Initialization</h2>
+<h2 *ngIf="!isEditMode">General Initialization</h2>
+<h2 *ngIf="isEditMode">Edit Simulation</h2>
 
 <div class="initialization-description">
-    <p>The initialization part of the Water Tariff Dashboard involves configuring several essential components to define the socio-economic simulation environment.</p>
+    <p>The initialization part of the Water Tariff Dashboard involves configuring several essential components to define
+        the socio-economic simulation environment.</p>
 
-    <p><strong>How to proceed:</strong> First the primitives, then the population, then usage tarification, then the demand and finally, the launch.</p>
+    <p><strong>How to proceed:</strong> First the primitives, then the population, then usage tarification, then the
+        demand and finally, the launch.</p>
 
     <ol>
-        <li><strong>Tariff Module Initialization (Primitives)</strong> - Configure the water pricing scheme to be evaluated</li>
-        <li><strong>Population Module Initialization</strong> - Load the household-level data needed for microsimulation</li>
+        <li><strong>Tariff Module Initialization (Primitives)</strong> - Configure the water pricing scheme to be
+            evaluated
+        </li>
+        <li><strong>Population Module Initialization</strong> - Load the household-level data needed for microsimulation
+        </li>
         <li><strong>Usage Tarification</strong> - Configure water usage pricing for Eau Potable and Assainissement</li>
         <li><strong>Demand Module</strong> - Compute expected consumption</li>
         <li><strong>Launch</strong> - Run the simulation</li>
@@ -20,7 +26,8 @@
         <div class="primitives-container">
             <h2>Tariff Module Initialization (Primitives)</h2>
             <p class="description-text">
-                Configure the water pricing scheme parameters including service costs, taxation, and social data thresholds.
+                Configure the water pricing scheme parameters including service costs, taxation, and social data
+                thresholds.
             </p>
 
             <form [formGroup]="tarificationForm">
@@ -117,7 +124,8 @@
                             <div class="form-group">
                                 <h5>Redevances (en euros par m3)</h5>
                                 <ng-container formArrayName="seuils_r_ep">
-                                    <div *ngFor="let trancheForm of seuils_r_ep.controls; last as isLast; let i = index; let r=last;" class="input-row">
+                                    <div *ngFor="let trancheForm of seuils_r_ep.controls; last as isLast; let i = index; let r=last;"
+                                         class="input-row">
                                         <div [formGroupName]="i">
                                             <mat-form-field appearance="fill">
                                                 <input type="number" matInput formControlName="prix" placeholder="prix">
@@ -141,7 +149,8 @@
                             <div class="form-group">
                                 <h5>Redevances (en euros par m3)</h5>
                                 <ng-container formArrayName="seuils_r_a">
-                                    <div *ngFor="let trancheForm of seuils_r_a.controls; last as isLast; let i = index; let r=last;" class="input-row">
+                                    <div *ngFor="let trancheForm of seuils_r_a.controls; last as isLast; let i = index; let r=last;"
+                                         class="input-row">
                                         <div [formGroupName]="i">
                                             <mat-form-field appearance="fill">
                                                 <input type="number" matInput formControlName="prix" placeholder="prix">
@@ -193,109 +202,169 @@
             </form>
         </div>
     </mat-tab>
-    <mat-tab label="Population"> 
+    <mat-tab label="Population">
         <app-population></app-population>
     </mat-tab>
+    <mat-tab label="Demande">
+        <div class="demand-container">
+            <h2>Demand Module Configuration</h2>
+            <p class="description-text">Configure the parameters for the demand calculation model.</p>
+
+            <form [formGroup]="demandeForm" class="demand-form">
+                <div class="equation-container">
+                    <h3>Demand Equation</h3>
+                    <p class="equation">
+                        ln(q) =
+                        <input type="number" matInput formControlName="a0" class="equation-input"> +
+                        <input type="number" matInput formControlName="a1" class="equation-input"> lnN +
+                        <input type="number" matInput formControlName="a2" class="equation-input"> SNWA +
+                        <input type="number" matInput formControlName="a3" class="equation-input"> POOL +
+                        <input type="number" matInput formControlName="a4" class="equation-input"> GardenWeather +
+                        <input type="number" matInput formControlName="a5" class="equation-input"> ln(Prix) +
+                        <input type="number" matInput formControlName="a6" class="equation-input"> ln(Revenu)
+                    </p>
+                </div>
+
+                <div class="perception-container">
+                    <h3>Perception Parameter</h3>
+                    <div class="form-field">
+                        <label for="k">Parameter k:</label>
+                        <input max="0.99" type="number" matInput id="k" placeholder="k" formControlName="k"
+                               class="form-input">
+                    </div>
+                </div>
+
+                <div class="determinants-container">
+                    <h3>Consumption Determinants</h3>
+                    <p>Souhaitez-vous inclure dans la liste des déterminants de la consommation de base :</p>
+                    <div class="checkbox-group">
+                        <div class="checkbox-field">
+                            <label for="pool">Piscine:</label>
+                            <input type="checkbox" id="pool" class="checkbox-input">
+                        </div>
+                        <div class="checkbox-field">
+                            <label for="garden">Jardin:</label>
+                            <input type="checkbox" id="garden" class="checkbox-input">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+
+        </div>
+    </mat-tab>
     <mat-tab label="Usage Tarification">
-      <div class="tarification-container">
-        <h2>Configuration des Tarifs d'Eau</h2>
-        <p class="description-text">
-          Configurez les tarifs pour l'eau potable et l'assainissement, y compris les montants d'abonnement et les seuils de consommation.
-        </p>
+        <div class="tarification-container">
+            <h2>Configuration des Tarifs d'Eau</h2>
+            <p class="description-text">
+                Configurez les tarifs pour l'eau potable et l'assainissement, y compris les montants d'abonnement et les
+                seuils de consommation.
+            </p>
 
-        <form [formGroup]="tarificationForm">
-          <mat-tab-group>
-            <mat-tab label="Eau Potable">
-              <div class="tarification-section">
-                <h3>Tarification Eau Potable</h3>
-                <p class="section-description">
-                  Définissez les tarifs pour la distribution d'eau potable, incluant l'abonnement et les différents paliers de consommation.
-                </p>
+            <form [formGroup]="tarificationForm">
+                <mat-tab-group>
+                    <mat-tab label="Eau Potable">
+                        <div class="tarification-section">
+                            <h3>Tarification Eau Potable</h3>
+                            <p class="section-description">
+                                Définissez les tarifs pour la distribution d'eau potable, incluant l'abonnement et les
+                                différents paliers de consommation.
+                            </p>
 
-                <div class="form-section">
-                  <h4>Abonnement</h4>
-                  <div class="form-field">
-                    <mat-form-field appearance="fill">
-                      <mat-label>Montant de l'abonnement (en euros par trimestre, hors TVA)</mat-label>
-                      <input type="number" min="0" max="100" matInput formControlName="montantAbo_ep">
-                      <mat-hint>Frais fixes facturés indépendamment de la consommation</mat-hint>
-                    </mat-form-field>
-                  </div>
-                </div>
+                            <div class="form-section">
+                                <h4>Abonnement</h4>
+                                <div class="form-field">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Montant de l'abonnement (en euros par trimestre, hors TVA)
+                                        </mat-label>
+                                        <input type="number" min="0" max="100" matInput formControlName="montantAbo_ep">
+                                        <mat-hint>Frais fixes facturés indépendamment de la consommation</mat-hint>
+                                    </mat-form-field>
+                                </div>
+                            </div>
 
-                <div class="form-section">
-                  <h4>Paliers de Consommation</h4>
-                  <p class="subsection-description">
-                    Définissez les seuils de consommation (en m³) et les prix unitaires correspondants (en euros par m³, hors TVA et redevances).
-                  </p>
+                            <div class="form-section">
+                                <h4>Paliers de Consommation</h4>
+                                <p class="subsection-description">
+                                    Définissez les seuils de consommation (en m³) et les prix unitaires correspondants
+                                    (en euros par m³, hors TVA et redevances).
+                                </p>
 
-                  <div class="thresholds-table">
-                    <div class="thresholds-header">
-                      <div class="threshold-label">Seuil (m³)</div>
-                      <div class="price-label">Prix (€/m³)</div>
-                      <div class="action-label"></div>
-                    </div>
+                                <div class="thresholds-table">
+                                    <div class="thresholds-header">
+                                        <div class="threshold-label">Seuil (m³)</div>
+                                        <div class="price-label">Prix (€/m³)</div>
+                                        <div class="action-label"></div>
+                                    </div>
 
-                    <ng-container formArrayName="seuils_ep">
-                      <div *ngFor="let trancheForm of seuils_ep.controls; last as isLast; let i = index; let r=last;" class="threshold-row">
-                        <div [formGroupName]="i" class="threshold-inputs">
-                          <mat-form-field appearance="fill">
-                            <input type="number" min="0" matInput formControlName="seuil" placeholder="seuil">
-                            <mat-hint *ngIf="i === 0">Début du palier</mat-hint>
-                          </mat-form-field>
-                          <mat-form-field appearance="fill">
-                            <input type="number" matInput formControlName="prix" placeholder="prix">
-                            <mat-hint>Prix pour ce palier</mat-hint>
-                          </mat-form-field>
+                                    <ng-container formArrayName="seuils_ep">
+                                        <div *ngFor="let trancheForm of seuils_ep.controls; last as isLast; let i = index; let r=last;"
+                                             class="threshold-row">
+                                            <div [formGroupName]="i" class="threshold-inputs">
+                                                <mat-form-field appearance="fill">
+                                                    <input type="number" min="0" matInput formControlName="seuil"
+                                                           placeholder="seuil">
+                                                    <mat-hint *ngIf="i === 0">Début du palier</mat-hint>
+                                                </mat-form-field>
+                                                <mat-form-field appearance="fill">
+                                                    <input type="number" matInput formControlName="prix"
+                                                           placeholder="prix">
+                                                    <mat-hint>Prix pour ce palier</mat-hint>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="threshold-actions">
+                                                <button mat-icon-button color="warn" *ngIf="seuils_ep.length > 1"
+                                                        (click)="removeInputControl(i)"
+                                                        aria-label="Supprimer ce palier">
+                                                    <mat-icon>remove_circle</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+
+                                    <div class="add-threshold">
+                                        <button mat-button color="primary" (click)="addInputControl()"
+                                                class="add-button">
+                                            <mat-icon>add_circle</mat-icon>
+                                            Ajouter un palier
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Commented redevances section preserved but hidden
+                            <div class="form-section" style="display: none;">
+                              <h4>Redevances</h4>
+                              <ng-container formArrayName="seuils_r_ep">
+                                <div *ngFor="let trancheForm of seuils_r_ep.controls; last as isLast; let i = index; let r=last;" class="input-row">
+                                  <div [formGroupName]="i">
+                                    <mat-form-field appearance="fill">
+                                      <input type="number" min="0" matInput formControlName="seuil" placeholder="seuil">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="fill">
+                                      <input type="number" matInput formControlName="prix" placeholder="prix">
+                                    </mat-form-field>
+                                  </div>
+                                  <button mat-icon-button color="warn" *ngIf="seuils_r_ep.length > 1" (click)="removeInputControl_r_ep(i)">
+                                    <mat-icon>remove_circle</mat-icon>
+                                  </button>
+                                </div>
+                              </ng-container>
+                              <button mat-icon-button color="primary" (click)="addInputControl_r_ep()">
+                                <mat-icon>add_circle</mat-icon>
+                              </button>
+                            </div>
+                            -->
                         </div>
-                        <div class="threshold-actions">
-                          <button mat-icon-button color="warn" *ngIf="seuils_ep.length > 1" (click)="removeInputControl(i)" aria-label="Supprimer ce palier">
-                            <mat-icon>remove_circle</mat-icon>
-                          </button>
-                        </div>
-                      </div>
-                    </ng-container>
+                    </mat-tab>
 
-                    <div class="add-threshold">
-                      <button mat-button color="primary" (click)="addInputControl()" class="add-button">
-                        <mat-icon>add_circle</mat-icon> Ajouter un palier
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Commented redevances section preserved but hidden
-                <div class="form-section" style="display: none;">
-                  <h4>Redevances</h4>
-                  <ng-container formArrayName="seuils_r_ep">
-                    <div *ngFor="let trancheForm of seuils_r_ep.controls; last as isLast; let i = index; let r=last;" class="input-row">
-                      <div [formGroupName]="i">
-                        <mat-form-field appearance="fill">
-                          <input type="number" min="0" matInput formControlName="seuil" placeholder="seuil">
-                        </mat-form-field>
-                        <mat-form-field appearance="fill">
-                          <input type="number" matInput formControlName="prix" placeholder="prix">
-                        </mat-form-field>
-                      </div>
-                      <button mat-icon-button color="warn" *ngIf="seuils_r_ep.length > 1" (click)="removeInputControl_r_ep(i)">
-                        <mat-icon>remove_circle</mat-icon>
-                      </button>
-                    </div>
-                  </ng-container>
-                  <button mat-icon-button color="primary" (click)="addInputControl_r_ep()">
-                    <mat-icon>add_circle</mat-icon>
-                  </button>
-                </div>
-                -->
-              </div>
-            </mat-tab>
-
-            <mat-tab label="Assainissement">
-              <div class="tarification-section">
-                <h3>Tarification Assainissement</h3>
-                <p class="section-description">
-                  Définissez les tarifs pour les services d'assainissement, incluant l'abonnement et les différents paliers de consommation.
-                </p>
+                    <mat-tab label="Assainissement">
+                        <div class="tarification-section">
+                            <h3>Tarification Assainissement</h3>
+                            <p class="section-description">
+                                Définissez les tarifs pour les services d'assainissement, incluant l'abonnement et les
+                                différents paliers de consommation.
+                            </p>
 
                 <div class="form-section">
                   <h4>Abonnement</h4>
@@ -314,120 +383,79 @@
                     Définissez les seuils de consommation (en m³) et les prix unitaires correspondants (en euros par m³, hors TVA et redevances).
                   </p>
 
-                  <div class="thresholds-table">
-                    <div class="thresholds-header">
-                      <div class="threshold-label">Seuil (m³)</div>
-                      <div class="price-label">Prix (€/m³)</div>
-                      <div class="action-label"></div>
-                    </div>
+                                <div class="thresholds-table">
+                                    <div class="thresholds-header">
+                                        <div class="threshold-label">Seuil (m³)</div>
+                                        <div class="price-label">Prix (€/m³)</div>
+                                        <div class="action-label"></div>
+                                    </div>
 
-                    <ng-container formArrayName="seuils_a">
-                      <div *ngFor="let trancheForm of seuils_a.controls; last as isLast; let i = index; let r=last;" class="threshold-row">
-                        <div [formGroupName]="i" class="threshold-inputs">
-                          <mat-form-field appearance="fill">
-                            <input type="number" min="0" matInput formControlName="seuil" placeholder="seuil">
-                            <mat-hint *ngIf="i === 0">Début du palier</mat-hint>
-                          </mat-form-field>
-                          <mat-form-field appearance="fill">
-                            <input type="number" matInput formControlName="prix" placeholder="prix">
-                            <mat-hint>Prix pour ce palier</mat-hint>
-                          </mat-form-field>
+                                    <ng-container formArrayName="seuils_a">
+                                        <div *ngFor="let trancheForm of seuils_a.controls; last as isLast; let i = index; let r=last;"
+                                             class="threshold-row">
+                                            <div [formGroupName]="i" class="threshold-inputs">
+                                                <mat-form-field appearance="fill">
+                                                    <input type="number" min="0" matInput formControlName="seuil"
+                                                           placeholder="seuil">
+                                                    <mat-hint *ngIf="i === 0">Début du palier</mat-hint>
+                                                </mat-form-field>
+                                                <mat-form-field appearance="fill">
+                                                    <input type="number" matInput formControlName="prix"
+                                                           placeholder="prix">
+                                                    <mat-hint>Prix pour ce palier</mat-hint>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="threshold-actions">
+                                                <button mat-icon-button color="warn" *ngIf="seuils_a.length > 1"
+                                                        (click)="removeInputControl_a(i)"
+                                                        aria-label="Supprimer ce palier">
+                                                    <mat-icon>remove_circle</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+
+                                    <div class="add-threshold">
+                                        <button mat-button color="primary" (click)="addInputControl_a()"
+                                                class="add-button">
+                                            <mat-icon>add_circle</mat-icon>
+                                            Ajouter un palier
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Commented redevances section preserved but hidden
+                            <div class="form-section" style="display: none;">
+                              <h4>Redevances</h4>
+                              <ng-container formArrayName="seuils_r_a">
+                                <div *ngFor="let trancheForm of seuils_r_a.controls; last as isLast; let i = index; let r=last;" class="input-row">
+                                  <div [formGroupName]="i">
+                                    <mat-form-field appearance="fill">
+                                      <input type="number" min="0" matInput formControlName="seuil" placeholder="seuil">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="fill">
+                                      <input type="number" matInput formControlName="prix" placeholder="prix">
+                                    </mat-form-field>
+                                  </div>
+                                  <button mat-icon-button color="warn" *ngIf="seuils_r_a.length > 1" (click)="removeInputControl_r_a(i)">
+                                    <mat-icon>remove_circle</mat-icon>
+                                  </button>
+                                </div>
+                              </ng-container>
+                              <button mat-icon-button color="primary" (click)="addInputControl_r_a()">
+                                <mat-icon>add_circle</mat-icon>
+                              </button>
+                            </div>
+                            -->
                         </div>
-                        <div class="threshold-actions">
-                          <button mat-icon-button color="warn" *ngIf="seuils_a.length > 1" (click)="removeInputControl_a(i)" aria-label="Supprimer ce palier">
-                            <mat-icon>remove_circle</mat-icon>
-                          </button>
-                        </div>
-                      </div>
-                    </ng-container>
-
-                    <div class="add-threshold">
-                      <button mat-button color="primary" (click)="addInputControl_a()" class="add-button">
-                        <mat-icon>add_circle</mat-icon> Ajouter un palier
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Commented redevances section preserved but hidden
-                <div class="form-section" style="display: none;">
-                  <h4>Redevances</h4>
-                  <ng-container formArrayName="seuils_r_a">
-                    <div *ngFor="let trancheForm of seuils_r_a.controls; last as isLast; let i = index; let r=last;" class="input-row">
-                      <div [formGroupName]="i">
-                        <mat-form-field appearance="fill">
-                          <input type="number" min="0" matInput formControlName="seuil" placeholder="seuil">
-                        </mat-form-field>
-                        <mat-form-field appearance="fill">
-                          <input type="number" matInput formControlName="prix" placeholder="prix">
-                        </mat-form-field>
-                      </div>
-                      <button mat-icon-button color="warn" *ngIf="seuils_r_a.length > 1" (click)="removeInputControl_r_a(i)">
-                        <mat-icon>remove_circle</mat-icon>
-                      </button>
-                    </div>
-                  </ng-container>
-                  <button mat-icon-button color="primary" (click)="addInputControl_r_a()">
-                    <mat-icon>add_circle</mat-icon>
-                  </button>
-                </div>
-                -->
-              </div>
-            </mat-tab>
-          </mat-tab-group>
-        </form>
-      </div>
-    </mat-tab>
-    <mat-tab label="Demande"> 
-      <div class="demand-container">
-        <h2>Demand Module Configuration</h2>
-        <p class="description-text">Configure the parameters for the demand calculation model.</p>
-
-        <form [formGroup]="demandeForm" class="demand-form">
-          <div class="equation-container">
-            <h3>Demand Equation</h3>
-            <p class="equation"> 
-              ln(q) = 
-              <input type="number" matInput formControlName="a0" class="equation-input"> + 
-              <input type="number" matInput formControlName="a1" class="equation-input"> lnN + 
-              <input type="number" matInput formControlName="a2" class="equation-input"> SNWA +
-              <input type="number" matInput formControlName="a3" class="equation-input"> POOL + 
-              <input type="number" matInput formControlName="a4" class="equation-input"> GardenWeather + 
-              <input type="number" matInput formControlName="a5" class="equation-input"> ln(Prix) +
-              <input type="number" matInput formControlName="a6" class="equation-input"> ln(Revenu)
-            </p>
-          </div>
-
-          <div class="perception-container">
-            <h3>Perception Parameter</h3>
-            <div class="form-field">
-              <label for="k">Parameter k:</label>
-              <input max="0.99" type="number" matInput id="k" placeholder="k" formControlName="k" class="form-input">
-            </div>
-          </div>
-
-          <div class="determinants-container">
-            <h3>Consumption Determinants</h3>
-            <p>Souhaitez-vous inclure dans la liste des déterminants de la consommation de base :</p>
-            <div class="checkbox-group">
-              <div class="checkbox-field">
-                <label for="pool">Piscine:</label>
-                <input type="checkbox" id="pool" class="checkbox-input">
-              </div>
-              <div class="checkbox-field">
-                <label for="garden">Jardin:</label>
-                <input type="checkbox" id="garden" class="checkbox-input">
-              </div>
-            </div>
-          </div>
-        </form>
-
-        <div class="image-container">
-          <img src="assets/A.png" alt="Demand Model Visualization" class="demand-image">
+                    </mat-tab>
+                </mat-tab-group>
+            </form>
         </div>
-      </div>
-     </mat-tab>
-     <mat-tab label="Launch">
+    </mat-tab>
+
+    <mat-tab label="Launch">
         <div class="launch-container">
             <h2>Launch Simulation</h2>
             <p>After configuring all the parameters in the previous tabs, you can now launch the simulation.</p>
@@ -447,11 +475,19 @@
                     </mat-form-field>
                 </div>
 
+                <div *ngIf="error" class="error-message">
+                    {{ error }}
+                </div>
+
                 <div class="button-group">
-                    <button type="submit" (click)="addSimulation()" [disabled]="!tarificationForm.valid" [hidden]="!demandeForm.valid" mat-raised-button color="primary">Send</button>
-                    <button type="submit" (click)="addPreSimulation()" [disabled]="!tarificationForm.valid" mat-raised-button color="primary">Send pre simulation</button>
+                    <button type="submit" (click)="addPreSimulation()" [disabled]="!tarificationForm.valid || loading"
+                            mat-raised-button color="primary">
+                        <span *ngIf="!loading && !isEditMode">Send pre simulation</span>
+                        <span *ngIf="!loading && isEditMode">Update simulation</span>
+                        <span *ngIf="loading">Sending...</span>
+                    </button>
                 </div>
             </form>
         </div>
-     </mat-tab>
-     </mat-tab-group>
+    </mat-tab>
+</mat-tab-group>

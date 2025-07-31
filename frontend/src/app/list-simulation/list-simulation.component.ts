@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { InitialAPIService, Simulation } from '../initial-api.service';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-list-simulation',
@@ -7,10 +8,30 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./list-simulation.component.css']
 })
 export class ListSimulationComponent implements OnInit {
-  dat:any; 
-  constructor(private http : HttpClient){}
-  ngOnInit(): void {
-    this.http.get('http://api.t2po.re/api/getAllSim/'+localStorage.getItem('userid')).subscribe((data)=>{this.dat=data;});
-  }
+  simulations: Simulation[] = [];
+  loading = false;
+  error = '';
 
+  constructor(private initialApiService: InitialAPIService,
+              private router: Router) {}
+
+  ngOnInit(): void {
+    this.loading = true;
+    this.initialApiService.getSimulations().subscribe({
+      next: (response) => {
+        this.simulations = response.data;
+        this.loading = false;
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.initialApiService.logout();
+
+          return;
+        }
+        this.error = 'Failed to load simulations. Please try again later.';
+        this.loading = false;
+        console.error('Error loading simulations:', err);
+      }
+    });
+  }
 }

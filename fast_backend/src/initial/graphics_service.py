@@ -1,23 +1,8 @@
-from src.initial.schemas import PopulationModel
-import matplotlib.pyplot as plt
 import io
-import base64
 
+from matplotlib import pyplot as plt
 
-async def generate_population_plot(input_data: PopulationModel) -> io.BytesIO:
-    """
-    Generate a population plot based on the input data.
-
-    Args:
-        input_data: The population model containing the input parameters
-
-    Returns:
-        dict: Base64 encoded image and content type
-    """
-    # Your logic code goes here using input_data parameters
-    # Example implementation (replace with your actual logic)
-    buf = await mock_data()
-    return buf
+from src.core.models import Simulation
 
 
 async def mock_data():
@@ -38,3 +23,19 @@ async def mock_data():
     plt.close(fig)
     buf.seek(0)
     return buf
+
+
+async def generate_tbse_par_affordability_plot(simulation: Simulation) -> io.BytesIO:
+    return await mock_data()
+
+
+async def generate_tbse_consumption_plot(simulation: Simulation) -> io.BytesIO:
+    return await mock_data()
+
+
+async def generate_pens_parade_consumptions_plot(simulation: Simulation) -> io.BytesIO:
+    return await mock_data()
+
+
+async def generate_consumption_deviation_losses_cost_recovery_plot(simulation: Simulation) -> io.BytesIO:
+    return await mock_data()

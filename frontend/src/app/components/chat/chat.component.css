@@ -2,7 +2,7 @@
   --primary-color: rgba(86, 85, 168, 1); /* Custom primary color */
   --primary-light: #7986cb; /* Material Indigo 300 */
   --primary-dark: #303f9f; /* Material Indigo 700 */
-  --accent-color: #ff4081; /* Material Pink A200 */
+  --accent-color: rgba(230, 230, 230); /* Material Pink A200 */
   --green-color: #4caf50; /* Material Green 500 */
   --green-hover: #388e3c; /* Material Green 700 */
   --light-bg: #f5f5f5; /* Material Grey 100 */

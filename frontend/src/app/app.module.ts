@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { InitialAPIService } from './initial-api.service';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -58,6 +61,7 @@ import {EquityComponent} from "./evaluation/equity/equity.component";
 import {FinancingComponent} from "./evaluation/financing/financing.component";
 import { AbordabiliteGeneralComponent } from './abordabilite-general/abordabilite-general.component';
 import { SimulationDetailsComponent } from './simulation-details/simulation-details.component';
+import { UsageTarificationComponent } from './addsimulation/usage-tarification/usage-tarification.component';
 
 @NgModule({
   declarations: [
@@ -98,6 +102,7 @@ import { SimulationDetailsComponent } from './simulation-details/simulation-deta
     SimulationDetailsComponent,
     ChatComponent,
     ChatButtonComponent,
+    UsageTarificationComponent,
   ],
   imports: [
     CommonModule,
@@ -134,7 +139,11 @@ import { SimulationDetailsComponent } from './simulation-details/simulation-deta
     }),
     MatStepperModule,
   ],
-  providers: [],
+  providers: [
+    InitialAPIService,
+    AuthService,
+    AuthGuard
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,6 +1,44 @@
-<div class="container">
-    <!-- Mettre ng if connecter afiche connection creation sinon profile-->
-    <app-login></app-login>
-    <app-signup></app-signup>   
-   
+<div class="account-container">
+  <div class="account-card">
+    <h2>{{ isCreatingAccount ? 'Create Account' : 'Login' }}</h2>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+
+    <form [formGroup]="accountForm" (ngSubmit)="submit()">
+      <div class="form-field">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="Enter your email">
+          <mat-error *ngIf="accountForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="accountForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-field">
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" placeholder="Enter your password">
+          <mat-error *ngIf="accountForm.get('password')?.hasError('required')">Password is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit">
+          {{ isCreatingAccount ? 'Create Account' : 'Login' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="toggle-mode">
+      <button mat-button (click)="toggleMode()">
+        {{ isCreatingAccount ? 'Already have an account? Login' : 'Need an account? Sign up' }}
+      </button>
+    </div>
+  </div>
 </div>

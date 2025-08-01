@@ -1,17 +1,36 @@
 <div class="home-container">
   <h1>Water Tariff Dashboard</h1>
 
-  <div class="actions-container">
-    <h2>Simulations</h2>
-    <p>Create a new simulation or view existing ones.</p>
+  <ng-container *ngIf="isLoggedIn; else notLoggedIn">
+    <div class="actions-container">
+      <h2>Simulations</h2>
+      <p>Create a new simulation or view existing ones.</p>
 
-    <div class="buttons-container">
-      <button class="create-btn" routerLink="/addsimulation">Create New Simulation</button>
+      <div class="buttons-container">
+        <button class="create-btn" routerLink="/addsimulation">Create New Simulation</button>
+      </div>
     </div>
-  </div>
 
-  <div class="simulations-container">
-    <h2>Your Simulations</h2>
-    <app-list-simulation></app-list-simulation>
-  </div>
+    <div class="simulations-container">
+      <h2>Your Simulations</h2>
+      <app-list-simulation></app-list-simulation>
+    </div>
+  </ng-container>
+
+  <ng-template #notLoggedIn>
+    <div class="info-container">
+      <p>
+        The Water Tariff Dashboard tool is an integral component of the InnWater project's Water Governance Platform. It aims to provide stakeholders with a comprehensive digital instrument for analyzing, evaluating, and visualizing the socio-economic implications of water tariff structures. This tool is specifically designed to facilitate informed decision-making by helping users assess the affordability, equity, and efficiency of different tariff models, such as Increasing Block Tariffs (IBT).
+      </p>
+      <p>
+        The tool also incorporates evaluation modules that measure the performance of pricing policies across five critical areas: Affordability, Incentive Effect, Equity, Economic Efficiency, and Cost Recovery. Users can analyze key indicators such as the Conventional Affordability Ratio (CAR) and the Potential Affordability Ratio (PAR), which help assess the extent to which households can access water services under reasonable financial terms.
+      </p>
+      <p>
+        Additionally, our platform features an AI assistant that can help you understand and analyze these key indicators, providing valuable insights and guidance throughout your water tariff analysis process.
+      </p>
+      <div class="login-container">
+        <button class="login-btn" routerLink="/account">Login to Access Dashboard</button>
+      </div>
+    </div>
+  </ng-template>
 </div>

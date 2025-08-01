@@ -1,20 +1,35 @@
 <div class="table-container">
-  <table class="simulation-table" *ngIf="dat && dat.all">
+  <div *ngIf="loading" class="loading-message">
+    Loading simulations...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <table class="simulation-table" *ngIf="simulations.length > 0">
     <thead>
       <tr>
         <th>Simulation Name</th>
-        <th>Date</th>
+        <th>Status</th>
+        <th>Periods</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let item of dat.all; index as i;">
-        <td>{{item.nom}}</td>
-        <td>{{item.date || 'N/A'}}</td>
+      <tr *ngFor="let simulation of simulations">
+        <td>{{ simulation.name }}</td>
+        <td>{{ simulation.status }}</td>
+        <td>{{ simulation.number_of_periods }}</td>
         <td>
-          <button class="view-btn" [routerLink]="['/simulation', item.nom]">View Details</button>
+          <button class="view-btn" [routerLink]="['/simulation', simulation.id]">View Details</button>
+          <button class="edit-btn" [routerLink]="['/edit-simulation', simulation.id]">Edit Simulation</button>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <div *ngIf="!loading && !error && simulations.length === 0" class="no-simulations-message">
+    No simulations found. Create a new simulation to get started.
+  </div>
 </div>

@@ -122,6 +122,16 @@ mat-form-field {
     margin-top: 20px;
 }
 
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
 /* Demand module styling */
 .demand-container {
     padding: 32px;

@@ -2,7 +2,7 @@
 
 ## Generate chart of population
 
-- **Endpoint: /simulation/population/plot/**
+- **Endpoint: api/v1/initial/population/plot**
 - Description: Generate the scatter plot chart to validate the population
 - Method: POST
 - Input Schema: PopulationModel

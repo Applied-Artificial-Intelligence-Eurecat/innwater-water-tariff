@@ -119,7 +119,7 @@ export interface SimulationDetailResponse {
     message: string;
     data: {
         id: number;
-        demand: {
+        demande: {
             coefficients: {
                 a0: number;
                 a1: number;
@@ -134,8 +134,8 @@ export interface SimulationDetailResponse {
             jardin: boolean;
         };
         launch: {
-            periods: number;
-            simulation_name: string;
+            periodes: number;
+            nom_simulation: string;
         };
         population: {
             bd: string;
@@ -175,7 +175,7 @@ export interface SimulationDetailResponse {
             };
         };
         status: string;
-        tariff: {
+        tarification: {
             ep: {
                 abonnement: number;
                 usage_tiers: {
@@ -303,6 +303,36 @@ export class InitialAPIService {
         return this.http.put<SimulationResponse>(
             `${this.apiUrl}/api/v1/initial/simulation/${id}/edit`,
             payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+
+    deleteSimulation(id: number) {
+        return this.http.delete(
+            `${this.apiUrl}/api/v1/initial/simulation/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    /**
+     * Duplicates an existing simulation
+     * @param id The simulation ID to duplicate
+     * @param newName The name for the duplicated simulation
+     * @returns Observable with simulation duplication response
+     */
+    duplicateSimulation(id: number, newName: string): Observable<SimulationResponse> {
+        return this.http.post<SimulationResponse>(
+            `${this.apiUrl}/api/v1/initial/simulation/${id}/duplicate`,
+            { new_name: newName },
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`

@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, Validators} from "@angular/forms";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
+import {SmallAssessmentService, SmallAssessmentUpdatePayload} from "../small-assessment.service";
 
 @Component({
     selector: 'app-first-round-assessment',
@@ -8,40 +9,38 @@ import {Router} from "@angular/router";
     styleUrls: ['./first-round-assessment.component.css']
 })
 export class FirstRoundAssessmentComponent implements OnInit {
-    seuil_ep!: { [key: string]: number };
-    prix_ep!: { [key: string]: number };
-    seuil_r_ep!: { [key: string]: number };
-    prix_r_ep!: { [key: string]: number };
-    disabled: boolean = false;
     tarificationForm = this.fb.group({
 
-        coutsFixe_ep: new FormControl({value: 1250000, disabled: this.disabled}, {validators: [Validators.required]}),
-        coutsVariable_ep: new FormControl(0.7, {validators: [Validators.required]}),
         montantAbo_ep: new FormControl(15, {validators: [Validators.required]}),
-        nombreAbonnes_ep: new FormControl(48000, {validators: [Validators.required]}),
-        redevances_ep: new FormControl(0.01, {validators: [Validators.required]}),
-        tva_ep: new FormControl(2.1, {validators: [Validators.required]}),
         seuils_ep: this.fb.array([]),
         seuils_r_ep: this.fb.array([]),
 
-        coutsFixe_a: new FormControl(720000, {validators: [Validators.required]}),
-        coutsVariable_a: new FormControl(0.6, {validators: [Validators.required]}),
         nombreAbonnes_a: new FormControl(22000, {validators: [Validators.required]}),
         montantAbo_a: new FormControl(15, {validators: [Validators.required]}),
-        redevances_a: new FormControl(0.06, {validators: [Validators.required]}),
-        tva_a: new FormControl(0, {validators: [Validators.required]}),
         seuils_a: this.fb.array([]),
         seuils_r_a: this.fb.array([]),
 
-        cenvU: new FormControl(1.3, {validators: [Validators.required]}),
-        env_fixed_costs: new FormControl(25000, {validators: [Validators.required]}),
 
     });
+    simulationId: number | null = null;
 
-    constructor(private fb: FormBuilder, private router: Router) {
+    constructor(
+        private fb: FormBuilder,
+        private router: Router,
+        private route: ActivatedRoute,
+        private smallAssessmentService: SmallAssessmentService
+    ) {
     }
 
     ngOnInit(): void {
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id');
+            this.simulationId = id ? +id : null;
+
+            if (this.simulationId) {
+                this.loadSmallAssessmentData(this.simulationId);
+            }
+        })
     }
 
 
@@ -70,7 +69,8 @@ export class FirstRoundAssessmentComponent implements OnInit {
         });
         this.seuils_ep.push(trancheForm);
     };
-        removeInputControl(idx: number) {
+
+    removeInputControl(idx: number) {
         this.seuils_ep.removeAt(idx);
     }
 
@@ -86,4 +86,127 @@ export class FirstRoundAssessmentComponent implements OnInit {
         });
         this.seuils_a.push(trancheForm);
     };
+
+    /**
+     * Loads small assessment data from the API and updates the form
+     * @param id The simulation ID
+     */
+    loadSmallAssessmentData(id: number): void {
+        this.smallAssessmentService.getSmallAssessment(id).subscribe(
+            (data) => {
+                // Update EP subscription
+                this.tarificationForm.get('montantAbo_ep')?.setValue(data.ep.abonnement);
+
+                // Update EP usage tiers
+                this.seuils_ep.clear();
+                data.ep.usage_tiers.forEach(tier => {
+                    const tierGroup = this.fb.group({
+                        seuil: new FormControl(tier.seuil, {validators: [Validators.required]}),
+                        prix: new FormControl(tier.prix, {validators: [Validators.required]}),
+                    });
+                    this.seuils_ep.push(tierGroup);
+                });
+
+                // Update Assainissement subscription
+                this.tarificationForm.get('montantAbo_a')?.setValue(data.assainissement.abonnement);
+
+                // Update Assainissement usage tiers
+                this.seuils_a.clear();
+                data.assainissement.usage_tiers.forEach(tier => {
+                    const tierGroup = this.fb.group({
+                        seuil: new FormControl(tier.seuil, {validators: [Validators.required]}),
+                        prix: new FormControl(tier.prix, {validators: [Validators.required]}),
+                    });
+                    this.seuils_a.push(tierGroup);
+                });
+            },
+            (error) => {
+                console.error('Error loading small assessment data:', error);
+            }
+        );
+    }
+
+    /**
+     * Updates the small assessment data via the API
+     */
+    updateSmallAssessmentData(): void {
+        if (!this.simulationId) {
+            console.error('No simulation ID available');
+            return;
+        }
+
+        // Create the payload from the form data
+        const payload: SmallAssessmentUpdatePayload = {
+            ep: {
+                subscription: this.tarificationForm.get('montantAbo_ep')!.value as number,
+                usage_tiers: this.seuils_ep.value.map((tier: any) => {
+                    return {
+                        seuil: tier.seuil,
+                        prix: tier.prix
+                    }
+                })
+            },
+            assainissement: {
+                subscription: this.tarificationForm.get('montantAbo_a')!.value as number,
+                usage_tiers: this.seuils_a.value.map((tier: any) => {
+                    return {
+                        seuil: tier.seuil,
+                        prix: tier.prix
+                    }
+                })
+            }
+        };
+
+        this.smallAssessmentService.updateSmallAssessment(this.simulationId, payload).subscribe({
+                next: (data) => {
+                    console.log('Small assessment updated successfully');
+                    this.loadSmallAssessmentData(this.simulationId!)
+                },
+                error: (error) => {
+                    console.error('Error updating small assessment:', error);
+                }
+            }
+        );
+    }
+
+    validateAndSimulate() {
+        if (!this.simulationId) {
+            console.error('No simulation ID available');
+            return;
+        }
+        const payload: SmallAssessmentUpdatePayload = {
+            ep: {
+                subscription: this.tarificationForm.get('montantAbo_ep')!.value as number,
+                usage_tiers: this.seuils_ep.value.map((tier: any) => {
+                    return {
+                        seuil: tier.seuil,
+                        prix: tier.prix
+                    }
+                })
+            },
+            assainissement: {
+                subscription: this.tarificationForm.get('montantAbo_a')!.value as number,
+                usage_tiers: this.seuils_a.value.map((tier: any) => {
+                    return {
+                        seuil: tier.seuil,
+                        prix: tier.prix
+                    }
+                })
+            }
+        };
+
+        this.smallAssessmentService.validateAndSimulate(this.simulationId, payload).subscribe({
+            next: (data) => {
+                if (data.status === 'success') {
+                    this.router.navigate(['/simulation/details/', this.simulationId]);
+                } else {
+                    alert(data.message)
+                }
+            },
+            error: (error) => {
+                console.error('Error starting simulation:', error);
+            }
+        })
+
+    }
 }

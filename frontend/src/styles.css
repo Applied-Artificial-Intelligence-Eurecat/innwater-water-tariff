@@ -52,3 +52,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     flex: 0 0 100%;
   }
 }
+
+/* Snackbar styles */
+.error-snackbar {
+  background-color: #f44336; /* Material Red */
+  color: white;
+}
+
+.success-snackbar {
+  background-color: var(--green-color);
+  color: white;
+}
+
+/* Override Material snackbar button color */
+.error-snackbar .mat-simple-snackbar-action,
+.success-snackbar .mat-simple-snackbar-action {
+  color: white;
+}

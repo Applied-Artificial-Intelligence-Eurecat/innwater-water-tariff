@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from fastapi.security import OAuth2PasswordRequestForm
 
+from src.core.models import StatusEnum
+
 
 class Token(BaseModel):
     access_token: str
@@ -447,3 +449,113 @@ class SimulationPayload(BaseModel):
                 }
             }
         }
+
+
+class GetSimulationPayload(SimulationPayload):
+    id: int
+    status: str
+
+    class Config:
+        populate_by_name = True
+        validate_by_name = True
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "status": str(StatusEnum.first_evaluation),
+                "primitives": {
+                    "drinking_water": {
+                        "fixed_costs": 100000.0,
+                        "variable_costs": 1.2,
+                        "number_of_subscribers": 5000
+                    },
+                    "sanitation": {
+                        "fixed_costs": 80000.0,
+                        "variable_costs": 0.9,
+                        "number_of_subscribers": 4800
+                    },
+                    "environment": {
+                        "fixed_costs_per_year": 25000.0,
+                        "average_variable_cost": 0.3
+                    },
+                    "taxation": {
+                        "drinking_water": {
+                            "vat": 5.5,
+                            "fees": 0.35
+                        },
+                        "sanitation": {
+                            "vat": 10.0,
+                            "fees": 0.25
+                        }
+                    },
+                    "social_data": {
+                        "threshold_par": 550,
+                        "threshold_car": 3300,
+                        "poverty": 14.0,
+                        "extreme_poverty": 3.5
+                    }
+                },
+                "population": {
+                    "bd": "lognormal",
+                    "eps": 10000,
+                    "std": 0.5
+                },
+                "tariff": {
+                    "drinking_water": {
+                        "subscription": 40.0,
+                        "usage_tiers": [
+                            {
+                                "threshold": 50.0,
+                                "price": 1.2
+                            },
+                            {
+                                "threshold": 100.0,
+                                "price": 1.5
+                            },
+                            {
+                                "threshold": 200.0,
+                                "price": 2.0
+                            }
+                        ]
+                    },
+                    "sanitation": {
+                        "subscription": 30.0,
+                        "usage_tiers": [
+                            {
+                                "threshold": 50.0,
+                                "price": 0.8
+                            },
+                            {
+                                "threshold": 100.0,
+                                "price": 1.0
+                            },
+                            {
+                                "threshold": 200.0,
+                                "price": 1.3
+                            }
+                        ]
+                    }
+                },
+                "demand": {
+                    "coefficients": {
+                        "a0": 120.0,
+                        "a1": -0.3,
+                        "a2": 0.2,
+                        "a3": 0.4,
+                        "a4": 0.1,
+                        "a5": 0.05,
+                        "a6": 0.02
+                    },
+                    "k": 1,
+                    "has_pool": False,
+                    "has_garden": True
+                },
+                "launch": {
+                    "periods": 10,
+                    "simulation_name": "Water Tariff Simulation 2025"
+                }
+            }
+        }
+
+
+class DuplicationSchema(BaseModel):
+    new_name: str

@@ -4,9 +4,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.affordability.router.affordability import router as affordability_router
 from src.core.database import engine, Base
 from src.initial.routers import initial_router
+from src.small_assessment.routers import small_assessment_router
 
 
 @asynccontextmanager
@@ -36,9 +36,8 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(affordability_router)
 app.include_router(initial_router)
-
+app.include_router(     small_assessment_router)
 
 # Health check endpoint
 @app.get("/health")

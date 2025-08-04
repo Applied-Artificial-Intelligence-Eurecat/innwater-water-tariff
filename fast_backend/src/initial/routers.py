@@ -14,11 +14,12 @@ from src.core.models import User, Simulation, Project, StatusEnum, DemandConfigu
 from src.initial.graphics_service import generate_tbse_par_affordability_plot, generate_tbse_consumption_plot, \
     generate_pens_parade_consumptions_plot, generate_consumption_deviation_losses_cost_recovery_plot
 from src.initial.initial_service import create_ibt_parameters, create_demand, create_population, create_primitives
-from src.initial.population_service import generate_population_plot, PopulationPlotModel
-from src.initial.schemas import PopulationModel, UserCreate, Token, DemandModel, CoefficientModel, \
+from src.initial.population_service import generate_and_create_population_plot, PopulationPlotModel, \
+    save_population_data_given_simulation_info
+from src.initial.schemas import SimulationPayload, DuplicationSchema, GetSimulationPayload, LaunchModel, PopulationModel
+from src.initial.schemas import UserCreate, Token, DemandModel, CoefficientModel, \
     WaterServiceCostModel, PrimitivesModel, EnvironmentalModel, TaxSectionModel, TaxModel, SocialDataModel, TariffModel, \
     TariffSectionModel, ConsumptionThresholds
-from src.initial.schemas import SimulationPayload
 
 initial_router = APIRouter(
     prefix="/initial",
@@ -38,8 +39,9 @@ async def get_population_plot(input: PopulationPlotModel) -> StreamingResponse:
     Returns:
         dict: Contains the base64 encoded PNG image and content type
     """
-    buf = await generate_population_plot(input.total_subscribers, input.sanitation_subscribers, input.bd, input.eps,
-                                         input.std, input.random_seed)
+    buf = await generate_and_create_population_plot(input.total_subscribers, input.sanitation_subscribers, input.bd,
+                                                    input.eps,
+                                                    input.std, input.random_seed)
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -144,6 +146,17 @@ async def create_and_save_simulation(
     await create_demand(db, payload, simulation)
     await create_ibt_parameters(db, payload, simulation)
     db.commit()
+
+    # TODO: Here, we should save the other files @jimmy
+    await save_population_data_given_simulation_info(
+        total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
+        sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
+        bd=simulation.population.database_path,
+        eps=simulation.population.eps,
+        std=simulation.population.std,
+        simulation_id=simulation.id,
+    )
+
     return {
         "status": "success",
         "message": "Simulation created successfully",
@@ -154,6 +167,23 @@ async def create_and_save_simulation(
             "project_id": project.project_id
         }
     }
+
+
+@initial_router.post("/simulation/{simulation_id}/duplicate")
+async def duplicate_simulation(simulation_id: int, duplication_payload: DuplicationSchema,
+                               current_user: User = Depends(get_current_active_user),
+                               db: Session = Depends(get_db)):
+    simulation: Dict = await get_simulation(simulation_id, current_user, db)
+    payload: GetSimulationPayload = simulation['data']
+    payload.launch.simulation_name = duplication_payload.new_name
+    simulation_payload = SimulationPayload(
+        primitives=payload.primitives,
+        population=payload.population,
+        tarification=payload.tariff,
+        demande=payload.demand,
+        launch=payload.launch
+    )
+    return await create_and_save_simulation(simulation_payload, current_user, db)
 
 
 @initial_router.get("/simulations", response_model=Dict[str, Any])
@@ -340,7 +370,7 @@ async def edit_simulation(simulation_id: int, payload: SimulationPayload,
     }
 
 
-@initial_router.get("/simulation/{simulation_id}")
+@initial_router.get("/simulation/{simulation_id}", response_model=dict)
 async def get_simulation(simulation_id: int, current_user: User = Depends(get_current_active_user),
                          db: Session = Depends(get_db)):
     """
@@ -358,9 +388,9 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
     return {
         "status": "success",
         "message": f"Found simulation {simulation.id}",
-        "data": {
-            "id": simulation.id,
-            "demand": DemandModel(
+        "data": GetSimulationPayload(
+            id=simulation.id,
+            demande=DemandModel(
                 coefficients=CoefficientModel(a0=demand_config.a,
                                               a1=demand_config.b,
                                               a2=demand_config.c,
@@ -372,16 +402,16 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
                 has_garden=demand_config.garden,
                 has_pool=demand_config.pool,
             ),
-            "launch": {
-                "periods": simulation.number_of_periods,
-                "simulation_name": simulation.name,
-            },
-            "population": {
-                "bd": simulation.population.root_database,
-                "eps": simulation.population.eps,
-                "std": simulation.population.std,
-            },
-            "primitives": PrimitivesModel(
+            launch=LaunchModel(
+                simulation_name=simulation.name,
+                periods=simulation.number_of_periods,
+            ),
+            population=PopulationModel(
+                bd=simulation.population.database_path,
+                eps=simulation.population.eps,
+                std=simulation.population.std,
+            ),
+            primitives=PrimitivesModel(
                 ep=WaterServiceCostModel(
                     couts_fixes=simulation.primitives.cost_potable_water.fixed_costs,
                     couts_variables=simulation.primitives.cost_potable_water.variable_costs,
@@ -413,34 +443,38 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
                     extreme_poverty=simulation.primitives.social_costs.extreme_poverty_threshold
                 )
             ),
-            "status": simulation.status.value,
-            "tariff": TariffModel(
-                ep=TariffSectionModel(
-                    subscription=simulation.ibt_eau_potable.abonnement,
-                    usage_tiers=[
-                        ConsumptionThresholds(
-                            threshold=b.seuil,
-                            price=b.price,
-                        )
-                        for b in
-                        simulation.ibt_eau_potable.blocks
-                    ]
-                ),
-                assainissement=TariffSectionModel(
-                    subscription=simulation.ibt_sanitation.abonnement,
-                    usage_tiers=[
-                        ConsumptionThresholds(
-                            threshold=b.seuil,
-                            price=b.price,
-                        )
-                        for b in
-                        simulation.ibt_sanitation.blocks
-                    ]
-
-                )
-            )
-        }
+            status=simulation.status.value,
+            tarification=await create_tariff_model_payload_from_simulation(simulation)
+        )
     }
+
+
+async def create_tariff_model_payload_from_simulation(simulation):
+    return TariffModel(
+        ep=TariffSectionModel(
+            subscription=simulation.ibt_eau_potable.abonnement,
+            usage_tiers=[
+                ConsumptionThresholds(
+                    threshold=b.seuil,
+                    price=b.price,
+                )
+                for b in
+                simulation.ibt_eau_potable.blocks
+            ]
+        ),
+        assainissement=TariffSectionModel(
+            subscription=simulation.ibt_sanitation.abonnement,
+            usage_tiers=[
+                ConsumptionThresholds(
+                    threshold=b.seuil,
+                    price=b.price,
+                )
+                for b in
+                simulation.ibt_sanitation.blocks
+            ]
+
+        )
+    )
 
 
 @initial_router.get("/simulation/{simulation_id}/population_plot")
@@ -451,7 +485,7 @@ async def get_population_plot_given_simulation(simulation_id: int,
         Project.user_id == current_user.id).first()
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    buf = await generate_population_plot(
+    buf = await generate_and_create_population_plot(
         total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
         sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
         bd=simulation.population.database_path,
@@ -505,3 +539,18 @@ async def get_consumption_deviation_loses_cost_recovery_plot(simulation_id: int,
         raise HTTPException(status_code=404, detail="Simulation not found")
     buf = await generate_consumption_deviation_losses_cost_recovery_plot(simulation)
     return StreamingResponse(buf, media_type="image/png")
+
+
+@initial_router.delete("/simulation/{simulation_id}")
+async def delete_simulation(simulation_id: int, current_user: User = Depends(get_current_active_user),
+                            db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    db.delete(simulation)
+    db.commit()
+    return {
+        "status": "success",
+        "message": f"Simulation {simulation_id} deleted successfully",
+    }

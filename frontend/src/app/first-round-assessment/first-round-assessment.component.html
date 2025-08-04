@@ -208,6 +208,15 @@
     </div>
 </mat-tab>
     <mat-tab label="Assessment">
-        <p>Small ssessment</p>
+        <div class="assessment-actions" style="padding: 16px; display: flex; justify-content: flex-end;">
+            <button mat-raised-button color="primary" (click)="updateSmallAssessmentData()">
+                Update Assessment Data
+            </button>
+            <button mat-raised-button class="validate-btn"
+                    (click)="validateAndSimulate()">
+                Validate and Create Final Simulation Results
+            </button>
+        </div>
+        <app-aggregated-dashboard [simulationId]="simulationId"></app-aggregated-dashboard>
     </mat-tab>
 </mat-tab-group>

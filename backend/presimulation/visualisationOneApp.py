@@ -27,3 +27,6 @@ plt.xlabel('Rang N')
 plt.ylabel('CAR TBSE')
 plt.grid(True)
 plt.show()
+
+if __name__ == '__main__':
+    pass

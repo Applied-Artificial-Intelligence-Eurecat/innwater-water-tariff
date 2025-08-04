@@ -47,6 +47,8 @@ export class SimulationDetailsComponent implements OnInit {
                         error: (err) => {
                             console.error('Error loading simulation:', err);
                             this.loading = false;
+                            this.initialApiService.logout();
+                            this.router.navigateByUrl('/')
                             this.error = 'Failed to load simulation data. Please try again.';
 
                         }

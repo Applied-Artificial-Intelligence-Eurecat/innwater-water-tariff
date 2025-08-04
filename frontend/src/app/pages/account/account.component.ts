@@ -10,7 +10,7 @@ import { AuthService } from '../../auth.service';
   styleUrls: ['./account.component.css']
 })
 export class AccountComponent {
-  isCreatingAccount = true;
+  isCreatingAccount = false;
   errorMessage = '';
   successMessage = '';
 

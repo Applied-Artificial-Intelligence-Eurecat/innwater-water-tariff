@@ -22,22 +22,20 @@ DATA = {
 }
 
 
-async def generate_population_plot(total_subscribers: int, sanitation_subscribers: int, bd: str, eps: int,
-                                   std: float, random_seed: int) -> io.BytesIO:
+async def generate_and_create_population_plot(total_subscribers: int, sanitation_subscribers: int, bd: str, eps: int,
+                                              std: float, random_seed: int = 42) -> io.BytesIO:
     xls_path = DATA[bd]
     df = pd.read_excel(Path(xls_path), "esfact7-ElPR1")
 
-    np.random.seed(42)
-    is_g1 = df['Assainissement Collectif (1 = oui)'] == 1
-    g1_perc = sanitation_subscribers / total_subscribers
-    g1_card = int(eps * g1_perc)
-    g2_card = int(eps - g1_card)
-    g2_card, g1_card, len(df)
-    g1_augmented = pd.concat([df[is_g1]] * ceil(g1_card / len(df[is_g1]))).sample(g1_card)
-    g2_augmented = pd.concat([df[~is_g1]] * ceil(g2_card / len(df[~is_g1]))).sample(g2_card)
-    g1_augmented['Revenu_Imputé_2'] = g1_augmented[('Revenu_Imputé_2')] + np.random.normal(0, std, g1_card)
-    g2_augmented['Revenu_Imputé_2'] = g2_augmented[('Revenu_Imputé_2')] + np.random.normal(0, std, g2_card)
+    g1_augmented, g2_augmented = await generate_population_sample_dfs(bd, total_subscribers, sanitation_subscribers,
+                                                                      eps,
+                                                                      std)
 
+    buf = await create_population_plot(df, g1_augmented, g2_augmented)
+    return buf
+
+
+async def create_population_plot(df, g1_augmented, g2_augmented):
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     axs[0].hist(g1_augmented['Revenu_Imputé_2'], bins=50, alpha=0.6, range=(0, df['Revenu_Imputé_2'].max()),
                 label='Sanitation and Potable Water (G1)', )
@@ -60,3 +58,28 @@ async def generate_population_plot(total_subscribers: int, sanitation_subscriber
     plt.close(fig)
     buf.seek(0)
     return buf
+
+
+async def generate_population_sample_dfs(bd: str, total_subscribers: int, sanitation_subscribers: int, eps: int,
+                                         std: float):
+    xls_path = DATA[bd]
+    df = pd.read_excel(Path(xls_path), "esfact7-ElPR1")
+    np.random.seed(42)
+    is_g1 = df['Assainissement Collectif (1 = oui)'] == 1
+    g1_perc = sanitation_subscribers / total_subscribers
+    g1_card = int(eps * g1_perc)
+    g2_card = int(eps - g1_card)
+    g2_card, g1_card, len(df)
+    g1_augmented = pd.concat([df[is_g1]] * ceil(g1_card / len(df[is_g1]))).sample(g1_card)
+    g2_augmented = pd.concat([df[~is_g1]] * ceil(g2_card / len(df[~is_g1]))).sample(g2_card)
+    g1_augmented['Revenu_Imputé_2'] = g1_augmented[('Revenu_Imputé_2')] * (1 + np.random.normal(0, std, g1_card))
+    g2_augmented['Revenu_Imputé_2'] = g2_augmented[('Revenu_Imputé_2')] * (1 + np.random.normal(0, std, g2_card))
+    return g1_augmented, g2_augmented
+
+
+async def save_population_data_given_simulation_info(bd: str, total_subscribers: int, sanitation_subscribers: int, eps: int,
+                                                     std: float, simulation_id: int):
+    Path(f'data/simulation_data/{simulation_id}').mkdir(parents=True, exist_ok=True)
+    g1_df, g2_df = await generate_population_sample_dfs(bd, total_subscribers, sanitation_subscribers, eps, std)
+    concat_df = pd.concat([g1_df, g2_df])
+    concat_df.to_csv(f'data/simulation_data/{simulation_id}/sample.csv', index=False)

@@ -1,12 +1,24 @@
 <div class="simulation-details-container">
     <h2>Simulation Details</h2>
-    <p>Status: {{ simulationData.status }}</p>
+    <div class="simulation-status-row">
+        <div class="status-column">
+            <p>Status: {{ simulationData.status }}</p>
+        </div>
+
+        <div class="button-column" *ngIf="simulationData.status === 'Initialized'">
+            <button mat-raised-button color="primary"
+                    [routerLink]="['/simulation', simulationId, 'first-round-assessment']">
+                First round evaluation
+            </button>
+        </div>
+    </div>
 
     <app-aggregated-dashboard [simulationId]="simulationId"></app-aggregated-dashboard>
 
 
     <mat-expansion-panel (opened)="panelPopulationOpenState = true"
-                         (closed)="panelPopulationOpenState = false">
+                         (closed)="panelPopulationOpenState = false"
+                         style="margin-bottom: 20px">
         <mat-expansion-panel-header>
             <mat-panel-title>Population</mat-panel-title>
         </mat-expansion-panel-header>
@@ -38,15 +50,10 @@
             </div>
         </div>
     </mat-expansion-panel>
-    <div *ngIf="simulationData.status === 'Initialized'">
-        <button mat-raised-button color="primary"
-                [routerLink]="['/simulation', this.simulationId, 'first-round-assessment']">First round evaluation
-        </button>
-    </div>
 
 
-    <button mat-raised-button color="primary" [routerLink]="['/simulation', 'dashboard', this.simulationId]">Aggregated
-        Dashboard
-    </button>
+    <!-- <button mat-raised-button color="primary" [routerLink]="['/simulation', 'dashboard', this.simulationId]">Aggregated
+         Dashboard
+     </button>-->
 
 </div>

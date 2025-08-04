@@ -102,3 +102,18 @@ button {
   border-radius: 5px;
   color: #666;
 }
+
+.simulation-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem; /* optional spacing between columns */
+}
+
+.status-column {
+  flex: 1;
+}
+
+.button-column {
+  /* Keeps the button on the right */
+}

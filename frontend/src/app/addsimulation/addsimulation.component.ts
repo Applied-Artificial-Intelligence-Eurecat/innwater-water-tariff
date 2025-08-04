@@ -1,10 +1,11 @@
-import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {InitialAPIService, SimulationPayload} from '../initial-api.service';
 import {DomSanitizer} from "@angular/platform-browser";
 import {PopulationComponent} from '../population/population.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-addsimulation',
@@ -42,6 +43,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         private route: ActivatedRoute,
         private initialApiService: InitialAPIService,
         private sanitizer: DomSanitizer,
+        private snackBar: MatSnackBar,
     ) {
     }
 
@@ -242,16 +244,16 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
                 // Update demand form
                 this.demandeForm.patchValue({
-                    a0: data.demand.coefficients.a0,
-                    a1: data.demand.coefficients.a1,
-                    a2: data.demand.coefficients.a2,
-                    a3: data.demand.coefficients.a3,
-                    a4: data.demand.coefficients.a4,
-                    a5: data.demand.coefficients.a5,
-                    a6: data.demand.coefficients.a6,
-                    k: data.demand.k,
-                    periodes: data.launch.periods,
-                    nom: data.launch.simulation_name,
+                    a0: data.demande.coefficients.a0,
+                    a1: data.demande.coefficients.a1,
+                    a2: data.demande.coefficients.a2,
+                    a3: data.demande.coefficients.a3,
+                    a4: data.demande.coefficients.a4,
+                    a5: data.demande.coefficients.a5,
+                    a6: data.demande.coefficients.a6,
+                    k: data.demande.k,
+                    periodes: data.launch.periodes,
+                    nom: data.launch.nom_simulation,
                     pauvret: data.primitives.donnees_sociales.pauvrete,
                     pauvretE: data.primitives.donnees_sociales.grande_pauvrete,
                     car: data.primitives.donnees_sociales.seuil_car,
@@ -264,12 +266,12 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     coutsFixe_ep: data.primitives.ep.couts_fixes,
                     coutsVariable_ep: data.primitives.ep.couts_variables,
                     nombreAbonnes_ep: data.primitives.ep.nombre_abonnes,
-                    montantAbo_ep: data.tariff.ep.abonnement,
+                    montantAbo_ep: data.tarification.ep.abonnement,
 
                     coutsFixe_a: data.primitives.assainissement.couts_fixes,
                     coutsVariable_a: data.primitives.assainissement.couts_variables,
                     nombreAbonnes_a: data.primitives.assainissement.nombre_abonnes,
-                    montantAbo_a: data.tariff.assainissement.abonnement,
+                    montantAbo_a: data.tarification.assainissement.abonnement,
 
                     cenvU: data.primitives.environnement.couts_variable_moyen,
                     env_fixed_costs: data.primitives.environnement.couts_fixes_par_an,
@@ -282,7 +284,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                 });
 
                 // Add drinking water tiers
-                data.tariff.ep.usage_tiers.forEach(tier => {
+                data.tarification.ep.usage_tiers.forEach(tier => {
                     this.seuils_ep.push(this.fb.group({
                         seuil: new FormControl(tier.seuil, {validators: [Validators.required]}),
                         prix: new FormControl(tier.prix, {validators: [Validators.required, Validators.minLength(4)]})
@@ -290,7 +292,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                 });
 
                 // Add sanitation tiers
-                data.tariff.assainissement.usage_tiers.forEach(tier => {
+                data.tarification.assainissement.usage_tiers.forEach(tier => {
                     this.seuils_a.push(this.fb.group({
                         seuil: new FormControl(tier.seuil, {validators: [Validators.required]}),
                         prix: new FormControl(tier.prix, {validators: [Validators.required, Validators.minLength(4)]})
@@ -314,6 +316,14 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                 console.error('Error loading simulation:', err);
                 this.loading = false;
                 this.error = 'Failed to load simulation data. Please try again.';
+
+                // Show error in snackbar
+                this.snackBar.open(this.error, 'Close', {
+                    duration: 5000,
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top',
+                    panelClass: ['error-snackbar']
+                });
 
                 // Initialize with default values if loading fails
                 this.initializeDefaultValues();
@@ -362,16 +372,16 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
     getPopulationData(): { eps: number; std: number } {
         if (!this.populationComponent) {
             console.warn('Population component not available, using default values');
-            return { eps: 10000, std: 0.5 };
+            return {eps: 10000, std: 0.5};
         }
-        
+
         // Check if the population component has been properly initialized
-        if (typeof this.populationComponent.expectedPopulationSize === 'undefined' || 
+        if (typeof this.populationComponent.expectedPopulationSize === 'undefined' ||
             typeof this.populationComponent.standardDeviation === 'undefined') {
             console.warn('Population component values not initialized, using default values');
-            return { eps: 10000, std: 0.5 };
+            return {eps: 10000, std: 0.5};
         }
-        
+
         return {
             eps: this.populationComponent.expectedPopulationSize,
             std: this.populationComponent.standardDeviation
@@ -380,11 +390,26 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
 
     addPreSimulation() {
+        console.log(this.tarificationForm.value, this.tarificationForm.valid);
+        console.log(this.demandeForm.value, this.demandeForm.valid);
+        console.log(this.demandeForm.get('periodes')!.valid);
+        Object.keys(this.demandeForm.controls).forEach(controlName => {
+            const control = this.demandeForm.get(controlName);
+            if (control && control.invalid) {
+                console.log(`Control: ${controlName}`);
+                console.log('Errors:', control.errors);
+            }
+        });
         if (!this.tarificationForm.valid || !this.demandeForm.valid) {
             this.error = 'Please fill in all required fields correctly.';
+            this.snackBar.open(this.error, 'Close', {
+                duration: 5000,
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+                panelClass: ['error-snackbar']
+            });
             return;
         }
-
 
 
         this.loading = true;
@@ -408,7 +433,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
         // Get population data from the population component
         const populationData = this.getPopulationData();
-        
+
         console.log('Population data:', populationData);
         console.log('Population component available:', !!this.populationComponent);
         if (this.populationComponent) {
@@ -495,14 +520,25 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     console.log('Simulation updated successfully:', response);
                     this.loading = false;
                     // Navigate to the simulation details page or show success message
-                    alert(`Simulation "${response.data.name}" updated successfully with ID: ${response.data.simulation_id}`);
+                    const successMessage = `Simulation "${response.data.name}" updated successfully with ID: ${response.data.simulation_id}`;
+                    this.snackBar.open(successMessage, 'Close', {
+                        duration: 5000,
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        panelClass: ['success-snackbar']
+                    });
                     this.router.navigateByUrl('/home');
                 },
                 error: (error) => {
                     console.error('Error updating simulation:', error);
                     this.loading = false;
                     this.error = error.error?.detail || 'Failed to update simulation. Please try again.';
-                    alert(this.error);
+                    this.snackBar.open(this.error, 'Close', {
+                        duration: 5000,
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        panelClass: ['error-snackbar']
+                    });
                 }
             });
         } else {
@@ -512,14 +548,25 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     console.log('Simulation created successfully:', response);
                     this.loading = false;
                     // Navigate to the simulation details page or show success message
-                    alert(`Simulation "${response.data.name}" created successfully with ID: ${response.data.simulation_id}`);
+                    const successMessage = `Simulation "${response.data.name}" created successfully with ID: ${response.data.simulation_id}`;
+                    this.snackBar.open(successMessage, 'Close', {
+                        duration: 5000,
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        panelClass: ['success-snackbar']
+                    });
                     this.router.navigateByUrl('/home');
                 },
                 error: (error) => {
                     console.error('Error creating simulation:', error);
                     this.loading = false;
                     this.error = error.error?.detail || 'Failed to create simulation. Please try again.';
-                    alert(this.error);
+                    this.snackBar.open(this.error, 'Close', {
+                        duration: 5000,
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        panelClass: ['error-snackbar']
+                    });
                 }
             });
         }

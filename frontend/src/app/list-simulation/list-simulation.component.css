@@ -56,6 +56,36 @@
   background-color: #218838;
 }
 
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 8px;
+}
+
+.delete-btn:hover {
+  background-color: #bd2130;
+}
+
+
+.copy-btn {
+  background-color: #494955;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 8px;
+}
+
+.copy-btn:hover {
+  background-color: #292930;
+}
 /* Message styling */
 .loading-message,
 .error-message,

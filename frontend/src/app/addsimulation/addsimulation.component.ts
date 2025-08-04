@@ -1,16 +1,20 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {InitialAPIService, SimulationPayload} from '../initial-api.service';
-import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
+import {DomSanitizer} from "@angular/platform-browser";
+import {PopulationComponent} from '../population/population.component';
 
 @Component({
     selector: 'app-addsimulation',
     templateUrl: './addsimulation.component.html',
     styleUrls: ['./addsimulation.component.css']
 })
-export class AddsimulationComponent implements OnInit {
+export class AddsimulationComponent implements OnInit, AfterViewInit {
+
+    @ViewChild(PopulationComponent) populationComponent!: PopulationComponent;
+
     seuil_ep!: { [key: string]: number };
     prix_ep!: { [key: string]: number };
     seuil_r_ep!: { [key: string]: number };
@@ -208,6 +212,12 @@ export class AddsimulationComponent implements OnInit {
         });
     }
 
+    ngAfterViewInit(): void {
+        // The population component might not be available immediately if it's in a tab
+        // We'll handle this in the getPopulationData method
+        console.log('AddsimulationComponent view initialized');
+    }
+
     loadSimulationData(id: number): void {
         this.loading = true;
         this.error = '';
@@ -249,6 +259,7 @@ export class AddsimulationComponent implements OnInit {
                 });
 
                 // Update tarification form
+
                 this.tarificationForm.patchValue({
                     coutsFixe_ep: data.primitives.ep.couts_fixes,
                     coutsVariable_ep: data.primitives.ep.couts_variables,
@@ -344,12 +355,37 @@ export class AddsimulationComponent implements OnInit {
         }));
     }
 
+    /**
+     * Gets the population data from the population component
+     * @returns Object containing expected population size and standard deviation
+     */
+    getPopulationData(): { eps: number; std: number } {
+        if (!this.populationComponent) {
+            console.warn('Population component not available, using default values');
+            return { eps: 10000, std: 0.5 };
+        }
+        
+        // Check if the population component has been properly initialized
+        if (typeof this.populationComponent.expectedPopulationSize === 'undefined' || 
+            typeof this.populationComponent.standardDeviation === 'undefined') {
+            console.warn('Population component values not initialized, using default values');
+            return { eps: 10000, std: 0.5 };
+        }
+        
+        return {
+            eps: this.populationComponent.expectedPopulationSize,
+            std: this.populationComponent.standardDeviation
+        };
+    }
+
 
     addPreSimulation() {
         if (!this.tarificationForm.valid || !this.demandeForm.valid) {
             this.error = 'Please fill in all required fields correctly.';
             return;
         }
+
+
 
         this.loading = true;
         this.error = '';
@@ -369,6 +405,18 @@ export class AddsimulationComponent implements OnInit {
             price: tier.prix,
             threshold: tier.seuil
         }));
+
+        // Get population data from the population component
+        const populationData = this.getPopulationData();
+        
+        console.log('Population data:', populationData);
+        console.log('Population component available:', !!this.populationComponent);
+        if (this.populationComponent) {
+            console.log('Population component values:', {
+                expectedPopulationSize: this.populationComponent.expectedPopulationSize,
+                standardDeviation: this.populationComponent.standardDeviation
+            });
+        }
 
         // Create payload according to the required format
         const payload: SimulationPayload = {
@@ -391,9 +439,9 @@ export class AddsimulationComponent implements OnInit {
                 simulation_name: this.demandeForm.value.nom || 'Unnamed Simulation'
             },
             population: {
-                bd: 'lognormal', // Default value
-                eps: 10000, // Default value
-                std: 0.5 // Default value
+                bd: 'Reunion 2010', // Default value
+                eps: populationData.eps, // Get from population component
+                std: populationData.std // Get from population component
             },
             primitives: {
                 drinking_water: {

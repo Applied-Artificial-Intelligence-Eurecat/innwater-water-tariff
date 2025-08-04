@@ -22,7 +22,7 @@
         <td>{{ simulation.status }}</td>
         <td>{{ simulation.number_of_periods }}</td>
         <td>
-          <button class="view-btn" [routerLink]="['/simulation', simulation.id]">View Details</button>
+          <button class="view-btn" [routerLink]="['/simulation/details', simulation.id]">View Details</button>
           <button class="edit-btn" [routerLink]="['/edit-simulation', simulation.id]">Edit Simulation</button>
         </td>
       </tr>

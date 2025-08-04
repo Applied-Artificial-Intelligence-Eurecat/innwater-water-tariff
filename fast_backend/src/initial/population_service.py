@@ -1,38 +1,60 @@
-from src.initial.schemas import PopulationModel
-import matplotlib.pyplot as plt
 import io
-import base64
+from math import ceil
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from pydantic import BaseModel
 
 
-async def generate_population_plot(input_data: PopulationModel) -> io.BytesIO:
-    """
-    Generate a population plot based on the input data.
-
-    Args:
-        input_data: The population model containing the input parameters
-
-    Returns:
-        dict: Base64 encoded image and content type
-    """
-    # Your logic code goes here using input_data parameters
-    # Example implementation (replace with your actual logic)
-    buf = await mock_data()
-    return buf
+class PopulationPlotModel(BaseModel):
+    total_subscribers: int
+    sanitation_subscribers: int
+    bd: str
+    eps: int
+    std: float
+    random_seed: int = 42
 
 
-async def mock_data():
-    x_values = [1, 2, 3, 4, 5]
-    y_values = [10, 20, 30, 40, 50]
-    # Create the plot
-    fig, axs = plt.subplots(1, 1, figsize=(10, 6))
-    axs.scatter(x_values, y_values)
-    # Add titles and labels
-    axs.set_title("Population Plot")
-    axs.set_xlabel("Years")
-    axs.set_ylabel("Population")
-    # Add grid for better readability
-    axs.grid(True, linestyle='--', alpha=0.7)
-    # Save the plot to a bytes buffer
+DATA = {
+    "Reunion 2010": "data/data_La_Réunion_2.xls"
+}
+
+
+async def generate_population_plot(total_subscribers: int, sanitation_subscribers: int, bd: str, eps: int,
+                                   std: float, random_seed: int) -> io.BytesIO:
+    xls_path = DATA[bd]
+    df = pd.read_excel(Path(xls_path), "esfact7-ElPR1")
+
+    np.random.seed(42)
+    is_g1 = df['Assainissement Collectif (1 = oui)'] == 1
+    g1_perc = sanitation_subscribers / total_subscribers
+    g1_card = int(eps * g1_perc)
+    g2_card = int(eps - g1_card)
+    g2_card, g1_card, len(df)
+    g1_augmented = pd.concat([df[is_g1]] * ceil(g1_card / len(df[is_g1]))).sample(g1_card)
+    g2_augmented = pd.concat([df[~is_g1]] * ceil(g2_card / len(df[~is_g1]))).sample(g2_card)
+    g1_augmented['Revenu_Imputé_2'] = g1_augmented[('Revenu_Imputé_2')] + np.random.normal(0, std, g1_card)
+    g2_augmented['Revenu_Imputé_2'] = g2_augmented[('Revenu_Imputé_2')] + np.random.normal(0, std, g2_card)
+
+    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+    axs[0].hist(g1_augmented['Revenu_Imputé_2'], bins=50, alpha=0.6, range=(0, df['Revenu_Imputé_2'].max()),
+                label='Sanitation and Potable Water (G1)', )
+    axs[1].hist(g2_augmented['Revenu_Imputé_2'], bins=50, alpha=0.6, range=(0, df['Revenu_Imputé_2'].max()),
+                label='Only Potable Water (G2)', )
+    axs[0].set_xlabel("Income")
+    axs[1].set_xlabel("Income")
+    axs[0].set_ylabel("Frequency")
+    plt.suptitle("Distribution Comparison of Income from households by different groups")
+    axs[0].set_title("Sanitation and Potable Water (G1)")
+    axs[1].set_title("Only Potable Water (G2)")
+    axs[0].grid(True, alpha=0.75, linestyle='--')
+    axs[1].grid(True, alpha=0.75, linestyle='--')
+    max_ylim = max(axs[0].get_ylim()[1], axs[1].get_ylim()[1])
+    axs[0].set_ylim(0, max_ylim)
+    axs[1].set_ylim(0, max_ylim)
+    plt.tight_layout()
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     plt.close(fig)

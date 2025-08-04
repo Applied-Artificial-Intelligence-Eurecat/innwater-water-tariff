@@ -203,7 +203,7 @@
         </div>
     </mat-tab>
     <mat-tab label="Population">
-        <app-population></app-population>
+        <app-population [totalSubscribers]="tarificationForm.value.nombreAbonnes_ep" [sanitationSubscribers]="tarificationForm.value.nombreAbonnes_a"></app-population>
     </mat-tab>
     <mat-tab label="Demande">
         <div class="demand-container">

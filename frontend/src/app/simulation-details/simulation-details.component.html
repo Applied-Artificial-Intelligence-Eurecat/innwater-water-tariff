@@ -1,42 +1,52 @@
 <div class="simulation-details-container">
-  <h2>Simulation Details</h2>
-  
-  <div *ngIf="loading" class="loading-indicator">
-    <p>Loading simulation data...</p>
-  </div>
-  
-  <div *ngIf="error" class="error-message">
-    <p>{{ error }}</p>
-    <button class="back-btn" routerLink="/home">Back to Home</button>
-  </div>
-  
-  <div *ngIf="!loading && !error && simulationData" class="simulation-content">
-    <div class="simulation-header">
-      <h3>{{ simulationData.nom || 'Unnamed Simulation' }}</h3>
-      <p *ngIf="simulationData.date">Date: {{ simulationData.date }}</p>
-      <p *ngIf="simulationData.id">ID: {{ simulationData.id }}</p>
+    <h2>Simulation Details</h2>
+    <p>Status: {{ simulationData.status }}</p>
+
+    <app-aggregated-dashboard [simulationId]="simulationId"></app-aggregated-dashboard>
+
+
+    <mat-expansion-panel (opened)="panelPopulationOpenState = true"
+                         (closed)="panelPopulationOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>Population</mat-panel-title>
+        </mat-expansion-panel-header>
+        <img [src]="populationPlotUrl" style="width: 100%"/>
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel (opened)="panelInitializationOpenState = true"
+                         (closed)="panelInitializationOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Initialization results
+            </mat-panel-title>
+            <mat-panel-description>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="row median-statistics-row">
+            <div class="col-md-6">
+                <img [src]="tbseParPlotUrl" style="width: 100%;"/>
+            </div>
+            <div class="col-md-6">
+                <img [src]="tbseConsumptionPlotUrl" style="width: 100%;"/>
+            </div>
+            <div class="col-md-6">
+                <img [src]="pensParadePlotUrl" style="width: 100%;"/>
+            </div>
+            <div class="col-md-6">
+                <img [src]="consumptionDeviationLosesCostRecoveryPlot" style="width: 100%;"/>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <div *ngIf="simulationData.status === 'Initialized'">
+        <button mat-raised-button color="primary"
+                [routerLink]="['/simulation', this.simulationId, 'first-round-assessment']">First round evaluation
+        </button>
     </div>
-    
-    <div class="simulation-results" *ngIf="simulationData.resultat">
-      <h4>Results</h4>
-      <p *ngIf="simulationData.resultat.score !== undefined">Score: {{ simulationData.resultat.score }}</p>
-      <p *ngIf="simulationData.resultat.profit !== undefined">
-        Profit: {{ simulationData.resultat.profit }}
-        <span *ngIf="simulationData.resultat.profit_message">
-          ({{ simulationData.resultat.profit_message }})
-        </span>
-      </p>
-    </div>
-    
-    <div class="simulation-actions">
-      <button class="back-btn" routerLink="/home">Back to Home</button>
-      <button class="eval-btn" routerLink="/evaluation">Evaluation</button>
-      <button class="facture-btn" routerLink="/facture">Factures</button>
-    </div>
-  </div>
-  
-  <div *ngIf="!loading && !error && !simulationData" class="no-data">
-    <p>No simulation data found for ID: {{ simulationId }}</p>
-    <button class="back-btn" routerLink="/home">Back to Home</button>
-  </div>
+
+
+    <button mat-raised-button color="primary" [routerLink]="['/simulation', 'dashboard', this.simulationId]">Aggregated
+        Dashboard
+    </button>
+
 </div>

@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from 'src/environments/environment';
@@ -301,7 +301,7 @@ export class InitialAPIService {
      */
     updateSimulation(id: number, payload: SimulationPayload): Observable<SimulationResponse> {
         return this.http.put<SimulationResponse>(
-            `${this.apiUrl}/api/v1/initial/simulation/edit/${id}`,
+            `${this.apiUrl}/api/v1/initial/simulation/${id}/edit`,
             payload,
             {
                 headers: {
@@ -310,4 +310,15 @@ export class InitialAPIService {
             }
         );
     }
-}
+
+    getPlot(url: string) {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'image/png',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        });
+        return this.http.get(url, {
+            headers: headers,
+            responseType: 'blob'
+        });
+    }}

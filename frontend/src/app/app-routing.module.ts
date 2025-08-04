@@ -9,16 +9,14 @@ import {DashboardComponent} from './pages/dashboard/dashboard.component';
 import {HomeComponent} from './pages/home/home.component';
 import {NotFoundComponent} from './pages/not-found/not-found.component';
 import {LastSimComponent} from './last-sim/last-sim.component';
-import {ListSimulationComponent} from './list-simulation/list-simulation.component';
-import {TestTComponent} from './test-t/test-t.component';
-import {RegistComponent} from './regist/regist.component';
-import {WaitComponent} from './wait/wait.component';
-import {GemaComponent} from './gema/gema.component';
 import {DataDisplayComponent} from './data-display/data-display.component';
 import {ResultatAffichageComponent} from './resultat-affichage/resultat-affichage.component';
 import {AffordabilityComponent} from "./evaluation/affordability/affordability.component";
 import {SimulationDetailsComponent} from './simulation-details/simulation-details.component';
 import {AuthGuard} from './auth.guard';
+import {SimplifiedDashboardComponent} from "./simplified-dashboard/simplified-dashboard.component";
+import {FirstRoundAssessmentComponent} from "./first-round-assessment/first-round-assessment.component";
+import {AggregatedDashboardComponent} from "./aggregated-dashboard/aggregated-dashboard.component";
 
 const routes: Routes = [
     {
@@ -73,13 +71,26 @@ const routes: Routes = [
         component: LastSimComponent,
     },
     {
-        path: 'simulation/:id',
+        path: 'simulation/details/:id',
         component: SimulationDetailsComponent,
+    },
+    {
+      path: 'simulation/dashboard/:id',
+      component: AggregatedDashboardComponent,
+    },
+    {
+        path: 'simulation/:id/first-round-assessment',
+        component: FirstRoundAssessmentComponent,
+    },
+    {
+        path: 'simulation/simplified-dashboard/:id',
+        component: SimplifiedDashboardComponent,
     },
     {
         path: 'edit-simulation/:id',
         component: AddsimulationComponent,
     },
+
     {
         path: '**',
         component: NotFoundComponent,

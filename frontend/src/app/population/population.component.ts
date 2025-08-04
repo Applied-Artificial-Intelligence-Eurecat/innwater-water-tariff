@@ -1,17 +1,23 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ChatDataProvider} from "../interfaces/chat-data-provider.interface";
-import {TableData} from "../interfaces/table-data.interface";
-import {ChatService} from "../services/chat.service";
-import {DomSanitizer} from "@angular/platform-browser";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { ChatDataProvider } from "../interfaces/chat-data-provider.interface";
+import { TableData } from "../interfaces/table-data.interface";
+import { ChatService } from "../services/chat.service";
+import { DomSanitizer } from "@angular/platform-browser";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { environment } from "../../environments/environment";
 
 @Component({
     selector: 'app-population',
     templateUrl: './population.component.html',
     styleUrls: ['./population.component.css']
 })
-export class PopulationComponent implements OnInit, OnDestroy, ChatDataProvider {
+export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDataProvider {
     // Expected Population Size (EPS) - default 1,000, min 1,000, max 10,000, increments of 1,000
+    @Input() totalSubscribers: number | null | undefined = null;
+    @Input() sanitationSubscribers: number | null | undefined = null;
+
+    private apiUrl: string = environment.apiUrl;
+
     expectedPopulationSize: number = 1000;
     populationSizeOptions: number[] = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000];
 
@@ -24,6 +30,10 @@ export class PopulationComponent implements OnInit, OnDestroy, ChatDataProvider 
     imageSrc: any;
 
     constructor(private chatService: ChatService, private sanitizer: DomSanitizer, private http: HttpClient) {
+    }
+
+    ngOnChanges(changes: any): void {
+        console.log(this.totalSubscribers)
     }
 
     getComponentDescription(): string {
@@ -48,14 +58,16 @@ export class PopulationComponent implements OnInit, OnDestroy, ChatDataProvider 
             'Content-Type': 'application/json',
             'Accept': 'image/png'
         });
-
+        const randomNumber = Math.ceil(Math.random() * 100000);
         const body = {
-            bd: 'lognormal',
-            eps: 10000,
-            std: 0.5
+            bd: 'Reunion 2010',
+            eps: this.expectedPopulationSize,
+            std: this.standardDeviation,
+            total_subscribers: this.totalSubscribers,
+            sanitation_subscribers: this.sanitationSubscribers,
+            random_seed: randomNumber,
         };
-
-        this.http.post('http://localhost:8000/api/v1/initial/population/plot', body, {
+        this.http.post(`${this.apiUrl}/api/v1/initial/population/plot`, body, {
             headers: headers,
             responseType: 'blob'
         }).subscribe(blob => {
@@ -65,12 +77,11 @@ export class PopulationComponent implements OnInit, OnDestroy, ChatDataProvider 
     }
 
     ngOnInit(): void {
-        // Register this component with the chat service
         this.chatService.registerComponent('population', this);
+        console.log(this.totalSubscribers)
     }
 
     ngOnDestroy(): void {
-        // Unregister this component when it's destroyed
         this.chatService.unregisterComponent('population');
     }
 

@@ -34,6 +34,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ConsomationComponent } from './consomation/consomation.component';
 import { FactureComponent } from './facture/facture.component';
 import { MatTableModule } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
 import { AddsimulationComponent } from './addsimulation/addsimulation.component';
 import { AbordabiliteComponent } from './abordabilite/abordabilite.component';
 import { PopulationComponent } from './population/population.component';
@@ -62,6 +63,17 @@ import {FinancingComponent} from "./evaluation/financing/financing.component";
 import { AbordabiliteGeneralComponent } from './abordabilite-general/abordabilite-general.component';
 import { SimulationDetailsComponent } from './simulation-details/simulation-details.component';
 import { UsageTarificationComponent } from './addsimulation/usage-tarification/usage-tarification.component';
+import { SimplifiedDashboardComponent } from './simplified-dashboard/simplified-dashboard.component';
+import { FirstRoundAssessmentComponent } from './first-round-assessment/first-round-assessment.component';
+import { AggregatedDashboardComponent } from './aggregated-dashboard/aggregated-dashboard.component';
+import { AffordabilityTableComponent } from './aggregated-dashboard/affordability-table/affordability-table.component';
+import { IncentiveEffectTableComponent } from './aggregated-dashboard/incentive-effect-table/incentive-effect-table.component';
+import { EconomicEfficiencyTableComponent } from './aggregated-dashboard/economic-efficiency-table/economic-efficiency-table.component';
+import { EquityTableComponent } from './aggregated-dashboard/equity-table/equity-table.component';
+import { FundingTableComponent } from './aggregated-dashboard/funding-table/funding-table.component';
+import { EnvironmentalCostsTableComponent } from './aggregated-dashboard/environmental-costs-table/environmental-costs-table.component';
+import { WaterAgencyTableComponent } from './aggregated-dashboard/water-agency-table/water-agency-table.component';
+import { StateTableComponent } from './aggregated-dashboard/state-table/state-table.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +115,17 @@ import { UsageTarificationComponent } from './addsimulation/usage-tarification/u
     ChatComponent,
     ChatButtonComponent,
     UsageTarificationComponent,
+    SimplifiedDashboardComponent,
+    FirstRoundAssessmentComponent,
+    AggregatedDashboardComponent,
+    AffordabilityTableComponent,
+    IncentiveEffectTableComponent,
+    EconomicEfficiencyTableComponent,
+    EquityTableComponent,
+    FundingTableComponent,
+    EnvironmentalCostsTableComponent,
+    WaterAgencyTableComponent,
+    StateTableComponent,
   ],
   imports: [
     CommonModule,
@@ -124,6 +147,7 @@ import { UsageTarificationComponent } from './addsimulation/usage-tarification/u
     MatTabsModule,
     HttpClientModule,
     MatTableModule,
+    MatCardModule,
     MatExpansionModule,
     MarkdownModule.forRoot({
       markedOptions: {

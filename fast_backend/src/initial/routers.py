@@ -9,11 +9,12 @@ from starlette.responses import StreamingResponse
 from src.core.auth import authenticate_user, create_access_token, get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, \
     get_current_active_user
 from src.core.database import get_db
-from src.core.models import User, Simulation, Project, StatusEnum, DemandConfiguration
+from src.core.models import User, Simulation, Project, StatusEnum, DemandConfiguration, IBTEauPotable, BlockEauPotable, \
+    IBTSanitation, BlockSanitation
 from src.initial.graphics_service import generate_tbse_par_affordability_plot, generate_tbse_consumption_plot, \
     generate_pens_parade_consumptions_plot, generate_consumption_deviation_losses_cost_recovery_plot
 from src.initial.initial_service import create_ibt_parameters, create_demand, create_population, create_primitives
-from src.initial.population_service import generate_population_plot
+from src.initial.population_service import generate_population_plot, PopulationPlotModel
 from src.initial.schemas import PopulationModel, UserCreate, Token, DemandModel, CoefficientModel, \
     WaterServiceCostModel, PrimitivesModel, EnvironmentalModel, TaxSectionModel, TaxModel, SocialDataModel, TariffModel, \
     TariffSectionModel, ConsumptionThresholds
@@ -27,7 +28,7 @@ initial_router = APIRouter(
 
 
 @initial_router.post("/population/plot")
-async def get_population_plot(input: PopulationModel) -> StreamingResponse:
+async def get_population_plot(input: PopulationPlotModel) -> StreamingResponse:
     """
     Endpoint to generate a scatter plot chart to validate the population.
 
@@ -37,7 +38,8 @@ async def get_population_plot(input: PopulationModel) -> StreamingResponse:
     Returns:
         dict: Contains the base64 encoded PNG image and content type
     """
-    buf = await generate_population_plot(input)
+    buf = await generate_population_plot(input.total_subscribers, input.sanitation_subscribers, input.bd, input.eps,
+                                         input.std, input.random_seed)
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -187,6 +189,157 @@ async def list_user_simulations(current_user: User = Depends(get_current_active_
     }
 
 
+@initial_router.put("/simulation/{simulation_id}/edit")
+async def edit_simulation(simulation_id: int, payload: SimulationPayload,
+                          current_user: User = Depends(get_current_active_user),
+                          db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+
+    # Update basic simulation properties
+    simulation.name = payload.launch.simulation_name
+    simulation.number_of_periods = payload.launch.periods
+    db.add(simulation)
+
+    # Update population
+    if simulation.population:
+        simulation.population.eps = payload.population.eps
+        simulation.population.std = payload.population.std
+        simulation.population.database_path = payload.population.bd
+        db.add(simulation.population)
+    else:
+        await create_population(db, payload, simulation)
+
+    # Update demand configuration
+    demand_config = db.query(DemandConfiguration).filter(DemandConfiguration.simulation_id == simulation.id).first()
+    if demand_config:
+        demand_config.a = payload.demand.coefficients.a0
+        demand_config.b = payload.demand.coefficients.a1
+        demand_config.c = payload.demand.coefficients.a2
+        demand_config.d = payload.demand.coefficients.a3
+        demand_config.e = payload.demand.coefficients.a4
+        demand_config.f = payload.demand.coefficients.a5
+        demand_config.g = payload.demand.coefficients.a6
+        demand_config.perception_parameter = payload.demand.k
+        demand_config.pool = payload.demand.has_pool
+        demand_config.garden = payload.demand.has_garden
+        db.add(demand_config)
+    else:
+        await create_demand(db, payload, simulation)
+
+    # Update IBT parameters for potable water
+    ibt_potable = db.query(IBTEauPotable).filter(IBTEauPotable.simulation_id == simulation.id).first()
+    if ibt_potable:
+        ibt_potable.abonnement = payload.tariff.drinking_water.subscription
+        db.add(ibt_potable)
+
+        # Delete existing blocks and create new ones
+        db.query(BlockEauPotable).filter(BlockEauPotable.ibt_id == ibt_potable.id).delete()
+        for potable_water_block in payload.tariff.drinking_water.usage_tiers:
+            db.add(BlockEauPotable(
+                seuil=potable_water_block.threshold,
+                price=potable_water_block.price,
+                ibt_id=ibt_potable.id,
+            ))
+    else:
+        # Create new IBT parameters if they don't exist
+        ibt_potable = IBTEauPotable(
+            abonnement=payload.tariff.drinking_water.subscription,
+            simulation_id=simulation.id
+        )
+        db.add(ibt_potable)
+        db.commit()
+        for potable_water_block in payload.tariff.drinking_water.usage_tiers:
+            db.add(BlockEauPotable(
+                seuil=potable_water_block.threshold,
+                price=potable_water_block.price,
+                ibt_id=ibt_potable.id,
+            ))
+
+    # Update IBT parameters for sanitation
+    ibt_sanitation = db.query(IBTSanitation).filter(IBTSanitation.simulation_id == simulation.id).first()
+    if ibt_sanitation:
+        ibt_sanitation.abonnement = payload.tariff.sanitation.subscription
+        db.add(ibt_sanitation)
+
+        # Delete existing blocks and create new ones
+        db.query(BlockSanitation).filter(BlockSanitation.ibt_id == ibt_sanitation.id).delete()
+        for sanitation_block in payload.tariff.sanitation.usage_tiers:
+            db.add(BlockSanitation(
+                seuil=sanitation_block.threshold,
+                price=sanitation_block.price,
+                ibt_id=ibt_sanitation.id,
+            ))
+    else:
+        # Create new IBT parameters if they don't exist
+        ibt_sanitation = IBTSanitation(
+            abonnement=payload.tariff.sanitation.subscription,
+            simulation_id=simulation.id
+        )
+        db.add(ibt_sanitation)
+        db.commit()
+        for sanitation_block in payload.tariff.sanitation.usage_tiers:
+            db.add(BlockSanitation(
+                seuil=sanitation_block.threshold,
+                price=sanitation_block.price,
+                ibt_id=ibt_sanitation.id,
+            ))
+
+    # Update primitives
+    if simulation.primitives:
+        # Update potable water costs
+        if simulation.primitives.cost_potable_water:
+            simulation.primitives.cost_potable_water.fixed_costs = payload.primitives.drinking_water.fixed_costs
+            simulation.primitives.cost_potable_water.variable_costs = payload.primitives.drinking_water.variable_costs
+            simulation.primitives.cost_potable_water.subscribers_number = payload.primitives.drinking_water.number_of_subscribers
+            db.add(simulation.primitives.cost_potable_water)
+
+        # Update sanitation costs
+        if simulation.primitives.cost_sanitation:
+            simulation.primitives.cost_sanitation.fixed_costs = payload.primitives.sanitation.fixed_costs
+            simulation.primitives.cost_sanitation.variable_costs = payload.primitives.sanitation.variable_costs
+            simulation.primitives.cost_sanitation.subscribers_number = payload.primitives.sanitation.number_of_subscribers
+            db.add(simulation.primitives.cost_sanitation)
+
+        # Update environmental costs
+        if simulation.primitives.environmental_costs:
+            simulation.primitives.environmental_costs.fixed_costs = payload.primitives.environment.fixed_costs_per_year
+            simulation.primitives.environmental_costs.variable_costs = payload.primitives.environment.average_variable_cost
+            db.add(simulation.primitives.environmental_costs)
+
+        # Update tax costs
+        if simulation.primitives.tax_costs:
+            simulation.primitives.tax_costs.vat_drinking_water = payload.primitives.taxation.drinking_water.vat
+            simulation.primitives.tax_costs.fee_drinking_water = payload.primitives.taxation.drinking_water.fees
+            simulation.primitives.tax_costs.vat_sanitation = payload.primitives.taxation.sanitation.vat
+            simulation.primitives.tax_costs.fee_sanitation = payload.primitives.taxation.sanitation.fees
+            db.add(simulation.primitives.tax_costs)
+
+        # Update social costs
+        if simulation.primitives.social_costs:
+            simulation.primitives.social_costs.car_threshold = payload.primitives.social_data.threshold_car
+            simulation.primitives.social_costs.par_threshold = payload.primitives.social_data.threshold_par
+            simulation.primitives.social_costs.poverty_threshold = payload.primitives.social_data.poverty
+            simulation.primitives.social_costs.extreme_poverty_threshold = payload.primitives.social_data.extreme_poverty
+            db.add(simulation.primitives.social_costs)
+    else:
+        await create_primitives(db, payload, simulation)
+
+    db.commit()
+
+    return {
+        "status": "success",
+        "message": "Simulation updated successfully",
+        "data": {
+            "simulation_id": simulation.id,
+            "name": simulation.name,
+            "status": simulation.status.value,
+        }
+    }
+
+
 @initial_router.get("/simulation/{simulation_id}")
 async def get_simulation(simulation_id: int, current_user: User = Depends(get_current_active_user),
                          db: Session = Depends(get_db)):
@@ -288,6 +441,25 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
             )
         }
     }
+
+
+@initial_router.get("/simulation/{simulation_id}/population_plot")
+async def get_population_plot_given_simulation(simulation_id: int,
+                                               current_user: User = Depends(get_current_active_user),
+                                               db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    buf = await generate_population_plot(
+        total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
+        sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
+        bd=simulation.population.database_path,
+        eps=simulation.population.eps,
+        std=simulation.population.std,
+        random_seed=42,
+    )
+    return StreamingResponse(buf, media_type="image/png")
 
 
 @initial_router.get("/simulation/{simulation_id}/tbse_par_plot")

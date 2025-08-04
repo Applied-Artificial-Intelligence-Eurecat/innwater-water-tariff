@@ -1,0 +1,385 @@
+input[type=number]{
+    -moz-appearance: textfield;
+}
+.container {
+    padding: 32px;
+    display: flex;
+    flex-direction: row;
+}
+
+.seuil-container {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-row {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+mat-form-field {
+    width: 260px;
+}
+
+/* Primitives tab styling */
+.primitives-container {
+    padding: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.primitives-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.primitives-container h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+.primitives-container h4 {
+    color: #444;
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+.primitives-container h5 {
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.subsection {
+    flex: 1;
+    min-width: 250px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Launch tab styling */
+.launch-container {
+    padding: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.launch-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.launch-container p {
+    margin-bottom: 20px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.launch-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Demand module styling */
+.demand-container {
+    padding: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.demand-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.description-text {
+    margin-bottom: 20px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.demand-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.equation-container, .perception-container, .determinants-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.equation-container h3, .perception-container h3, .determinants-container h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.equation {
+    font-size: 16px;
+    line-height: 2;
+    margin-bottom: 0;
+}
+
+.equation-input {
+    width: 60px;
+    margin: 0 5px;
+    padding: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.form-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.form-field label {
+    width: 120px;
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100px;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-field label {
+    width: 120px;
+    margin-right: 10px;
+}
+
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+}
+
+.image-container {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.demand-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Usage Tarification styling */
+.tarification-container {
+    padding: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tarification-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.tarification-container h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+.tarification-container h4 {
+    color: #444;
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+.tarification-section {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.section-description {
+    margin-bottom: 20px;
+    color: #555;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.subsection-description {
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 14px;
+}
+
+.thresholds-table {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.thresholds-header {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 2px solid #eee;
+    font-weight: bold;
+    color: #333;
+}
+
+.threshold-label, .price-label {
+    flex: 1;
+    padding: 0 10px;
+}
+
+.action-label {
+    width: 50px;
+}
+
+.threshold-row {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.threshold-inputs {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+}
+
+.threshold-actions {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.add-threshold {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.add-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+mat-hint {
+    color: #666;
+    font-size: 12px;
+}
+
+/* Make form fields in thresholds table more compact */
+.threshold-inputs mat-form-field {
+    width: 100%;
+    margin-right: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tarification-container,
+    .primitives-container,
+    .launch-container,
+    .demand-container {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .threshold-inputs {
+        flex-direction: column;
+    }
+
+    .threshold-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .threshold-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+}

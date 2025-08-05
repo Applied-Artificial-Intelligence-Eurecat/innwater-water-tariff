@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.database import engine, Base
 from src.initial.routers import initial_router
+from src.results.routers import results_router
 from src.small_assessment.routers import small_assessment_router
 
 
@@ -14,7 +15,6 @@ async def lifespan(app: FastAPI):
     # Create tables in the database
     Base.metadata.create_all(bind=engine)
     yield
-
 
 
 # Create FastAPI app
@@ -37,7 +37,9 @@ app.add_middleware(
 
 # Include routers
 app.include_router(initial_router)
-app.include_router(     small_assessment_router)
+app.include_router(small_assessment_router)
+app.include_router(results_router)
+
 
 # Health check endpoint
 @app.get("/health")

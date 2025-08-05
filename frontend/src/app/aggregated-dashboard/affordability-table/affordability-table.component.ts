@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ResultsService, AffordabilityTable } from '../../results.service';
 
 export interface AffordabilityData {
   metric: string;
@@ -13,16 +14,46 @@ export interface AffordabilityData {
 })
 export class AffordabilityTableComponent implements OnInit {
   displayedColumns: string[] = ['metric', 'ibt', 'tbse'];
-  dataSource: AffordabilityData[] = [
-    { metric: 'Headcount ratio', ibt: '15.9%', tbse: '32.1%' },
-    { metric: 'App. Afford. Deft', ibt: '3.37 €', tbse: '16.87 €' },
-    { metric: 'Effec. Afford. Defit', ibt: '17.69 €', tbse: '53.33 €' },
-    { metric: 'Gini_App', ibt: '0.956', tbse: '0.793' },
-    { metric: 'Gini_Eff', ibt: '0.725', tbse: '0.355' }
-  ];
+  dataSource: AffordabilityData[] = [];
 
-  constructor() { }
+  constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
+    const simulationId = 1;  // Replace with dynamic value if needed
+
+    this.resultsService.getAffordabilityResults(simulationId).subscribe({
+      next: (data: AffordabilityTable) => {
+        this.dataSource = [
+          {
+            metric: 'Headcount ratio',
+            ibt: `${data.headcount_ratio.ibt}%`,
+            tbse: `${data.headcount_ratio.tbse}%`
+          },
+          {
+            metric: 'App. Afford. Deft',
+            ibt: `${data.apparent_affordability_deficit.ibt} €`,
+            tbse: `${data.apparent_affordability_deficit.tbse} €`
+          },
+          {
+            metric: 'Effec. Afford. Defit',
+            ibt: `${data.effective_affordability_deficit.ibt} €`,
+            tbse: `${data.effective_affordability_deficit.tbse} €`
+          },
+          {
+            metric: 'Gini_App',
+            ibt: data.gini_app.ibt.toString(),
+            tbse: data.gini_app.tbse.toString()
+          },
+          {
+            metric: 'Gini_Eff',
+            ibt: data.gini_eff.ibt.toString(),
+            tbse: data.gini_eff.tbse.toString()
+          }
+        ];
+      },
+      error: (err) => {
+        console.error('Failed to load affordability data', err);
+      }
+    });
   }
-} 
+}

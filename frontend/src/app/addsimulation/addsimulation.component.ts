@@ -57,7 +57,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         a6: new FormControl({value: 0.25, disabled: this.disabled}, {validators: [Validators.required]}),
         car: new FormControl({value: 3, disabled: this.disabled}, {validators: [Validators.required]}),
         par: new FormControl({value: 3, disabled: this.disabled}, {validators: [Validators.required]}),
-        k: new FormControl({value: 0, disabled: this.disabled}, {validators: [Validators.required]}),
+        k: new FormControl({value: 0.99, disabled: this.disabled}, {validators: [Validators.required]}),
         periodes: new FormControl({value: 4, disabled: this.disabled}, {validators: [Validators.required]}),
         nom: new FormControl('', {validators: [Validators.required]}),
         pauvret: new FormControl({value: 800, disabled: this.disabled}, {validators: [Validators.required]}),
@@ -84,7 +84,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         seuils_r_a: this.fb.array([]),
 
         cenvU: new FormControl(1.3, {validators: [Validators.required]}),
-        env_fixed_costs: new FormControl(25000, {validators: [Validators.required]}),
+        env_fixed_costs: new FormControl(0, {validators: [Validators.required]}),
 
     });
     isLinear = true;
@@ -560,7 +560,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                 error: (error) => {
                     console.error('Error creating simulation:', error);
                     this.loading = false;
-                    this.error = error.error?.detail || 'Failed to create simulation. Please try again.';
+                    this.error = error.error?.detail[0].msg || 'Failed to create simulation. Please try again.';
                     this.snackBar.open(this.error, 'Close', {
                         duration: 5000,
                         horizontalPosition: 'center',

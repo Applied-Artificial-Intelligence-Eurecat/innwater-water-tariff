@@ -1,1 +1,5 @@
-@import '../shared-table-styles.css'; 
+@import '../shared-table-styles.css';
+
+.section-break td {
+  border-top: 2px solid #000;  /* Bold separator */
+}

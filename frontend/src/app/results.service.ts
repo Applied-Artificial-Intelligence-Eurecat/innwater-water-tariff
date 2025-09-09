@@ -53,6 +53,75 @@ export interface EconomicEfficiencyTable {
     delta_surplus_m: EconomicEfficiencyRow;
 }
 
+// Gini Index
+export interface EquityGiniTable {
+    ibt: number | null;
+    ibt_ae: number | null;
+    tbse: number | null;
+}
+
+// Basic Consumption (DAE / DAI)
+export interface BasicConsumptionEquityRow {
+    dae: number | null;
+    dai: number | null;
+}
+
+export interface BasicConsumptionEquityTable {
+    net_sub_basic_c: BasicConsumptionEquityRow;
+    omega_ratio_1: BasicConsumptionEquityRow;
+    net_taxes_basic_c: BasicConsumptionEquityRow;
+    omega_ratio_2: BasicConsumptionEquityRow;
+}
+
+// Full Consumption (AFE / AFI)
+export interface FullConsumptionEquityRow {
+    afe: number | null;
+    afi: number | null;
+}
+
+export interface FullConsumptionEquityTable {
+    net_sub_c: FullConsumptionEquityRow;
+    omega_ratio_1: FullConsumptionEquityRow;
+    net_taxation: FullConsumptionEquityRow;
+    omega_ratio_2: FullConsumptionEquityRow;
+}
+
+// /funding/rex_op
+export interface FundingRexOp {
+    general: number;
+    total_cost: number;
+}
+
+// /funding/other
+export interface FundingOther {
+    net_contributors_percent: number | null;
+    net_beneficiaries_percent: number | null;
+    subsidized_basic_c_percent: number | null;
+    subsidized_non_basic_c_percent: number | null;
+    margined_c_percent: number | null;
+    bad_sub_percent: number | null;
+    bad_tax_percent: number | null;
+}
+
+// /environmental_cost
+export interface EnvironmentalCostTable {
+    tbse_conso_rang_1: number | null;
+    effective_tbse: number | null;
+    ibt: number | null;
+    ibt_pp: number | null;
+}
+
+// /water_agency
+export interface WaterAgency {
+    exercise_duty: number | null;
+}
+
+// /state
+export interface StateFunding {
+    vat: number | null;
+}
+
+
 @Injectable({
     providedIn: 'root',
 })
@@ -110,5 +179,94 @@ export class ResultsService {
             }
         );
     }
+
+    getEquityGini(simulationId: number): Observable<EquityGiniTable> {
+        return this.http.get<EquityGiniTable>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/equity/gini`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getBasicConsumptionEquity(simulationId: number): Observable<BasicConsumptionEquityTable> {
+        return this.http.get<BasicConsumptionEquityTable>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/equity/basic_consumption`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getFullConsumptionEquity(simulationId: number): Observable<FullConsumptionEquityTable> {
+        return this.http.get<FullConsumptionEquityTable>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/equity/full_consumption`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getFundingRexOp(simulationId: number): Observable<FundingRexOp> {
+        return this.http.get<FundingRexOp>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/funding/rex_op`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getFundingOther(simulationId: number): Observable<FundingOther> {
+        return this.http.get<FundingOther>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/funding/other`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getEnvironmentalCost(simulationId: number): Observable<EnvironmentalCostTable> {
+        return this.http.get<EnvironmentalCostTable>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/environmental_cost`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getWaterAgency(simulationId: number): Observable<WaterAgency> {
+        return this.http.get<WaterAgency>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/water_agency`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getStateFunding(simulationId: number): Observable<StateFunding> {
+        return this.http.get<StateFunding>(
+            `${this.apiUrl}/api/v1/results/${simulationId}/state`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
 
 }

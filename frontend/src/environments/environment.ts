@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: "http://msm-backend"
+    apiUrl: "https://innwater.eurecatprojects.com/water-tariff-api/"
 };

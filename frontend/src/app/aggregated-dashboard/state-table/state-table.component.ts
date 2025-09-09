@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ResultsService, StateFunding } from '../../results.service';
 
 export interface StateData {
   category: string;
@@ -12,12 +13,29 @@ export interface StateData {
 })
 export class StateTableComponent implements OnInit {
   displayedColumns: string[] = ['category', 'totalAnnuel'];
-  dataSource: StateData[] = [
-    { category: 'VAT', totalAnnuel: '1,076,968 €' }
-  ];
+  dataSource: StateData[] = [];
 
-  constructor() { }
+  constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
+    const simulationId = 2; // Replace with a dynamic ID if needed
+
+    this.resultsService.getStateFunding(simulationId).subscribe({
+      next: (data: StateFunding) => {
+        this.dataSource = [
+          {
+            category: 'VAT',
+            totalAnnuel: this.formatEuro(data.vat)
+          }
+        ];
+      },
+      error: err => {
+        console.error('Failed to load state funding data', err);
+      }
+    });
   }
-} 
+
+  private formatEuro(value: number | null): string {
+    return value !== null ? `${value.toLocaleString('en-US', { minimumFractionDigits: 0 })} €` : '-';
+  }
+}

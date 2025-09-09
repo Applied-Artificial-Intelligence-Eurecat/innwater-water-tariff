@@ -1,4 +1,4 @@
-<h2 *ngIf="!isEditMode">General Initialization</h2>
+<h2 *ngIf="!isEditMode">MicroSimulation Model</h2>
 <h2 *ngIf="isEditMode">Edit Simulation</h2>
 
 <div class="initialization-description">
@@ -9,14 +9,15 @@
         demand and finally, the launch.</p>
 
     <ol>
-        <li><strong>Tariff Module Initialization (Primitives)</strong> - Configure the water pricing scheme to be
-            evaluated
+        <li><strong>Tariff Module Initialization (Primitives)</strong> sets the general environment within which the
+            pricing of the public
+            water service will be assessed.
         </li>
-        <li><strong>Population Module Initialization</strong> - Load the household-level data needed for microsimulation
+        <li><strong>Population Module</strong> - Load the household-level data needed for microsimulation.
         </li>
-        <li><strong>Usage Tarification</strong> - Configure water usage pricing for Eau Potable and Assainissement</li>
-        <li><strong>Demand Module</strong> - Compute expected consumption</li>
-        <li><strong>Launch</strong> - Run the simulation</li>
+        <li><strong>Tariff Module</strong> - Configure parameters for drinking water and (collective) sanitation.</li>
+        <li><strong>Demand Module</strong> - Compute expected consumption.</li>
+        <li><strong>Launch</strong> - Run the simulation.</li>
     </ol>
 </div>
 
@@ -26,36 +27,37 @@
         <div class="primitives-container">
             <h2>Tariff Module Initialization (Primitives)</h2>
             <p class="description-text">
-                Configure the water pricing scheme parameters including service costs, taxation, and social data
+                Configure some of the parameters of the decision problem including service costs, taxation, and social
+                data.
                 thresholds.
             </p>
 
             <form [formGroup]="tarificationForm">
                 <!-- Coût du service EPA Section -->
                 <div class="form-section">
-                    <h3>Coût du service EPA</h3>
+                    <h3>Service Cost (Drinking Water & Collective Sanitation)</h3>
 
                     <div class="section-content">
                         <!-- Eau potable -->
                         <div class="subsection">
-                            <h4>Eau potable</h4>
+                            <h4>Drinking Water</h4>
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Coûts fixes (par an)</mat-label>
+                                    <mat-label>Fixed cost (per year)</mat-label>
                                     <input type="number" min="0" matInput formControlName="coutsFixe_ep">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Coût variable moyen</mat-label>
+                                    <mat-label>Unit variable cost (in euro per cubic meter)</mat-label>
                                     <input type="number" min="0" matInput formControlName="coutsVariable_ep">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Nombre d'abonnés</mat-label>
+                                    <mat-label>Number of domestic subscribers (households)</mat-label>
                                     <input type="number" min="0" matInput formControlName="nombreAbonnes_ep">
                                 </mat-form-field>
                             </div>
@@ -63,24 +65,24 @@
 
                         <!-- Assainissement -->
                         <div class="subsection">
-                            <h4>Assainissement</h4>
+                            <h4>Collective Sanitation</h4>
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Coûts fixes (par an)</mat-label>
+                                    <mat-label>Fixed costs (per year)</mat-label>
                                     <input type="number" min="0" matInput formControlName="coutsFixe_a">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Coût variable moyen</mat-label>
+                                    <mat-label>Unit Variable Cost (in euro per cubic meter)</mat-label>
                                     <input type="number" min="0" matInput formControlName="coutsVariable_a">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Nombre d'abonnés</mat-label>
+                                    <mat-label>Number of domestic subscribers (households)</mat-label>
                                     <input type="number" min="0" matInput formControlName="nombreAbonnes_a">
                                 </mat-form-field>
                             </div>
@@ -88,17 +90,18 @@
 
                         <!-- Environnement -->
                         <div class="subsection">
-                            <h4>Environnement</h4>
+                            <h4>Environmental Cost</h4>
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Coûts fixes (par an)</mat-label>
-                                    <input type="number" min="0" matInput>
+                                    <mat-label>Fixed Costs (per year)</mat-label>
+                                    <input type="number" min="0" matInput formControlName="env_fixed_costs"
+                                           [defaultValue]="0">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Coût variable moyen</mat-label>
+                                    <mat-label>Unit Cost (in euro per cubic meter)</mat-label>
                                     <input type="number" min="0" matInput formControlName="cenvU">
                                 </mat-form-field>
                             </div>
@@ -108,12 +111,12 @@
 
                 <!-- Fiscalité Section -->
                 <div class="form-section">
-                    <h3>Fiscalité</h3>
+                    <h3>Taxation</h3>
 
                     <div class="section-content">
                         <!-- Eau potable -->
                         <div class="subsection">
-                            <h4>Eau potable</h4>
+                            <h4>Drinking Water</h4>
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
                                     <mat-label>TVA (en %)</mat-label>
@@ -122,7 +125,7 @@
                             </div>
 
                             <div class="form-group">
-                                <h5>Redevances (en euros par m3)</h5>
+                                <h5>Charges (in euros per cubic meter)</h5>
                                 <ng-container formArrayName="seuils_r_ep">
                                     <div *ngFor="let trancheForm of seuils_r_ep.controls; last as isLast; let i = index; let r=last;"
                                          class="input-row">
@@ -138,7 +141,7 @@
 
                         <!-- Assainissement -->
                         <div class="subsection">
-                            <h4>Assainissement</h4>
+                            <h4>Collective Sanitation</h4>
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
                                     <mat-label>TVA (en %)</mat-label>
@@ -147,7 +150,7 @@
                             </div>
 
                             <div class="form-group">
-                                <h5>Redevances (en euros par m3)</h5>
+                                <h5>Charges (in euros per cubic meter)</h5>
                                 <ng-container formArrayName="seuils_r_a">
                                     <div *ngFor="let trancheForm of seuils_r_a.controls; last as isLast; let i = index; let r=last;"
                                          class="input-row">
@@ -165,34 +168,34 @@
 
                 <!-- Données sociales Section -->
                 <div class="form-section">
-                    <h3>Données sociales</h3>
+                    <h3>Social Data</h3>
 
                     <div class="section-content">
                         <form [formGroup]="demandeForm">
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Seuil CAR (en %)</mat-label>
+                                    <mat-label>Threshold CAR (in %)</mat-label>
                                     <input type="number" min="0" matInput formControlName="car">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Seuil PAR (en %)</mat-label>
+                                    <mat-label>Threshold PAR (en %)</mat-label>
                                     <input type="number" min="0" matInput formControlName="par">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Seuil de pauvreté (en euros par mois)</mat-label>
+                                    <mat-label>Poverty threshold (in euros per month)</mat-label>
                                     <input type="number" min="0" matInput formControlName="pauvret">
                                 </mat-form-field>
                             </div>
 
                             <div class="form-group">
                                 <mat-form-field appearance="fill">
-                                    <mat-label>Seuil de grande pauvreté (en euros par mois)</mat-label>
+                                    <mat-label>Extreme poverty threshold (in euros per month)</mat-label>
                                     <input type="number" min="0" matInput formControlName="pauvretE">
                                 </mat-form-field>
                             </div>
@@ -203,12 +206,13 @@
         </div>
     </mat-tab>
     <mat-tab label="Population">
-        <app-population [totalSubscribers]="tarificationForm.value.nombreAbonnes_ep" [sanitationSubscribers]="tarificationForm.value.nombreAbonnes_a"></app-population>
+        <app-population [totalSubscribers]="tarificationForm.value.nombreAbonnes_ep"
+                        [sanitationSubscribers]="tarificationForm.value.nombreAbonnes_a"></app-population>
     </mat-tab>
     <mat-tab label="Demande">
         <div class="demand-container">
-            <h2>Demand Module Configuration</h2>
-            <p class="description-text">Configure the parameters for the demand calculation model.</p>
+            <h2>Demand Module</h2>
+            <p class="description-text">Set the values of the response coefficients of the demand function.</p>
 
             <form [formGroup]="demandeForm" class="demand-form">
                 <div class="equation-container">
@@ -220,8 +224,8 @@
                         <input type="number" matInput formControlName="a2" class="equation-input"> SNWA +
                         <input type="number" matInput formControlName="a3" class="equation-input"> POOL +
                         <input type="number" matInput formControlName="a4" class="equation-input"> GardenWeather +
-                        <input type="number" matInput formControlName="a5" class="equation-input"> ln(Prix) +
-                        <input type="number" matInput formControlName="a6" class="equation-input"> ln(Revenu)
+                        <input type="number" matInput formControlName="a5" class="equation-input"> ln(Perceived Price) +
+                        <input type="number" matInput formControlName="a6" class="equation-input"> ln(Virtual Income)
                     </p>
                 </div>
 
@@ -229,21 +233,21 @@
                     <h3>Perception Parameter</h3>
                     <div class="form-field">
                         <label for="k">Parameter k:</label>
-                        <input max="1" type="number" matInput id="k" placeholder="k" formControlName="k"
+                        <input max="1.0" type="number" matInput id="k" placeholder="k" formControlName="k" step="0.05"
                                class="form-input">
                     </div>
                 </div>
 
                 <div class="determinants-container">
-                    <h3>Consumption Determinants</h3>
-                    <p>Souhaitez-vous inclure dans la liste des déterminants de la consommation de base :</p>
+                    <h3>Basic consumption Determinants</h3>
+                    <p>Would you like to include the following in the list of basic consumption determinants:</p>
                     <div class="checkbox-group">
                         <div class="checkbox-field">
-                            <label for="pool">Piscine:</label>
+                            <label for="pool">Swimming pool:</label>
                             <input type="checkbox" id="pool" class="checkbox-input">
                         </div>
                         <div class="checkbox-field">
-                            <label for="garden">Jardin:</label>
+                            <label for="garden">Garden:</label>
                             <input type="checkbox" id="garden" class="checkbox-input">
                         </div>
                     </div>
@@ -253,47 +257,49 @@
 
         </div>
     </mat-tab>
-    <mat-tab label="Usage Tarification">
+    <mat-tab label="Drinking Water and Sanitation Tariffs">
         <div class="tarification-container">
-            <h2>Configuration des Tarifs d'Eau</h2>
+            <h2>Tariffs Module</h2>
             <p class="description-text">
-                Configurez les tarifs pour l'eau potable et l'assainissement, y compris les montants d'abonnement et les
-                seuils de consommation.
+
             </p>
 
             <form [formGroup]="tarificationForm">
                 <mat-tab-group>
                     <mat-tab label="Eau Potable">
                         <div class="tarification-section">
-                            <h3>Tarification Eau Potable</h3>
+                            <h3>Drinking Water Tarification</h3>
                             <p class="section-description">
-                                Définissez les tarifs pour la distribution d'eau potable, incluant l'abonnement et les
-                                différents paliers de consommation.
+                                Set the pricing parameters for the drinking water service, excluding VAT (State)
+                                and environmental excise duties (Water Agency). Based on a quarterly billing
+                                period, these include a subscription fee and, in the case of progressive pricing,
+                                the thresholds for the di¤erent consumption blocks.
                             </p>
 
                             <div class="form-section">
-                                <h4>Abonnement</h4>
+                                <h4>Fixed part</h4>
                                 <div class="form-field">
                                     <mat-form-field appearance="fill">
-                                        <mat-label>Montant de l'abonnement (en euros par trimestre, hors TVA)
+                                        <mat-label>Subscription fee, in euros per quarter
                                         </mat-label>
                                         <input type="number" min="0" max="100" matInput formControlName="montantAbo_ep">
-                                        <mat-hint>Frais fixes facturés indépendamment de la consommation</mat-hint>
+                                        <mat-hint>Fixed charges billed regardless of consumption</mat-hint>
                                     </mat-form-field>
                                 </div>
                             </div>
 
                             <div class="form-section">
-                                <h4>Paliers de Consommation</h4>
+                                <h4>Price thresholds</h4>
                                 <p class="subsection-description">
-                                    Définissez les seuils de consommation (en m³) et les prix unitaires correspondants
-                                    (en euros par m³, hors TVA et redevances).
+                                    Enter the tariff thresholds (in cubic meters, based on quarterly consumption) and
+                                    the corresponding unit prices (in euros per cubic meter), excluding VAT and
+                                    environmental excise duties.
                                 </p>
 
                                 <div class="thresholds-table">
                                     <div class="thresholds-header">
-                                        <div class="threshold-label">Seuil (m³)</div>
-                                        <div class="price-label">Prix (€/m³)</div>
+                                        <div class="threshold-label">Threshold (m³)</div>
+                                        <div class="price-label">Price (€/m³)</div>
                                         <div class="action-label"></div>
                                     </div>
 
@@ -304,18 +310,18 @@
                                                 <mat-form-field appearance="fill">
                                                     <input type="number" min="0" matInput formControlName="seuil"
                                                            placeholder="seuil">
-                                                    <mat-hint *ngIf="i === 0">Début du palier</mat-hint>
+                                                    <mat-hint *ngIf="i === 0">Start of the tier</mat-hint>
                                                 </mat-form-field>
                                                 <mat-form-field appearance="fill">
                                                     <input type="number" matInput formControlName="prix"
                                                            placeholder="prix">
-                                                    <mat-hint>Prix pour ce palier</mat-hint>
+                                                    <mat-hint>Block price</mat-hint>
                                                 </mat-form-field>
                                             </div>
                                             <div class="threshold-actions">
                                                 <button mat-icon-button color="warn" *ngIf="seuils_ep.length > 1"
                                                         (click)="removeInputControl(i)"
-                                                        aria-label="Supprimer ce palier">
+                                                        aria-label="Add a price threshold">
                                                     <mat-icon>remove_circle</mat-icon>
                                                 </button>
                                             </div>
@@ -366,22 +372,24 @@
                                 différents paliers de consommation.
                             </p>
 
-                <div class="form-section">
-                  <h4>Abonnement</h4>
-                  <div class="form-field">
-                    <mat-form-field appearance="fill">
-                      <mat-label>Montant de l'abonnement (en euros par trimestre, hors TVA)</mat-label>
-                      <input type="number" min="0" matInput formControlName="montantAbo_a">
-                      <mat-hint>Frais fixes facturés indépendamment de la consommation</mat-hint>
-                    </mat-form-field>
-                  </div>
-                </div>
+                            <div class="form-section">
+                                <h4>Abonnement</h4>
+                                <div class="form-field">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Montant de l'abonnement (en euros par trimestre, hors TVA)
+                                        </mat-label>
+                                        <input type="number" min="0" matInput formControlName="montantAbo_a">
+                                        <mat-hint>Frais fixes facturés indépendamment de la consommation</mat-hint>
+                                    </mat-form-field>
+                                </div>
+                            </div>
 
-                <div class="form-section">
-                  <h4>Paliers de Consommation</h4>
-                  <p class="subsection-description">
-                    Définissez les seuils de consommation (en m³) et les prix unitaires correspondants (en euros par m³, hors TVA et redevances).
-                  </p>
+                            <div class="form-section">
+                                <h4>Paliers de Consommation</h4>
+                                <p class="subsection-description">
+                                    Définissez les seuils de consommation (en m³) et les prix unitaires correspondants
+                                    (en euros par m³, hors TVA et redevances).
+                                </p>
 
                                 <div class="thresholds-table">
                                     <div class="thresholds-header">

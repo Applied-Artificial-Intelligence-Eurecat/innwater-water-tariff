@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.core.auth import get_current_active_user
 from src.core.database import get_db
 from src.core.models import User
+from src.results.affordability.routers import affordability_router
 from src.results.schemas import *
 
 results_router = APIRouter(
@@ -139,3 +140,5 @@ async def get_state_table(simulation_id: int, current_user: User = Depends(get_c
     return StateTable(
         vat=None
     )
+
+results_router.include_router(affordability_router)

@@ -10,7 +10,6 @@ import {HomeComponent} from './pages/home/home.component';
 import {NotFoundComponent} from './pages/not-found/not-found.component';
 import {LastSimComponent} from './last-sim/last-sim.component';
 import {DataDisplayComponent} from './data-display/data-display.component';
-import {ResultatAffichageComponent} from './resultat-affichage/resultat-affichage.component';
 import {AffordabilityComponent} from "./evaluation/affordability/affordability.component";
 import {SimulationDetailsComponent} from './simulation-details/simulation-details.component';
 import {AuthGuard} from './auth.guard';
@@ -53,10 +52,6 @@ const routes: Routes = [
     {
         path: 'data-display', // This is in fact Affordability Groups
         component: DataDisplayComponent
-    },
-    {
-        path: 'resultats', // This is in fact Affordability General
-        component: ResultatAffichageComponent,
     },
     {
         path: 'affordability',

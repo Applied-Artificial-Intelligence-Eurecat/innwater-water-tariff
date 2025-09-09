@@ -26,7 +26,6 @@ import {HomeComponent} from './pages/home/home.component';
 import {AboutComponent} from './pages/about/about.component';
 import {NotFoundComponent} from './pages/not-found/not-found.component';
 import {SignupComponent} from './pages/signup/signup.component';
-import {TarificationComponent} from './tarification/tarification.component';
 import {LoginComponent} from './login/login.component';
 import {CommonModule} from '@angular/common';
 import {AccountComponent} from './pages/account/account.component';
@@ -37,20 +36,17 @@ import {FactureComponent} from './facture/facture.component';
 import {MatTableModule} from '@angular/material/table';
 import {MatCardModule} from '@angular/material/card';
 import {AddsimulationComponent} from './addsimulation/addsimulation.component';
-import {AbordabiliteComponent} from './abordabilite/abordabilite.component';
 import {PopulationComponent} from './population/population.component';
 import {EvaluationComponent} from './evaluation/evaluation.component';
 import {IncitatifComponent} from './incitatif/incitatif.component';
 import {ListSimulationComponent} from './list-simulation/list-simulation.component';
 import {LastSimComponent} from './last-sim/last-sim.component';
-import {TestTComponent} from './test-t/test-t.component';
 import {MatStepperModule} from '@angular/material/stepper';
 import {RegistComponent} from './regist/regist.component';
 import {WaitComponent} from './wait/wait.component';
 import {GemaComponent} from './gema/gema.component';
 import {TableComponent} from './components/table/table.component';
 import {DataDisplayComponent} from './data-display/data-display.component';
-import {ResultatAffichageComponent} from './resultat-affichage/resultat-affichage.component';
 import {ScatterPlotComponent} from './scatter-plot/scatter-plot.component';
 import {EtapesProcessusComponent} from './etapes-processus/etapes-processus.component';
 import {PenParadeChartComponent} from './pen-parade-chart/pen-parade-chart.component';
@@ -61,7 +57,6 @@ import {IncentiveComponent} from './evaluation/incentive/incentive.component';
 import {EfficiencyComponent} from './evaluation/efficiency/efficiency.component'
 import {EquityComponent} from "./evaluation/equity/equity.component";
 import {FinancingComponent} from "./evaluation/financing/financing.component";
-import {AbordabiliteGeneralComponent} from './abordabilite-general/abordabilite-general.component';
 import {SimulationDetailsComponent} from './simulation-details/simulation-details.component';
 import {UsageTarificationComponent} from './addsimulation/usage-tarification/usage-tarification.component';
 import {SimplifiedDashboardComponent} from './simplified-dashboard/simplified-dashboard.component';
@@ -83,6 +78,7 @@ import {WaterAgencyTableComponent} from './aggregated-dashboard/water-agency-tab
 import {StateTableComponent} from './aggregated-dashboard/state-table/state-table.component';
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
 import {MatSnackBarModule} from "@angular/material/snack-bar";
+import {AffordabilityGeneralComponent} from "./affordability/affordability-general/affordability-general.component";
 
 @NgModule({
     declarations: [
@@ -91,26 +87,22 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
         AboutComponent,
         NotFoundComponent,
         SignupComponent,
-        TarificationComponent,
         LoginComponent,
         AccountComponent,
         DashboardComponent,
         ConsomationComponent,
         FactureComponent,
         AddsimulationComponent,
-        AbordabiliteComponent,
         PopulationComponent,
         EvaluationComponent,
         IncitatifComponent,
         ListSimulationComponent,
         LastSimComponent,
-        TestTComponent,
         RegistComponent,
         WaitComponent,
         GemaComponent,
         TableComponent,
         DataDisplayComponent,
-        ResultatAffichageComponent,
         ScatterPlotComponent,
         EtapesProcessusComponent,
         PenParadeChartComponent,
@@ -119,13 +111,13 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
         EfficiencyComponent,
         EquityComponent,
         FinancingComponent,
-        AbordabiliteGeneralComponent,
         SimulationDetailsComponent,
         ChatComponent,
         ChatButtonComponent,
         UsageTarificationComponent,
         SimplifiedDashboardComponent,
         FirstRoundAssessmentComponent,
+        AffordabilityGeneralComponent,
         AggregatedDashboardComponent,
         AffordabilityTableComponent,
         IncentiveEffectTableComponent,

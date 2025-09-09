@@ -309,7 +309,7 @@ class CoefficientModel(BaseModel):
 
 class DemandModel(BaseModel):
     coefficients: CoefficientModel
-    k: int = Field(..., description="Scaling factor", example=1)
+    k: float = Field(..., description="Scaling factor", example=1)
     has_pool: bool = Field(..., alias="piscine", description="Whether the household has a swimming pool", example=False)
     has_garden: bool = Field(..., alias="jardin", description="Whether the household has a garden", example=True)
 

@@ -1,0 +1,24 @@
+<table>
+  <thead>
+    <tr>
+      <th>Catégorie</th>
+      <th>PAR IBT</th>
+      <th>PAR TBSE</th>
+      <th>Δ PAR</th>
+      <th>CAR IBT</th>
+      <th>CAR TBSE</th>
+      <th>Δ CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of tableData">
+      <td>{{ row.metric }}</td>
+      <td>{{ row.par_ibt }}</td>
+      <td>{{ row.par_tbse }}</td>
+      <td>{{ row.delta_par }}</td>
+      <td>{{ row.car_ibt }}</td>
+      <td>{{ row.car_tbse }}</td>
+      <td>{{ row.delta_car }}</td>
+    </tr>
+  </tbody>
+</table>

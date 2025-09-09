@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ResultsService, FundingRexOp, FundingOther } from '../../results.service';
 
 export interface FundingData {
   metric: string;
@@ -13,21 +14,44 @@ export interface FundingData {
 })
 export class FundingTableComponent implements OnInit {
   displayedColumns: string[] = ['metric', 'general', 'percentTotalCost'];
-  dataSource: FundingData[] = [
-    { metric: 'REX_Op', general: '-179,449 €', percentTotalCost: '-0.8%' },
-    { metric: '% H', general: '-', percentTotalCost: '-' },
-    { metric: 'Net Contributors', general: '42.8', percentTotalCost: '' },
-    { metric: 'Net Beneficiaries', general: '57.2', percentTotalCost: '' },
-    { metric: 'Subsididized basic C (en %)', general: '69.20', percentTotalCost: '' },
-    { metric: 'Subsididized non basic C (en %)', general: '41.6', percentTotalCost: '' },
-    { metric: 'Margined C (en %)', general: '34.5', percentTotalCost: '' },
-    { metric: 'In %', general: '-', percentTotalCost: '' },
-    { metric: '"Bad" Sub', general: '0.1', percentTotalCost: '' },
-    { metric: '"Bad" Tax', general: '18.2', percentTotalCost: '' }
-  ];
+  dataSource: FundingData[] = [];
 
-  constructor() { }
+  constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
+    const simulationId = 2; // replace with dynamic value if needed
+
+    this.resultsService.getFundingRexOp(simulationId).subscribe({
+      next: (rex: FundingRexOp) => {
+        this.resultsService.getFundingOther(simulationId).subscribe({
+          next: (other: FundingOther) => {
+            this.dataSource = [
+              {
+                metric: 'REX_Op',
+                general: this.formatEuro(rex.general),
+                percentTotalCost: this.formatPercent(rex.total_cost)
+              },
+              { metric: 'Net Contributors', general: this.formatPercent(other.net_contributors_percent), percentTotalCost: '' },
+              { metric: 'Net Beneficiaries', general: this.formatPercent(other.net_beneficiaries_percent), percentTotalCost: '' },
+              { metric: 'Subsididized basic C', general: this.formatPercent(other.subsidized_basic_c_percent), percentTotalCost: '' },
+              { metric: 'Subsididized non basic C', general: this.formatPercent(other.subsidized_non_basic_c_percent), percentTotalCost: '' },
+              { metric: 'Margined C', general: this.formatPercent(other.margined_c_percent), percentTotalCost: '' },
+              { metric: '"Bad" Sub', general: this.formatPercent(other.bad_sub_percent), percentTotalCost: '' },
+              { metric: '"Bad" Tax', general: this.formatPercent(other.bad_tax_percent), percentTotalCost: '' }
+            ];
+          },
+          error: err => console.error('Error loading funding/other data', err)
+        });
+      },
+      error: err => console.error('Error loading funding/rex_op data', err)
+    });
   }
-} 
+
+  private formatEuro(value: number | null): string {
+    return value !== null ? `${value.toLocaleString('en-US', { minimumFractionDigits: 0 })} €` : '-';
+  }
+
+  private formatPercent(value: number | null): string {
+    return value !== null ? `${value.toFixed(1)} %` : '- %';
+  }
+}

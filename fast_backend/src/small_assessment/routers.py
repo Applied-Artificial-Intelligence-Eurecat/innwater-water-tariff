@@ -1,3 +1,6 @@
+import time
+from multiprocessing import Process
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -93,6 +96,18 @@ async def check_simulation_ibt_is_updated(simulation: Simulation, payload: Tarif
     return True
 
 
+def full_evaluation(simulation_id: int, current_user_id: int):
+    time.sleep(10)
+    db: Session = get_db()
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user_id).first()
+    if simulation:
+        raise Exception("Simulation not found")
+    simulation.status = str(StatusEnum.completed)
+    db.add(simulation)
+    db.commit()
+
+
 @small_assessment_router.post("/validate/{simulation_id}")
 async def validate_and_evaluate(simulation_id, payload: TariffModel,
                                 current_user: User = Depends(get_current_active_user),
@@ -112,10 +127,11 @@ async def validate_and_evaluate(simulation_id, payload: TariffModel,
     db.add(simulation)
     db.commit()
 
-    # TODO: Start full evaluation @jimmy
+    p = Process(target=full_evaluation, args=(simulation.id, current_user.id,))
+    p.start()
+
 
     return {
         "status": "success",
         "message": "Simulation updated successfully"
     }
-

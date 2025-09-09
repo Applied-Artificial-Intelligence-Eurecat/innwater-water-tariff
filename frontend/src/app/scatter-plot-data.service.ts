@@ -13,11 +13,6 @@ import {  HttpErrorResponse } from '@angular/common/http';
 export class ScatterPlotDataService {
     constructor(private http: HttpClient) {}
 
-    // Méthode pour obtenir les données depuis l'API (ex : Flask)
-    getPlotData(): Observable<ScatterData> {
-        
-      return this.http.get<ScatterData>('http://localhost:5001/scatter_plot_data');  // URL de l'API Flask
-    }
 
     getPlotDataIterable(): Observable<ScatterData> {
         return this.http.get<any>('http://localhost:5001/scatter_plot_data').pipe(

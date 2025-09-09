@@ -24,12 +24,6 @@ export class SignupComponent {
     console.log(this.sigupForm.value.password,this.sigupForm.value.emailControl,this.sigupForm.value.name);
     console.log('1',this.test);
     
-    this.http.post('http://localhost:5001/api/signup',{
-    //this.http.post('http://api.t2po.re/api/signup',{
-      name : this.sigupForm.value.name,
-      email : this.sigupForm.value.emailControl,
-      password : this.sigupForm.value.password,
-    }).subscribe({next:data=>{console.log(data);alert('vous pouvez vous connectez');},error:error=>{alert('pb');console.log(error);}});
     console.log(this.test);
   }
 }

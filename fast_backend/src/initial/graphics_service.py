@@ -49,6 +49,13 @@ async def generate_tbse_par_affordability_plot(simulation: Simulation) -> io.Byt
     plt.title('Scatter Plot : Niveau de Vie OCDE vs Par TBSE')
     plt.xlabel('Niveau de Vie OCDE')
     plt.ylabel('Par TBSE')
+    plt.xlim(*plt.xlim())
+    plt.ylim(*plt.ylim())
+    plt.hlines(y=simulation.primitives.social_costs.par_threshold, xmin=plt.xlim()[0], xmax=plt.xlim()[1],
+               label='Par TBSE Threshold', color='green')
+    plt.vlines(x=simulation.primitives.social_costs.poverty_threshold, ymin=plt.ylim()[0], ymax=plt.ylim()[1],
+               label="Poverty threshold", color='red')
+    plt.legend()
     plt.grid(True)
     buf = io.BytesIO()
     plt.savefig(buf, format='png')

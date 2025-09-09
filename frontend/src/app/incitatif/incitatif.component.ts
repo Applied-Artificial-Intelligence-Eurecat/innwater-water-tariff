@@ -14,8 +14,7 @@ export class IncitatifComponent implements OnInit{
   
   ngOnInit(): void{
     
-    this.http.get('http://localhost:5001/api/getSim/'+localStorage.getItem('userid')).subscribe(data=>{console.log(data); this.dat=data;});
-    
+
   }
 
 }

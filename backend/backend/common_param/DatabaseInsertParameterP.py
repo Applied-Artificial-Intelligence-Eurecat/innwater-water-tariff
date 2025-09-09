@@ -1,19 +1,15 @@
-import sqlite3
 import pandas as pd
-from commonAbSrvCreate import c_Ab_srvCreate
-from CommonTBSETable import CommonTBSETable
-from comonNordinCreateSrv import comonNordinCreateSrv
-from comonTarifTableCreateSrv import comonTarifTableCreateSrv
-from ComonTvaRedevance import ComonTvaRedevance
-from comonTvaRedTBSECreateSrv import comonTvaRedTBSECreateSrv
-from CommoAbsrvinsert import CommoAbsrvinsert
-from commonAbDataframe import CommonAbDataframe
-from CommonTarifTBSE import CommonTarifTBSEModel
-from comonNordinInsertSrv import comonNordinInsert
-from ComonTarifTableInsertSrv import ComonTarifTableInsert
-from CommonTarifTBSESrv import CommonTarifTBSESrv
-from ComonTvaRedevanceInsertSrv import ComonTavaRedevanceInsertSrv
-from ComonTvaRedTBSEInsertSrv import ComonTvaRedTBSEInsertSrv
+from common_param.CommonTBSETable import CommonTBSETable
+from common_param.commonAbSrvCreate import c_Ab_srvCreate
+
+from common_param.CommoAbsrvinsert import CommoAbsrvinsert
+from common_param.CommonTarifTBSE import CommonTarifTBSEModel
+from common_param.CommonTarifTBSESrv import CommonTarifTBSESrv
+from common_param.ComonTarifTableInsertSrv import ComonTarifTableInsert
+from common_param.ComonTvaRedTBSEInsertSrv import ComonTvaRedTBSEInsertSrv
+from common_param.ComonTvaRedevanceInsertSrv import ComonTavaRedevanceInsertSrv
+from common_param.commonAbDataframe import CommonAbDataframe
+from common_param.comonNordinInsertSrv import comonNordinInsert
 
 
 class DatabaseInsertParameterP:

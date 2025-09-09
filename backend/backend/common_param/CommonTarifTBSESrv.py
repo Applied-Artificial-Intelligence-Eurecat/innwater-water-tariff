@@ -4,7 +4,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 # Importer le modèle depuis l'autre fichier
-from CommonTarifTBSE import CommonTarifTBSEModel # adapte le nom si nécessaire
+from common_param.CommonTarifTBSE import CommonTarifTBSEModel # adapte le nom si nécessaire
 
 @dataclass
 class CommonTarifTBSEModelDTO:

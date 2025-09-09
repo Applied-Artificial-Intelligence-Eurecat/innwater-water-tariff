@@ -1,5 +1,5 @@
 import pandas as pd
-from CommoAbsrvinsert import CommoAbsrvinsert
+from common_param.CommoAbsrvinsert import CommoAbsrvinsert
 class CommonAbDataframe:
     def __init__(self):
         self.columns = [

@@ -2,11 +2,11 @@ import sqlite3
 import traceback
 from typing import List, Dict, Any, Optional
 from .commonAbSrvCreate import c_Ab_srvCreate
-from CommonTBSETable import CommonTBSETable
-from comonNordinCreateSrv import comonNordinCreateSrv
-from comonTarifTableCreateSrv import comonTarifTableCreateSrv
-from ComonTvaRedevance import ComonTvaRedevance
-from comonTvaRedTBSECreateSrv import comonTvaRedTBSECreateSrv
+from common_param.CommonTBSETable import CommonTBSETable
+from common_param.comonNordinCreateSrv import comonNordinCreateSrv
+from common_param.comonTarifTableCreateSrv import comonTarifTableCreateSrv
+from common_param.ComonTvaRedevance import ComonTvaRedevance
+from common_param.comonTvaRedTBSECreateSrv import comonTvaRedTBSECreateSrv
 
 class DatabaseTableManagerP:
     """

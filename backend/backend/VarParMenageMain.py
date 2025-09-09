@@ -27,7 +27,7 @@ class VarParMenageMain:
         table_name="VarParMenageResult",
         id_projet=1)
 
-    def run(self):
+    def run(self, projet_id):
 
         ##############################NT############################
         print("=== Démarrage du traitement des ménages ===")
@@ -74,8 +74,7 @@ class VarParMenageMain:
 
     
         # ID du projet à mettre à jour (à adapter selon vos besoins)
-        projet_id = 1
-        
+
         # Méthode 1: Utilisation avec gestion manuelle de la connexion
         try:
             self.acah.connect()

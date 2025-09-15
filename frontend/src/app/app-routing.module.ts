@@ -70,8 +70,8 @@ const routes: Routes = [
         component: SimulationDetailsComponent,
     },
     {
-      path: 'simulation/dashboard/:id',
-      component: AggregatedDashboardComponent,
+        path: 'simulation/dashboard/:id',
+        component: AggregatedDashboardComponent,
     },
     {
         path: 'simulation/:id/first-round-assessment',

@@ -39,7 +39,7 @@ async def get_population_plot(input: PopulationPlotModel) -> StreamingResponse:
     Returns:
         dict: Contains the base64 encoded PNG image and content type
     """
-    buf = await generate_and_create_population_plot(input.total_subscribers, input.sanitation_subscribers, input.bd,
+    buf = generate_and_create_population_plot(input.total_subscribers, input.sanitation_subscribers, input.bd,
                                                     input.eps,
                                                     input.std, input.random_seed)
     return StreamingResponse(buf, media_type="image/png")
@@ -485,7 +485,7 @@ async def get_population_plot_given_simulation(simulation_id: int,
         Project.user_id == current_user.id).first()
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    buf = await generate_and_create_population_plot(
+    buf = generate_and_create_population_plot(
         total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
         sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
         bd=simulation.population.database_path,

@@ -15,7 +15,6 @@ class SimulationData(BaseModel):
 
 @app.post("/lunch-simulation")
 def lunch_simulation(payload: SimulationData):
-
     try:
         # Étape 1 : création des tables
         table_manager = DatabaseTableManagerP("database.db")

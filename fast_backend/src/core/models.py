@@ -70,7 +70,6 @@ class Primitives(Base):
     tax_costs = relationship("TaxCosts", back_populates="primitives")
 
 
-
 class CostsPotableWater(Base):
     __tablename__ = "costs_potable_water"
     id = Column(Integer, primary_key=True)
@@ -103,6 +102,7 @@ class EnvironmentalCosts(Base):
 
     primitives = relationship("Primitives", back_populates="environmental_costs")
 
+
 class TaxCosts(Base):
     __tablename__ = "tax_costs"
     id = Column(Integer, primary_key=True)
@@ -114,6 +114,7 @@ class TaxCosts(Base):
 
     primitives = relationship("Primitives", back_populates="tax_costs")
 
+
 class SocialCosts(Base):
     __tablename__ = "social_costs"
     id = Column(Integer, primary_key=True)
@@ -121,7 +122,6 @@ class SocialCosts(Base):
     car_threshold = Column(Float)
     par_threshold = Column(Float)
     poverty_threshold = Column(Float)
-    extreme_poverty_threshold = Column(Float)
 
     primitives = relationship("Primitives", back_populates="social_costs")
 
@@ -130,6 +130,7 @@ class Population(Base):
     __tablename__ = "population"
     id = Column(Integer, primary_key=True)
     root_database = Column(String)
+    original_datasource = Column(Boolean)
     database_path = Column(String)
     eps = Column(Float)
     std = Column(Float)
@@ -197,3 +198,19 @@ class BlockSanitation(Base):
 
     ibt_id = Column(Integer, ForeignKey("ibt_sanitation.id"))
     ibt = relationship("IBTSanitation", back_populates="blocks")
+
+
+class GameRound(Base):
+    __tablename__ = "game_rounds"
+    id = Column(Integer, primary_key=True)
+    alpha = Column(Float)
+    ratio_tbse = Column(Float)
+    threshold_res = Column(Float)
+
+
+class GameParticipant(Base):
+    __tablename__ = "game_participants"
+    id = Column(Integer, primary_key=True)
+    game_round_id = Column(Integer, ForeignKey("game_rounds.id"))
+    simulation_id = Column(Integer, ForeignKey("simulations.id"))
+    game_score = Column(Float)

@@ -126,16 +126,11 @@
 
                             <div class="form-group">
                                 <h5>Charges (in euros per cubic meter)</h5>
-                                <ng-container formArrayName="seuils_r_ep">
-                                    <div *ngFor="let trancheForm of seuils_r_ep.controls; last as isLast; let i = index; let r=last;"
-                                         class="input-row">
-                                        <div [formGroupName]="i">
-                                            <mat-form-field appearance="fill">
-                                                <input type="number" matInput formControlName="prix" placeholder="prix">
-                                            </mat-form-field>
-                                        </div>
-                                    </div>
-                                </ng-container>
+                                <div class="form-group">
+                                    <mat-form-field appearance="fill">
+                                        <input type="number" matInput formControlName="redevances_ep">
+                                    </mat-form-field>
+                                </div>
                             </div>
                         </div>
 
@@ -151,16 +146,11 @@
 
                             <div class="form-group">
                                 <h5>Charges (in euros per cubic meter)</h5>
-                                <ng-container formArrayName="seuils_r_a">
-                                    <div *ngFor="let trancheForm of seuils_r_a.controls; last as isLast; let i = index; let r=last;"
-                                         class="input-row">
-                                        <div [formGroupName]="i">
-                                            <mat-form-field appearance="fill">
-                                                <input type="number" matInput formControlName="prix" placeholder="prix">
-                                            </mat-form-field>
-                                        </div>
-                                    </div>
-                                </ng-container>
+                                <div class="input-row">
+                                    <mat-form-field appearance="fill">
+                                        <input type="number" matInput formControlName="redevances_a">
+                                    </mat-form-field>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -193,12 +183,6 @@
                                 </mat-form-field>
                             </div>
 
-                            <div class="form-group">
-                                <mat-form-field appearance="fill">
-                                    <mat-label>Extreme poverty threshold (in euros per month)</mat-label>
-                                    <input type="number" min="0" matInput formControlName="pauvretE">
-                                </mat-form-field>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -244,11 +228,11 @@
                     <div class="checkbox-group">
                         <div class="checkbox-field">
                             <label for="pool">Swimming pool:</label>
-                            <input type="checkbox" id="pool" class="checkbox-input">
+                            <input type="checkbox" id="pool" class="checkbox-input" formControlName="has_pool">
                         </div>
                         <div class="checkbox-field">
                             <label for="garden">Garden:</label>
-                            <input type="checkbox" id="garden" class="checkbox-input">
+                            <input type="checkbox" id="garden" class="checkbox-input" formControlName="has_garden">
                         </div>
                     </div>
                 </div>
@@ -318,23 +302,23 @@
                                                     <mat-hint>Block price</mat-hint>
                                                 </mat-form-field>
                                             </div>
-                                            <div class="threshold-actions">
+                                            <!--<div class="threshold-actions">
                                                 <button mat-icon-button color="warn" *ngIf="seuils_ep.length > 1"
                                                         (click)="removeInputControl(i)"
                                                         aria-label="Add a price threshold">
                                                     <mat-icon>remove_circle</mat-icon>
                                                 </button>
-                                            </div>
+                                            </div>-->
                                         </div>
                                     </ng-container>
 
-                                    <div class="add-threshold">
+                                    <!--<div class="add-threshold">
                                         <button mat-button color="primary" (click)="addInputControl()"
                                                 class="add-button">
                                             <mat-icon>add_circle</mat-icon>
                                             Ajouter un palier
                                         </button>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
 
@@ -413,23 +397,23 @@
                                                     <mat-hint>Prix pour ce palier</mat-hint>
                                                 </mat-form-field>
                                             </div>
-                                            <div class="threshold-actions">
+                                            <!--<div class="threshold-actions">
                                                 <button mat-icon-button color="warn" *ngIf="seuils_a.length > 1"
                                                         (click)="removeInputControl_a(i)"
                                                         aria-label="Supprimer ce palier">
                                                     <mat-icon>remove_circle</mat-icon>
                                                 </button>
-                                            </div>
+                                            </div>-->
                                         </div>
                                     </ng-container>
 
-                                    <div class="add-threshold">
+                                    <!--<div class="add-threshold">
                                         <button mat-button color="primary" (click)="addInputControl_a()"
                                                 class="add-button">
                                             <mat-icon>add_circle</mat-icon>
                                             Ajouter un palier
                                         </button>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
 

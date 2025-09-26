@@ -79,6 +79,11 @@ import {StateTableComponent} from './aggregated-dashboard/state-table/state-tabl
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {AffordabilityGeneralComponent} from "./affordability/affordability-general/affordability-general.component";
+import { IncentiveEffectComponent } from './incentive-effect/incentive-effect.component';
+import { RoundDetailComponent } from './round-detail/round-detail.component';
+import { LinkGameDialogComponent } from './simulation-details/link-game-dialog/link-game-dialog.component';
+import { CreateGameDialogComponent } from './simulation-details/create-game-dialog/create-game-dialog.component';
+import { GameDetailComponent } from './game-detail/game-detail.component';
 
 @NgModule({
     declarations: [
@@ -128,6 +133,11 @@ import {AffordabilityGeneralComponent} from "./affordability/affordability-gener
         WaterAgencyTableComponent,
         StateTableComponent,
         ConfirmDialogComponent,
+        IncentiveEffectComponent,
+        RoundDetailComponent,
+        LinkGameDialogComponent,
+        CreateGameDialogComponent,
+        GameDetailComponent,
     ],
     imports: [
         CommonModule,

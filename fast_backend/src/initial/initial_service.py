@@ -57,6 +57,7 @@ async def create_population(db, payload: SimulationPayload, simulation):
         eps=payload.population.eps,
         std=payload.population.std,
         root_database="",
+        original_datasource=payload.population.original_datasource,
         database_path=payload.population.bd,
         simulation_id=simulation.id
     )
@@ -92,7 +93,6 @@ async def create_primitives(db: Session, payload: SimulationPayload, simulation)
     social_costs = SocialCosts(car_threshold=payload.primitives.social_data.threshold_car,
                                par_threshold=payload.primitives.social_data.threshold_par,
                                poverty_threshold=payload.primitives.social_data.poverty,
-                               extreme_poverty_threshold=payload.primitives.social_data.extreme_poverty
                                )
     db.add(social_costs)
     db.commit()

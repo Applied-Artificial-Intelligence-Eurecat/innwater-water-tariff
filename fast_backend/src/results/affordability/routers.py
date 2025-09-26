@@ -1,8 +1,12 @@
 from typing import Dict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 from .schemas import *
+from ...core.auth import get_current_active_user
+from ...core.database import get_db
+from ...core.models import User
 
 affordability_router = APIRouter(prefix="/affordability",
                                  tags=["affordability"],
@@ -12,7 +16,9 @@ affordability_router = APIRouter(prefix="/affordability",
 
 
 @affordability_router.get("/{simulation_id}/general", response_model=List[GeneralRow])
-async def get_general_affordability_indicators(simulation_id):
+async def get_general_affordability_indicators(simulation_id: int, current_user: User = Depends(get_current_active_user),
+                                           db: Session = Depends(get_db)):
+
     return [
         GeneralRow(metric="Mean", par_ibt=1.1, par_tbse=3.2, delta_par=-2.0, car_ibt=2.5, car_tbse=4.1,
                    delta_car=-1.57),
@@ -43,12 +49,13 @@ async def get_general_affordability_indicators(simulation_id):
                    delta_car=None),
         GeneralRow(metric="Yule coefficient", par_ibt=0.29, par_tbse=0.30, delta_par=None, car_ibt=0.23, car_tbse=0.18,
                    delta_car=None),
-
     ]
 
 
 @affordability_router.get("/{simulation_id}/headcount_ratio", response_model=List[GeneralRow])
-async def get_headcount_ratio(simulation_id):
+async def get_headcount_ratio(simulation_id, current_user: User = Depends(get_current_active_user),
+                                           db: Session = Depends(get_db)):
+
     return [
         GeneralRow(metric="Household", par_ibt=7.9, par_tbse=32.8, delta_par=-24.9, car_ibt=28.8, car_tbse=48.3,
                    delta_car=-19.4),

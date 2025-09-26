@@ -34,6 +34,12 @@ class PopulationModel(BaseModel):
         description="Distribution type for population (e.g., 'lognormal', 'normal', 'uniform')",
         example="lognormal"
     )
+    original_datasource: bool = Field(
+        ...,
+        default_factory=lambda: False,
+        description="Use the original datasource for the population",
+        example=False
+    )
     eps: int = Field(
         ...,
         description="Population size parameter",
@@ -75,6 +81,12 @@ class WaterServiceCostModel(BaseModel):
         description="Number of subscribers to the service",
         example=5000
     )
+
+    @property
+    def tbse_base_prix(self):
+        cfm = self.fixed_costs / self.number_of_subscribers
+        f_tbse = cfm / 4
+        return f_tbse
 
     class Config:
         populate_by_name = True
@@ -187,12 +199,6 @@ class SocialDataModel(BaseModel):
         description="Poverty rate in percentage",
         example=14.0
     )
-    extreme_poverty: float = Field(
-        ...,
-        alias="grande_pauvrete",
-        description="Extreme poverty rate in percentage",
-        example=3.5
-    )
 
     class Config:
         populate_by_name = True
@@ -202,7 +208,6 @@ class SocialDataModel(BaseModel):
                 "threshold_par": 550,
                 "threshold_car": 3300,
                 "poverty": 14.0,
-                "extreme_poverty": 3.5
             }
         }
 
@@ -430,6 +435,15 @@ class SimulationPayload(BaseModel):
         return res
 
     @property
+    def potable_water_nordin_tiers(self):
+        res = [0]
+        last_prix = self.potable_water_tiers_prix_ttc[0]
+        for prix_tier, tier in zip(self.potable_water_tiers_prix_ttc[1:], self.tariff.drinking_water.usage_tiers[1:]):
+            res.append(res[-1] + (prix_tier - last_prix) * tier.threshold)
+            last_prix = prix_tier
+        return res
+
+    @property
     def epa_nordin_tiers(self):
         res = []
         for potable_water_tier, sanitation_tier in zip(self.potable_water_nordin_tiers, self.sanitation_nordin_tiers):
@@ -482,13 +496,16 @@ class SimulationPayload(BaseModel):
         return res
 
     @property
-    def potable_water_nordin_tiers(self):
-        res = [0]
-        last_prix = self.potable_water_tiers_prix_ttc[0]
-        for prix_tier, tier in zip(self.potable_water_tiers_prix_ttc[1:], self.tariff.drinking_water.usage_tiers[1:]):
-            res.append(res[-1] + (prix_tier - last_prix) * tier.threshold)
-            last_prix = prix_tier
-        return res
+    def tbse_ep_variable_prix(self):
+        return self.primitives.taxation.drinking_water.fees + self.primitives.drinking_water.variable_costs
+
+    @property
+    def tbse_a_variable_prix(self):
+        return self.primitives.taxation.sanitation.fees + self.primitives.sanitation.variable_costs
+
+    @property
+    def tbse_epa_variable_prix(self):
+        return self.primitives.taxation.epa().fees + self.primitives.epa().variable_costs
 
     @property
     def tbse_potable_water_base_prix(self):
@@ -517,6 +534,14 @@ class SimulationPayload(BaseModel):
         prix_h_tva = self.primitives.sanitation.variable_costs + self.primitives.taxation.sanitation.fees
         montant_tva_per_unite_de_service = self.primitives.taxation.sanitation.vat / 100 * prix_h_tva
         return prix_h_tva + montant_tva_per_unite_de_service
+
+    @property
+    def tbse_epa_base_prix(self):
+        return self.tbse_sanitation_base_prix + self.tbse_potable_water_base_prix
+
+    @property
+    def tbse_epa_variable_prix(self):
+        return self.tbse_sanitation_variable_prix + self.tbse_potable_water_variable_prix
 
     class Config:
         populate_by_name = True
@@ -552,7 +577,6 @@ class SimulationPayload(BaseModel):
                         "threshold_par": 550,
                         "threshold_car": 3300,
                         "poverty": 14.0,
-                        "extreme_poverty": 3.5
                     }
                 },
                 "population": {
@@ -658,7 +682,6 @@ class GetSimulationPayload(SimulationPayload):
                         "threshold_par": 550,
                         "threshold_car": 3300,
                         "poverty": 14.0,
-                        "extreme_poverty": 3.5
                     }
                 },
                 "population": {

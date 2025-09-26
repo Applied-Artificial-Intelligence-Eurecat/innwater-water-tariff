@@ -55,31 +55,33 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         a4: new FormControl({value: 0.37, disabled: this.disabled}, {validators: [Validators.required]}),
         a5: new FormControl({value: -0.31, disabled: this.disabled}, {validators: [Validators.required]}),
         a6: new FormControl({value: 0.25, disabled: this.disabled}, {validators: [Validators.required]}),
+        has_pool: new FormControl({value: false, disabled: this.disabled}, {validators: [Validators.required]}),
+        has_garden: new FormControl({value: false, disabled: this.disabled}, {validators: [Validators.required]}),
         car: new FormControl({value: 3, disabled: this.disabled}, {validators: [Validators.required]}),
         par: new FormControl({value: 3, disabled: this.disabled}, {validators: [Validators.required]}),
         k: new FormControl({value: 0.99, disabled: this.disabled}, {validators: [Validators.required]}),
         periodes: new FormControl({value: 4, disabled: this.disabled}, {validators: [Validators.required]}),
         nom: new FormControl('', {validators: [Validators.required]}),
         pauvret: new FormControl({value: 800, disabled: this.disabled}, {validators: [Validators.required]}),
-        pauvretE: new FormControl({value: 500, disabled: this.disabled}, {validators: [Validators.required]}),
     });
     tarificationForm = this.fb.group({
 
-        coutsFixe_ep: new FormControl({value: 1250000, disabled: this.disabled}, {validators: [Validators.required]}),
-        coutsVariable_ep: new FormControl(0.7, {validators: [Validators.required]}),
-        montantAbo_ep: new FormControl(15, {validators: [Validators.required]}),
-        nombreAbonnes_ep: new FormControl(48000, {validators: [Validators.required]}),
-        redevances_ep: new FormControl(0.01, {validators: [Validators.required]}),
+        coutsFixe_ep: new FormControl({value: 9000000, disabled: this.disabled}, {validators: [Validators.required]}),
+        coutsVariable_ep: new FormControl(0.9, {validators: [Validators.required]}),
+        montantAbo_ep: new FormControl(18.69, {validators: [Validators.required]}),
+        nombreAbonnes_ep: new FormControl(47847, {validators: [Validators.required]}),
+        redevances_ep: new FormControl(0.12, {validators: [Validators.required]}),
         tva_ep: new FormControl(2.1, {validators: [Validators.required]}),
         seuils_ep: this.fb.array([]),
         seuils_r_ep: this.fb.array([]),
 
-        coutsFixe_a: new FormControl(720000, {validators: [Validators.required]}),
-        coutsVariable_a: new FormControl(0.6, {validators: [Validators.required]}),
-        nombreAbonnes_a: new FormControl(22000, {validators: [Validators.required]}),
-        montantAbo_a: new FormControl(15, {validators: [Validators.required]}),
-        redevances_a: new FormControl(0.06, {validators: [Validators.required]}),
-        tva_a: new FormControl(0, {validators: [Validators.required]}),
+        coutsFixe_a: new FormControl(6000000, {validators: [Validators.required]}),
+        coutsVariable_a: new FormControl(0.40, {validators: [Validators.required]}),
+        nombreAbonnes_a: new FormControl(25300, {validators: [Validators.required]}),
+        montantAbo_a: new FormControl(15.545, {validators: [Validators.required]}),
+        redevances_a: new FormControl(0.04, {validators: [Validators.required]}),
+
+        tva_a: new FormControl(10, {validators: [Validators.required]}),
         seuils_a: this.fb.array([]),
         seuils_r_a: this.fb.array([]),
 
@@ -180,17 +182,6 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         this.seuils_a.removeAt(idx);
     }
 
-    addInputControl_r_a() {
-        const trancheForm = this.fb.group({
-            seuil: new FormControl(0, {validators: [Validators.required]}),
-            prix: new FormControl('', {validators: [Validators.required, Validators.minLength(4)]}),
-        });
-        this.seuils_r_a.push(trancheForm);
-    };
-
-    removeInputControl_r_a(idx: number) {
-        this.seuils_r_a.removeAt(idx);
-    }
 
     ngOnInit(): void {
         this.seuil_ep = {};
@@ -251,11 +242,12 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     a4: data.demande.coefficients.a4,
                     a5: data.demande.coefficients.a5,
                     a6: data.demande.coefficients.a6,
+                    has_garden: data.demande.jardin,
+                    has_pool: data.demande.piscine,
                     k: data.demande.k,
                     periodes: data.launch.periodes,
                     nom: data.launch.nom_simulation,
                     pauvret: data.primitives.donnees_sociales.pauvrete,
-                    pauvretE: data.primitives.donnees_sociales.grande_pauvrete,
                     car: data.primitives.donnees_sociales.seuil_car,
                     par: data.primitives.donnees_sociales.seuil_par
                 });
@@ -310,6 +302,23 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     prix: new FormControl(data.primitives.fiscalite.assainissement.redevances, {validators: [Validators.required, Validators.minLength(4)]})
                 }));
 
+                // Update population component if available
+                if (this.populationComponent && data.population) {
+                    // Set the useOriginalDatasource property if it exists in the API response
+                    if (data.population.original_datasource !== undefined) {
+                        this.populationComponent.useOriginalDatasource = data.population.original_datasource;
+                    }
+
+                    // Set other population properties
+                    if (data.population.eps !== undefined) {
+                        this.populationComponent.expectedPopulationSize = data.population.eps;
+                    }
+
+                    if (data.population.std !== undefined) {
+                        this.populationComponent.standardDeviation = data.population.std;
+                    }
+                }
+
                 this.loading = false;
             },
             error: (err) => {
@@ -339,52 +348,64 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         }));
         this.seuils_ep.push(this.fb.group({
             seuil: new FormControl(0, {validators: [Validators.required]}),
-            prix: new FormControl(0.5, {validators: [Validators.required, Validators.minLength(4)]}),
+            prix: new FormControl(0.878, {validators: [Validators.required, Validators.minLength(4)]}),
+        }));
+        this.seuils_ep.push(this.fb.group({
+            seuil: new FormControl(15, {validators: [Validators.required]}),
+            prix: new FormControl(1.839, {validators: [Validators.required, Validators.minLength(4)]}),
         }));
         this.seuils_ep.push(this.fb.group({
             seuil: new FormControl(30, {validators: [Validators.required]}),
-            prix: new FormControl(2.05, {validators: [Validators.required, Validators.minLength(4)]}),
+            prix: new FormControl(2.768, {validators: [Validators.required, Validators.minLength(4)]}),
         }));
         this.seuils_ep.push(this.fb.group({
             seuil: new FormControl(60, {validators: [Validators.required]}),
-            prix: new FormControl(2.2680, {validators: [Validators.required, Validators.minLength(4)]}),
-        }));
+            prix: new FormControl(4.38, {validators: [Validators.required, Validators.minLength(4)]}),
+        }))
 
         this.seuils_a.push(this.fb.group({
             seuil: new FormControl(0, {validators: [Validators.required]}),
-            prix: new FormControl(0.6, {validators: [Validators.required, Validators.minLength(4)]}),
+            prix: new FormControl(1.3, {validators: [Validators.required, Validators.minLength(4)]}),
         }));
         this.seuils_a.push(this.fb.group({
-            seuil: new FormControl(40, {validators: [Validators.required]}),
+            seuil: new FormControl(15, {validators: [Validators.required]}),
+            prix: new FormControl(2.12, {validators: [Validators.required, Validators.minLength(4)]}),
+        }));
+
+        this.seuils_a.push(this.fb.group({
+            seuil: new FormControl(30, {validators: [Validators.required]}),
+            prix: new FormControl(2.21, {validators: [Validators.required, Validators.minLength(4)]}),
+        }));
+
+        this.seuils_a.push(this.fb.group({
+            seuil: new FormControl(60, {validators: [Validators.required]}),
             prix: new FormControl(2.5, {validators: [Validators.required, Validators.minLength(4)]}),
         }));
 
-        this.seuils_r_a.push(this.fb.group({
-            seuil: new FormControl(0, {validators: [Validators.required]}),
-            prix: new FormControl(0.04, {validators: [Validators.required, Validators.minLength(4)]}),
-        }));
     }
 
     /**
      * Gets the population data from the population component
-     * @returns Object containing expected population size and standard deviation
+     * @returns Object containing expected population size, standard deviation, and useOriginalDatasource flag
      */
-    getPopulationData(): { eps: number; std: number } {
+    getPopulationData(): { eps: number; std: number; useOriginalDatasource: boolean } {
         if (!this.populationComponent) {
             console.warn('Population component not available, using default values');
-            return {eps: 10000, std: 0.5};
+            return {eps: 10000, std: 0.5, useOriginalDatasource: false};
         }
 
         // Check if the population component has been properly initialized
         if (typeof this.populationComponent.expectedPopulationSize === 'undefined' ||
-            typeof this.populationComponent.standardDeviation === 'undefined') {
+            typeof this.populationComponent.standardDeviation === 'undefined' ||
+            typeof this.populationComponent.useOriginalDatasource === 'undefined') {
             console.warn('Population component values not initialized, using default values');
-            return {eps: 10000, std: 0.5};
+            return {eps: 10000, std: 0.5, useOriginalDatasource: false};
         }
 
         return {
             eps: this.populationComponent.expectedPopulationSize,
-            std: this.populationComponent.standardDeviation
+            std: this.populationComponent.standardDeviation,
+            useOriginalDatasource: this.populationComponent.useOriginalDatasource
         };
     }
 
@@ -439,7 +460,8 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         if (this.populationComponent) {
             console.log('Population component values:', {
                 expectedPopulationSize: this.populationComponent.expectedPopulationSize,
-                standardDeviation: this.populationComponent.standardDeviation
+                standardDeviation: this.populationComponent.standardDeviation,
+                useOriginalDatasource: this.populationComponent.useOriginalDatasource
             });
         }
 
@@ -455,8 +477,8 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     a5: this.demandeForm.value.a5 || 0,
                     a6: this.demandeForm.value.a6 || 0
                 },
-                has_garden: true, // Default values, can be adjusted based on form data
-                has_pool: false,
+                has_garden: this.demandeForm.value.has_garden || false, // Default values, can be adjusted based on form data
+                has_pool: this.demandeForm.value.has_pool || false,
                 k: this.demandeForm.value.k || 1
             },
             launch: {
@@ -465,6 +487,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
             },
             population: {
                 bd: 'Reunion 2010', // Default value
+                original_datasource: populationData.useOriginalDatasource,
                 eps: populationData.eps, // Get from population component
                 std: populationData.std // Get from population component
             },
@@ -484,7 +507,6 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                     variable_costs: this.tarificationForm.value.coutsVariable_a || 0
                 },
                 social_data: {
-                    extreme_poverty: this.demandeForm.value.pauvretE || 0,
                     poverty: this.demandeForm.value.pauvret || 0,
                     threshold_car: this.demandeForm.value.car || 0,
                     threshold_par: this.demandeForm.value.par || 0
@@ -577,3 +599,4 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
     }
 
 }
+

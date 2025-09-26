@@ -1,0 +1,41 @@
+.grid-3cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table-card {
+  margin-bottom: 20px;
+}
+
+.error {
+  color: #b00020;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 1200px) {
+  .grid-3cols { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .grid-3cols { grid-template-columns: 1fr; }
+}
+
+/* Center delta section */
+.delta-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.delta-col {
+  width: min(1000px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+

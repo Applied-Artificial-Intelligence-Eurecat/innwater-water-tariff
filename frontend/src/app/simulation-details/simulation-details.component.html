@@ -5,15 +5,24 @@
             <p>Status: {{ simulationData.status }}</p>
         </div>
 
+
+    <div class="button-column" style="margin-top: 20px;">
+        <button mat-raised-button color="primary" [routerLink]="['/incentive-effect', simulationId]">
+            Go to Incentive Effect Details
+        </button>
+    </div>
+<!--
         <div class="button-column" *ngIf="simulationData.status === 'Initialized'">
             <button mat-raised-button color="primary"
                     [routerLink]="['/simulation', simulationId, 'first-round-assessment']">
                 First round evaluation
             </button>
-        </div>
+        </div>-->
     </div>
 
     <app-aggregated-dashboard [simulationId]="simulationId"></app-aggregated-dashboard>
+
+
 
 
     <mat-expansion-panel (opened)="panelPopulationOpenState = true"
@@ -27,10 +36,11 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel (opened)="panelInitializationOpenState = true"
-                         (closed)="panelInitializationOpenState = false">
+                         (closed)="panelInitializationOpenState = false"
+    style="margin-bottom: 20px">
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Initialization results
+                TBSE results
             </mat-panel-title>
             <mat-panel-description>
             </mat-panel-description>
@@ -43,11 +53,104 @@
                 <img [src]="tbseConsumptionPlotUrl" style="width: 100%;"/>
             </div>
             <div class="col-md-6">
-                <img [src]="pensParadePlotUrl" style="width: 100%;"/>
+                <img [src]="tbsePensParadePlotUrl" style="width: 100%;"/>
             </div>
             <div class="col-md-6">
-                <img [src]="consumptionDeviationLosesCostRecoveryPlot" style="width: 100%;"/>
+                <img [src]="tbseConsumptionDeviationLosesCostRecoveryPlot" style="width: 100%;"/>
             </div>
+        </div>
+    </mat-expansion-panel>
+
+
+    <mat-expansion-panel (opened)="panelInitializationOpenState = true"
+                         (closed)="panelInitializationOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                IBT results
+            </mat-panel-title>
+            <mat-panel-description>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="row median-statistics-row">
+            <div class="col-md-6">
+                <img [src]="ibtParPlotUrl" style="width: 100%;"/>
+            </div>
+            <div class="col-md-6">
+                <img [src]="ibtConsumptionPlotUrl" style="width: 100%;"/>
+            </div>
+            <div class="col-md-6">
+                <img [src]="ibtPensParadePlotUrl" style="width: 100%;"/>
+            </div>
+            <div class="col-md-6">
+                <img [src]="ibtConsumptionDeviationLosesCostRecoveryPlot" style="width: 100%;"/>
+            </div>
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel (opened)="panelGameParticipationsOpenState = true"
+                         (closed)="panelGameParticipationsOpenState = false"
+                         style="margin-top: 20px">
+        <mat-expansion-panel-header>
+            <mat-panel-title>Game Participations</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="game-actions" style="margin-bottom: 15px;">
+            <button mat-raised-button color="primary" (click)="openLinkGameModal()">
+                <mat-icon>link</mat-icon> Link to Existing Game
+            </button>
+            <button mat-raised-button color="accent" (click)="openCreateGameModal()" style="margin-left: 10px;">
+                <mat-icon>add</mat-icon> Create New Game
+            </button>
+        </div>
+
+        <div *ngIf="loadingParticipations" class="loading-container" style="text-align: center; padding: 20px;">
+            <mat-spinner diameter="40" style="margin: 0 auto;"></mat-spinner>
+            <p>Loading game participations...</p>
+        </div>
+
+        <div *ngIf="!loadingParticipations && gameParticipations.length === 0" style="text-align: center; padding: 20px;">
+            <p>No game participations found for this simulation.</p>
+        </div>
+
+        <div *ngIf="!loadingParticipations && gameParticipations.length > 0">
+            <table mat-table [dataSource]="gameParticipations" class="mat-elevation-z8" style="width: 100%;">
+                <!-- Alpha Column -->
+                <ng-container matColumnDef="alpha">
+                    <th mat-header-cell *matHeaderCellDef>Alpha</th>
+                    <td mat-cell *matCellDef="let element">{{ element.alpha }}</td>
+                </ng-container>
+
+                <!-- Ratio TBSE Column -->
+                <ng-container matColumnDef="ratio_tbse">
+                    <th mat-header-cell *matHeaderCellDef>Ratio TBSE</th>
+                    <td mat-cell *matCellDef="let element">{{ element.ratio_tbse }}</td>
+                </ng-container>
+
+                <!-- Threshold Res Column -->
+                <ng-container matColumnDef="threshold_res">
+                    <th mat-header-cell *matHeaderCellDef>Threshold Res</th>
+                    <td mat-cell *matCellDef="let element">{{ element.threshold_res }}</td>
+                </ng-container>
+
+                <!-- Score Column -->
+                <ng-container matColumnDef="score">
+                    <th mat-header-cell *matHeaderCellDef>Score</th>
+                    <td mat-cell *matCellDef="let element">{{ element.score }}</td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-raised-button color="primary" [routerLink]="['/game-detail', element.round_id]">
+                            View Participants
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
         </div>
     </mat-expansion-panel>
 
@@ -55,5 +158,6 @@
     <!-- <button mat-raised-button color="primary" [routerLink]="['/simulation', 'dashboard', this.simulationId]">Aggregated
          Dashboard
      </button>-->
+
 
 </div>

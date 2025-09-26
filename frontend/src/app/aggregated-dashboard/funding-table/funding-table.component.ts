@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ResultsService, FundingRexOp, FundingOther } from '../../results.service';
 
 export interface FundingData {
@@ -15,15 +15,15 @@ export interface FundingData {
 export class FundingTableComponent implements OnInit {
   displayedColumns: string[] = ['metric', 'general', 'percentTotalCost'];
   dataSource: FundingData[] = [];
+  @Input() simulationId: number | null= 1;
 
   constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
-    const simulationId = 2; // replace with dynamic value if needed
 
-    this.resultsService.getFundingRexOp(simulationId).subscribe({
+    this.resultsService.getFundingRexOp(this.simulationId || 1).subscribe({
       next: (rex: FundingRexOp) => {
-        this.resultsService.getFundingOther(simulationId).subscribe({
+        this.resultsService.getFundingOther(this.simulationId || 1 ).subscribe({
           next: (other: FundingOther) => {
             this.dataSource = [
               {

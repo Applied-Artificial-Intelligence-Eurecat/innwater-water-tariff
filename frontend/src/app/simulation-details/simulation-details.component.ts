@@ -3,6 +3,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {InitialAPIService} from "../initial-api.service";
 import {environment} from "../../environments/environment";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
+import {GameService, GameRound, GameRoundParams} from "../game.service";
+import {MatDialog} from '@angular/material/dialog';
+import { LinkGameDialogComponent } from './link-game-dialog/link-game-dialog.component';
+import { CreateGameDialogComponent } from './create-game-dialog/create-game-dialog.component';
 
 @Component({
     selector: 'app-simulation-details',
@@ -16,18 +20,41 @@ export class SimulationDetailsComponent implements OnInit {
     error: string | null = null;
     panelInitializationOpenState: boolean = false;
     panelPopulationOpenState: boolean = false;
+    panelGameParticipationsOpenState: boolean = false;
+
+    // Game participations
+    gameParticipations: { id?: number; alpha: number; ratio_tbse: number; threshold_res: number; score: number }[] = [];
+    loadingParticipations: boolean = false;
+    displayedColumns: string[] = ['alpha', 'ratio_tbse', 'threshold_res', 'score', 'actions'];
+
+    // Available game rounds for linking
+    availableGameRounds: GameRound[] = [];
+    loadingGameRounds: boolean = false;
+
+    // New game round form
+    newGameRound: GameRoundParams = {
+        alpha: 0,
+        ratio_tbse: 0,
+        threshold_res: 0
+    };
 
     private apiUrl = environment.apiUrl;
     tbseParPlotUrl: SafeResourceUrl | null = null;
     tbseConsumptionPlotUrl: SafeResourceUrl | null = null;
-    pensParadePlotUrl: SafeResourceUrl | null = null;
-    consumptionDeviationLosesCostRecoveryPlot: SafeResourceUrl | null = null;
+    tbsePensParadePlotUrl: SafeResourceUrl | null = null;
+    tbseConsumptionDeviationLosesCostRecoveryPlot: SafeResourceUrl | null = null;
     populationPlotUrl: SafeResourceUrl | null = null;
+    ibtParPlotUrl: SafeResourceUrl | null = null;
+    ibtConsumptionPlotUrl: SafeResourceUrl | null = null;
+    ibtPensParadePlotUrl: SafeResourceUrl | null = null;
+    ibtConsumptionDeviationLosesCostRecoveryPlot: SafeResourceUrl | null = null;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private initialApiService: InitialAPIService,
+        private gameService: GameService,
+        private dialog: MatDialog,
         private sanitizer: DomSanitizer
     ) {
     }
@@ -43,6 +70,9 @@ export class SimulationDetailsComponent implements OnInit {
                             this.simulationData = response.data;
                             this.loading = false;
                             console.log(this.simulationData);
+
+                            // Load game participations for this simulation
+                            this.loadGameParticipations();
                         },
                         error: (err) => {
                             console.error('Error loading simulation:', err);
@@ -50,7 +80,6 @@ export class SimulationDetailsComponent implements OnInit {
                             this.initialApiService.logout();
                             this.router.navigateByUrl('/')
                             this.error = 'Failed to load simulation data. Please try again.';
-
                         }
                     }
                 );
@@ -63,22 +92,111 @@ export class SimulationDetailsComponent implements OnInit {
             const objectURL = URL.createObjectURL(blob);
             this.tbseParPlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectURL);
         });
+        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/ibt_par_plot`).subscribe(blob => {
+            const objectURL = URL.createObjectURL(blob);
+            this.ibtParPlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectURL);
+        })
         this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/tbse_consumption_plot`).subscribe(blob => {
             const objectUrl = URL.createObjectURL(blob);
             this.tbseConsumptionPlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
         })
-        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/pens_parade_consumption_plot`).subscribe(blob => {
+        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/ibt_consumption_plot`).subscribe(blob => {
             const objectUrl = URL.createObjectURL(blob);
-            this.pensParadePlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
-        });
-        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/consumption_deviation_loses_cost_recovery_plot`).subscribe(blob => {
+            this.ibtConsumptionPlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        })
+        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/tbse_pens_parade_consumption_plot`).subscribe(blob => {
             const objectUrl = URL.createObjectURL(blob);
-            this.consumptionDeviationLosesCostRecoveryPlot = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+            this.tbsePensParadePlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
         });
+        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/ibt_pens_parade_consumption_plot`).subscribe(blob => {
+            const objectUrl = URL.createObjectURL(blob);
+            this.ibtPensParadePlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        })
+        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/tbse_consumption_deviation_loses_cost_recovery_plot`).subscribe(blob => {
+            const objectUrl = URL.createObjectURL(blob);
+            this.tbseConsumptionDeviationLosesCostRecoveryPlot = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        });
+        this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/ibt_consumption_deviation_loses_cost_recovery_plot`).subscribe(blob => {
+            const objectUrl = URL.createObjectURL(blob)
+            this.ibtConsumptionDeviationLosesCostRecoveryPlot = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        })
         this.initialApiService.getPlot(`${this.apiUrl}/api/v1/initial/simulation/${this.simulationId}/population_plot`).subscribe(blob => {
             const objectUrl = URL.createObjectURL(blob);
             this.populationPlotUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
         })
     }
 
+    /**
+     * Loads game participations for the current simulation
+     */
+    loadGameParticipations(): void {
+        if (!this.simulationId) return;
+
+        this.loadingParticipations = true;
+        this.gameService.getGameParticipations(this.simulationId).subscribe({
+            next: (participations) => {
+                this.gameParticipations = participations;
+                this.loadingParticipations = false;
+            },
+            error: (err) => {
+                console.error('Error loading game participations:', err);
+                this.loadingParticipations = false;
+            }
+        });
+    }
+
+    /**
+     * Opens the modal for linking to an existing game round
+     */
+    openLinkGameModal(): void {
+        // Load available game rounds
+        this.loadingGameRounds = true;
+        this.gameService.getAllRounds().subscribe({
+            next: (rounds) => {
+                this.availableGameRounds = rounds;
+                console.log(this.availableGameRounds);
+                this.loadingGameRounds = false;
+
+                // Open the modal dialog
+                const dialogRef = this.dialog.open(LinkGameDialogComponent, {
+                    width: '500px',
+                    data: {
+                        gameRounds: this.availableGameRounds,
+                        simulationId: this.simulationId
+                    }
+                });
+
+                dialogRef.afterClosed().subscribe(result => {
+                    if (result) {
+                        // Reload participations if a game was linked
+                        this.loadGameParticipations();
+                    }
+                });
+            },
+            error: (err) => {
+                console.error('Error loading game rounds:', err);
+                this.loadingGameRounds = false;
+            }
+        });
+    }
+
+    /**
+     * Opens the modal for creating a new game round
+     */
+    openCreateGameModal(): void {
+        const dialogRef = this.dialog.open(CreateGameDialogComponent, {
+            width: '500px',
+            data: {
+                newGameRound: this.newGameRound,
+                simulationId: this.simulationId
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                // Reload participations if a game was created and linked
+                this.loadGameParticipations();
+            }
+        });
+    }
 }

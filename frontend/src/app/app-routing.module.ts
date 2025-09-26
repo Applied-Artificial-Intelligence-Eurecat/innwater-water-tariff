@@ -16,6 +16,9 @@ import {AuthGuard} from './auth.guard';
 import {SimplifiedDashboardComponent} from "./simplified-dashboard/simplified-dashboard.component";
 import {FirstRoundAssessmentComponent} from "./first-round-assessment/first-round-assessment.component";
 import {AggregatedDashboardComponent} from "./aggregated-dashboard/aggregated-dashboard.component";
+import {IncentiveEffectComponent} from "./incentive-effect/incentive-effect.component";
+import {RoundDetailComponent} from "./round-detail/round-detail.component";
+import {GameDetailComponent} from "./game-detail/game-detail.component";
 
 const routes: Routes = [
     {
@@ -85,7 +88,18 @@ const routes: Routes = [
         path: 'edit-simulation/:id',
         component: AddsimulationComponent,
     },
-
+    {
+        path: 'incentive-effect/:id',
+        component: IncentiveEffectComponent,
+    },
+    {
+        path: 'round-detail/:id',
+        component: RoundDetailComponent,
+    },
+    {
+        path: 'game-detail/:id',
+        component: GameDetailComponent,
+    },
     {
         path: '**',
         component: NotFoundComponent,

@@ -18,14 +18,14 @@ class PopulationPlotModel(BaseModel):
 
 
 DATA = {
-    "Reunion 2010": "data/data_La_Réunion_2.xls"
+    "Reunion 2010": "data/data.csv"
 }
 
 
 def generate_and_create_population_plot(total_subscribers: int, sanitation_subscribers: int, bd: str, eps: int,
                                         std: float, random_seed: int = 42) -> io.BytesIO:
     xls_path = DATA[bd]
-    df = pd.read_excel(Path(xls_path), "esfact7-ElPR1")
+    df = pd.read_csv(Path(xls_path))
 
     g1_augmented, g2_augmented = generate_population_sample_dfs(bd, total_subscribers, sanitation_subscribers,
                                                                 eps,
@@ -38,9 +38,9 @@ def generate_and_create_population_plot(total_subscribers: int, sanitation_subsc
 def create_population_plot(df, g1_augmented, g2_augmented):
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     axs[0].hist(g1_augmented['Revenu_Imputé_2'], bins=50, alpha=0.6, range=(0, df['Revenu_Imputé_2'].max()),
-                label='Sanitation and Potable Water (G1)', )
+                label='Only Potable Water (G1)', )
     axs[1].hist(g2_augmented['Revenu_Imputé_2'], bins=50, alpha=0.6, range=(0, df['Revenu_Imputé_2'].max()),
-                label='Only Potable Water (G2)', )
+                label='Sanitation and Potable Water (G2)', )
     axs[0].set_xlabel("Income")
     axs[1].set_xlabel("Income")
     axs[0].set_ylabel("Number of cases")
@@ -60,10 +60,17 @@ def create_population_plot(df, g1_augmented, g2_augmented):
     return buf
 
 
+def generate_original_df(bd: str):
+    xls_path = DATA[bd]
+    df = pd.read_csv(Path(xls_path))
+    df['Garden * Wheather'] = df['jardin (1 = oui)'] * df["Freq Nombre de Jours sans pluie"]
+    return df
+
+
 def generate_population_sample_dfs(bd: str, total_subscribers: int, sanitation_subscribers: int, eps: int,
                                    std: float):
     xls_path = DATA[bd]
-    df = pd.read_excel(Path(xls_path), "esfact7-ElPR1")
+    df = pd.read_csv(Path(xls_path))
     g1_augmented, g2_augmented = process_population_sample_df(df, total_subscribers, sanitation_subscribers, eps,
                                                               std, )
     return g1_augmented, g2_augmented
@@ -72,7 +79,7 @@ def generate_population_sample_dfs(bd: str, total_subscribers: int, sanitation_s
 def process_population_sample_df(df, total_subscribers, sanitation_subscribers, eps, std, ):
     np.random.seed(42)
     df['Garden * Wheather'] = df['jardin (1 = oui)'] * df["Freq Nombre de Jours sans pluie"]
-    is_g1 = df['Assainissement Collectif (1 = oui)'] == 1
+    is_g1 = df['Assainissement Collectif (1 = oui)'] == 0
     g1_perc = sanitation_subscribers / total_subscribers
     g1_card = int(eps * g1_perc)
     g2_card = int(eps - g1_card)
@@ -87,8 +94,12 @@ def process_population_sample_df(df, total_subscribers, sanitation_subscribers, 
 
 async def save_population_data_given_simulation_info(bd: str, total_subscribers: int, sanitation_subscribers: int,
                                                      eps: int,
-                                                     std: float, simulation_id: int):
+                                                     std: float, use_original_datasource: bool, simulation_id: int):
     Path(f'data/simulation_data/{simulation_id}').mkdir(parents=True, exist_ok=True)
-    g1_df, g2_df = generate_population_sample_dfs(bd, total_subscribers, sanitation_subscribers, eps, std)
-    concat_df = pd.concat([g1_df, g2_df])
+    if not use_original_datasource:
+        g1_df, g2_df = generate_population_sample_dfs(bd, total_subscribers, sanitation_subscribers, eps, std)
+        concat_df = pd.concat([g1_df, g2_df])
+    else:
+        concat_df = generate_original_df(bd)
+
     concat_df.to_csv(f'data/simulation_data/{simulation_id}/sample.csv', index=False)

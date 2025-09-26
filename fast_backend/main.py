@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.database import engine, Base
+from src.game.routers import game_router
 from src.initial.routers import initial_router
 from src.results.routers import results_router
 from src.small_assessment.routers import small_assessment_router
@@ -39,6 +40,8 @@ app.add_middleware(
 app.include_router(initial_router)
 app.include_router(small_assessment_router)
 app.include_router(results_router)
+
+app.include_router(game_router)
 
 
 # Health check endpoint

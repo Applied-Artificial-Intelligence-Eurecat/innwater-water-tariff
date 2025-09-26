@@ -18,6 +18,9 @@ export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDa
 
     private apiUrl: string = environment.apiUrl;
 
+    // Flag to control whether to use original datasource
+    useOriginalDatasource: boolean = false;
+
     expectedPopulationSize: number = 1000;
     populationSizeOptions: number[] = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000];
 
@@ -61,6 +64,7 @@ export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDa
         const randomNumber = Math.ceil(Math.random() * 100000);
         const body = {
             bd: 'Reunion 2010',
+            original_datasource: this.useOriginalDatasource,
             eps: this.expectedPopulationSize,
             std: this.standardDeviation,
             total_subscribers: this.totalSubscribers,
@@ -91,9 +95,9 @@ export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDa
     convertPopulationDataToTableData(): TableData {
         return {
             tableName: 'Population Generation Parameters',
-            columnNames: ['Choix BDD', 'Expected Population Size (EPS)'],
+            columnNames: ['Choice Source Database', 'Use Original Datasource', 'Expected Population Size (EPS)'],
             values: [
-                ['Reunion 2010', this.expectedPopulationSize.toString()]
+                ['Reunion 2010', this.useOriginalDatasource ? 'Yes' : 'No', this.expectedPopulationSize.toString()]
             ]
         };
     }
@@ -127,6 +131,11 @@ export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDa
     // Method to handle changes to the Standard Deviation
     onStandardDeviationChange(event: any): void {
         this.standardDeviation = Number(event.target.value);
+    }
+
+    // Method to handle changes to the Use Original Datasource checkbox
+    onUseOriginalDatasourceChange(event: any): void {
+        this.useOriginalDatasource = event.target.checked;
     }
 
     // Method to toggle the visibility of the scatter plot

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { ResultsService, AffordabilityTable } from '../../results.service';
 
 export interface AffordabilityData {
@@ -15,13 +15,13 @@ export interface AffordabilityData {
 export class AffordabilityTableComponent implements OnInit {
   displayedColumns: string[] = ['metric', 'ibt', 'tbse'];
   dataSource: AffordabilityData[] = [];
+  @Input() simulationId: number | null = null;
 
   constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
-    const simulationId = 1;  // Replace with dynamic value if needed
 
-    this.resultsService.getAffordabilityResults(simulationId).subscribe({
+    this.resultsService.getAffordabilityResults(this.simulationId ||0).subscribe({
       next: (data: AffordabilityTable) => {
         this.dataSource = [
           {
@@ -44,11 +44,7 @@ export class AffordabilityTableComponent implements OnInit {
             ibt: data.gini_app.ibt.toString(),
             tbse: data.gini_app.tbse.toString()
           },
-          {
-            metric: 'Gini_Eff',
-            ibt: data.gini_eff.ibt.toString(),
-            tbse: data.gini_eff.tbse.toString()
-          }
+         
         ];
       },
       error: (err) => {

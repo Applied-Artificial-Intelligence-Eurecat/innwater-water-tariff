@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 from typing import Dict, Any
 
@@ -11,15 +12,18 @@ from src.core.auth import authenticate_user, create_access_token, get_password_h
 from src.core.database import get_db
 from src.core.models import User, Simulation, Project, StatusEnum, DemandConfiguration, IBTEauPotable, BlockEauPotable, \
     IBTSanitation, BlockSanitation
-from src.initial.graphics_service import generate_tbse_par_affordability_plot, generate_tbse_consumption_plot, \
-    generate_pens_parade_consumptions_plot, generate_consumption_deviation_losses_cost_recovery_plot
+from src.initial.graphics_service import generate_par_affordability_plot, generate_consumption_plot, \
+    generate_tbse_pens_parade_consumptions_plot, generate_tbse_consumption_deviation_losses_cost_recovery_plot, \
+    generate_ibt_pens_parade_consumptions_plot
 from src.initial.initial_service import create_ibt_parameters, create_demand, create_population, create_primitives
 from src.initial.population_service import generate_and_create_population_plot, PopulationPlotModel, \
     save_population_data_given_simulation_info
+from src.initial.processing_service import start_processing_and_calculating_simulation
 from src.initial.schemas import SimulationPayload, DuplicationSchema, GetSimulationPayload, LaunchModel, PopulationModel
 from src.initial.schemas import UserCreate, Token, DemandModel, CoefficientModel, \
     WaterServiceCostModel, PrimitivesModel, EnvironmentalModel, TaxSectionModel, TaxModel, SocialDataModel, TariffModel, \
     TariffSectionModel, ConsumptionThresholds
+from src.small_assessment.calculator_service import SimulationFinished
 
 initial_router = APIRouter(
     prefix="/initial",
@@ -40,8 +44,8 @@ async def get_population_plot(input: PopulationPlotModel) -> StreamingResponse:
         dict: Contains the base64 encoded PNG image and content type
     """
     buf = generate_and_create_population_plot(input.total_subscribers, input.sanitation_subscribers, input.bd,
-                                                    input.eps,
-                                                    input.std, input.random_seed)
+                                              input.eps,
+                                              input.std, input.random_seed)
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -136,7 +140,7 @@ async def create_and_save_simulation(
     simulation = Simulation(
         name=payload.launch.simulation_name,
         number_of_periods=payload.launch.periods,
-        status=StatusEnum.initialized,
+        status=StatusEnum.created,
         project_id=project.project_id
     )
     db.add(simulation)
@@ -147,15 +151,18 @@ async def create_and_save_simulation(
     await create_ibt_parameters(db, payload, simulation)
     db.commit()
 
-    # TODO: Here, we should save the other files @jimmy
     await save_population_data_given_simulation_info(
         total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
         sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
         bd=simulation.population.database_path,
         eps=simulation.population.eps,
         std=simulation.population.std,
+        use_original_datasource=simulation.population.original_datasource,
         simulation_id=simulation.id,
     )
+
+    asyncio.create_task(start_processing_and_calculating_simulation(simulation.id, payload, db),
+                        name=f"start processing {simulation.id}")
 
     return {
         "status": "success",
@@ -352,12 +359,14 @@ async def edit_simulation(simulation_id: int, payload: SimulationPayload,
             simulation.primitives.social_costs.car_threshold = payload.primitives.social_data.threshold_car
             simulation.primitives.social_costs.par_threshold = payload.primitives.social_data.threshold_par
             simulation.primitives.social_costs.poverty_threshold = payload.primitives.social_data.poverty
-            simulation.primitives.social_costs.extreme_poverty_threshold = payload.primitives.social_data.extreme_poverty
             db.add(simulation.primitives.social_costs)
     else:
         await create_primitives(db, payload, simulation)
 
     db.commit()
+
+    asyncio.create_task(start_processing_and_calculating_simulation(simulation.id, payload, db),
+                        name=f"start processing {simulation.id}")
 
     return {
         "status": "success",
@@ -376,6 +385,15 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
     """
     Get details of a specific simulation.
     """
+    get_simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    return {
+        "status": "success",
+        "message": f"Found simulation {simulation_id}",
+        "data": get_simulation_payload
+    }
+
+
+async def get_simulation_payload_from_db(current_user, db, simulation_id):
     simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
         Project.user_id == current_user.id).first()
     if simulation is None:
@@ -385,89 +403,61 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
         DemandConfiguration.simulation_id == simulation.id).first()
     if demand_config is None:
         raise HTTPException(status_code=404, detail="Demand not found")
-    return {
-        "status": "success",
-        "message": f"Found simulation {simulation.id}",
-        "data": GetSimulationPayload(
-            id=simulation.id,
-            demande=DemandModel(
-                coefficients=CoefficientModel(a0=demand_config.a,
-                                              a1=demand_config.b,
-                                              a2=demand_config.c,
-                                              a3=demand_config.d,
-                                              a4=demand_config.e,
-                                              a5=demand_config.f,
-                                              a6=demand_config.g, ),
-                k=demand_config.perception_parameter,
-                has_garden=demand_config.garden,
-                has_pool=demand_config.pool,
-            ),
-            launch=LaunchModel(
-                simulation_name=simulation.name,
-                periods=simulation.number_of_periods,
-            ),
-            population=PopulationModel(
-                bd=simulation.population.database_path,
-                eps=simulation.population.eps,
-                std=simulation.population.std,
-            ),
-            primitives=PrimitivesModel(
-                ep=WaterServiceCostModel(
-                    couts_fixes=simulation.primitives.cost_potable_water.fixed_costs,
-                    couts_variables=simulation.primitives.cost_potable_water.variable_costs,
-                    number_of_subscribers=simulation.primitives.cost_potable_water.subscribers_number
-                ),
-                assainissement=WaterServiceCostModel(
-                    couts_fixes=simulation.primitives.cost_sanitation.fixed_costs,
-                    couts_variables=simulation.primitives.cost_sanitation.variable_costs,
-                    number_of_subscribers=simulation.primitives.cost_sanitation.subscribers_number
-                ),
-                environnement=EnvironmentalModel(
-                    couts_fixes_par_an=simulation.primitives.environmental_costs.fixed_costs,
-                    couts_variable_moyen=simulation.primitives.environmental_costs.variable_costs,
-                ),
-                taxation=TaxSectionModel(
-                    drinking_water=TaxModel(
-                        vat=simulation.primitives.tax_costs.vat_drinking_water,
-                        fees=simulation.primitives.tax_costs.fee_drinking_water,
-                    ),
-                    sanitation=TaxModel(
-                        vat=simulation.primitives.tax_costs.vat_sanitation,
-                        fees=simulation.primitives.tax_costs.fee_sanitation,
-                    )
-                ),
-                social_data=SocialDataModel(
-                    threshold_par=simulation.primitives.social_costs.car_threshold,
-                    threshold_car=simulation.primitives.social_costs.par_threshold,
-                    poverty=simulation.primitives.social_costs.poverty_threshold,
-                    extreme_poverty=simulation.primitives.social_costs.extreme_poverty_threshold
-                )
-            ),
-            status=simulation.status.value,
-            tarification=await create_tariff_model_payload_from_simulation(simulation)
-        )
-    }
+    get_simulation_payload = GetSimulationPayload(id=simulation.id, demande=DemandModel(
+        coefficients=CoefficientModel(a0=demand_config.a, a1=demand_config.b, a2=demand_config.c, a3=demand_config.d,
+                                      a4=demand_config.e, a5=demand_config.f, a6=demand_config.g, ),
+        k=demand_config.perception_parameter, has_garden=demand_config.garden, has_pool=demand_config.pool, ),
+                                                  launch=LaunchModel(simulation_name=simulation.name,
+                                                                     periods=simulation.number_of_periods, ),
+                                                  population=PopulationModel(bd=simulation.population.database_path,
+                                                                             eps=simulation.population.eps,
+                                                                             std=simulation.population.std, ),
+                                                  primitives=PrimitivesModel(ep=WaterServiceCostModel(
+                                                      couts_fixes=simulation.primitives.cost_potable_water.fixed_costs,
+                                                      couts_variables=simulation.primitives.cost_potable_water.variable_costs,
+                                                      number_of_subscribers=simulation.primitives.cost_potable_water.subscribers_number),
+                                                      assainissement=WaterServiceCostModel(
+                                                          couts_fixes=simulation.primitives.cost_sanitation.fixed_costs,
+                                                          couts_variables=simulation.primitives.cost_sanitation.variable_costs,
+                                                          number_of_subscribers=simulation.primitives.cost_sanitation.subscribers_number),
+                                                      environnement=EnvironmentalModel(
+                                                          couts_fixes_par_an=simulation.primitives.environmental_costs.fixed_costs,
+                                                          couts_variable_moyen=simulation.primitives.environmental_costs.variable_costs, ),
+                                                      taxation=TaxSectionModel(drinking_water=TaxModel(
+                                                          vat=simulation.primitives.tax_costs.vat_drinking_water,
+                                                          fees=simulation.primitives.tax_costs.fee_drinking_water, ),
+                                                          sanitation=TaxModel(
+                                                              vat=simulation.primitives.tax_costs.vat_sanitation,
+                                                              fees=simulation.primitives.tax_costs.fee_sanitation, )),
+                                                      social_data=SocialDataModel(
+                                                          threshold_par=simulation.primitives.social_costs.car_threshold,
+                                                          threshold_car=simulation.primitives.social_costs.par_threshold,
+                                                          poverty=simulation.primitives.social_costs.poverty_threshold)),
+                                                  status=simulation.status.value,
+                                                  tarification=await create_tariff_model_payload_from_simulation(
+                                                      simulation))
+    return get_simulation_payload
 
 
 async def create_tariff_model_payload_from_simulation(simulation):
     return TariffModel(
         ep=TariffSectionModel(
-            subscription=simulation.ibt_eau_potable.abonnement,
+            abonnement=simulation.ibt_eau_potable.abonnement,
             usage_tiers=[
                 ConsumptionThresholds(
-                    threshold=b.seuil,
-                    price=b.price,
+                    seuil=b.seuil,
+                    prix=b.price,
                 )
                 for b in
                 simulation.ibt_eau_potable.blocks
             ]
         ),
         assainissement=TariffSectionModel(
-            subscription=simulation.ibt_sanitation.abonnement,
+            abonnement=simulation.ibt_sanitation.abonnement,
             usage_tiers=[
                 ConsumptionThresholds(
-                    threshold=b.seuil,
-                    price=b.price,
+                    seuil=b.seuil,
+                    prix=b.price,
                 )
                 for b in
                 simulation.ibt_sanitation.blocks
@@ -503,7 +493,25 @@ async def get_tbse_par_plot(simulation_id: int, current_user: User = Depends(get
         Project.user_id == current_user.id).first()
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    buf = await generate_tbse_par_affordability_plot(simulation)
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    print(simulation.id, simulation_payload)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+
+    buf = generate_par_affordability_plot(simulation_payload, simulation_finished.df)
+    return StreamingResponse(buf, media_type="image/png")
+
+
+@initial_router.get("/simulation/{simulation_id}/ibt_par_plot")
+async def get_ibt_par_plot(simulation_id: int, current_user: User = Depends(get_current_active_user),
+                           db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+
+    buf = generate_par_affordability_plot(simulation_payload, simulation_finished.df, 'VAR_PAR_Menages AM', 'IBT')
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -514,22 +522,52 @@ async def get_tbse_consumption_plot(simulation_id: int, current_user: User = Dep
         Project.user_id == current_user.id).first()
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    buf = await generate_tbse_consumption_plot(simulation)
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    buf = generate_consumption_plot(simulation_finished.df, 'C_et_F_TBSE P', feat='TBSE')
     return StreamingResponse(buf, media_type="image/png")
 
 
-@initial_router.get("/simulation/{simulation_id}/pens_parade_consumption_plot")
+@initial_router.get("/simulation/{simulation_id}/ibt_consumption_plot")
+async def get_ibt_consumption_plot(simulation_id: int, current_user: User = Depends(get_current_active_user),
+                                   db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    buf = generate_consumption_plot(simulation_finished.df, 'C_EP_BCP HM', feat='IBT')
+    return StreamingResponse(buf, media_type="image/png")
+
+
+@initial_router.get("/simulation/{simulation_id}/tbse_pens_parade_consumption_plot")
 async def get_pens_parade_consumption_plot(simulation_id: int, current_user: User = Depends(get_current_active_user),
                                            db: Session = Depends(get_db)):
     simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
         Project.user_id == current_user.id).first()
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    buf = await generate_pens_parade_consumptions_plot(simulation)
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    buf = generate_tbse_pens_parade_consumptions_plot(simulation_finished.df)
     return StreamingResponse(buf, media_type="image/png")
 
 
-@initial_router.get("/simulation/{simulation_id}/consumption_deviation_loses_cost_recovery_plot")
+@initial_router.get("/simulation/{simulation_id}/ibt_pens_parade_consumption_plot")
+async def get_pens_parade_consumption_plot(simulation_id: int, current_user: User = Depends(get_current_active_user),
+                                           db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    buf = generate_ibt_pens_parade_consumptions_plot(simulation_finished.df)
+    return StreamingResponse(buf, media_type="image/png")
+
+
+@initial_router.get("/simulation/{simulation_id}/tbse_consumption_deviation_loses_cost_recovery_plot")
 async def get_consumption_deviation_loses_cost_recovery_plot(simulation_id: int,
                                                              current_user: User = Depends(get_current_active_user),
                                                              db: Session = Depends(get_db)):
@@ -537,9 +575,25 @@ async def get_consumption_deviation_loses_cost_recovery_plot(simulation_id: int,
         Project.user_id == current_user.id).first()
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    buf = await generate_consumption_deviation_losses_cost_recovery_plot(simulation)
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+
+    buf = generate_tbse_consumption_deviation_losses_cost_recovery_plot(simulation_finished, 'C_et_F_TBSE P', 'TBSE')
     return StreamingResponse(buf, media_type="image/png")
 
+
+@initial_router.get("/simulation/{simulation_id}/ibt_consumption_deviation_loses_cost_recovery_plot")
+async def get_consumption_deviation_loses_cost_recovery_plot(simulation_id: int,
+                                                             current_user: User = Depends(get_current_active_user),
+                                                             db: Session = Depends(get_db)):
+    simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
+        Project.user_id == current_user.id).first()
+    if simulation is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
+    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    buf = generate_tbse_consumption_deviation_losses_cost_recovery_plot(simulation_finished, 'C_EP_BCP HM', 'IBT')
+    return StreamingResponse(buf, media_type="image/png")
 
 @initial_router.delete("/simulation/{simulation_id}")
 async def delete_simulation(simulation_id: int, current_user: User = Depends(get_current_active_user),

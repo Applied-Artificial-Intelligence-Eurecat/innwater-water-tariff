@@ -50,6 +50,7 @@ export interface SimulationPayload {
     };
     population: {
         bd: string;
+        original_datasource: boolean;
         eps: number;
         std: number;
     };
@@ -69,7 +70,6 @@ export interface SimulationPayload {
             variable_costs: number;
         };
         social_data: {
-            extreme_poverty: number;
             poverty: number;
             threshold_car: number;
             threshold_par: number;
@@ -139,6 +139,7 @@ export interface SimulationDetailResponse {
         };
         population: {
             bd: string;
+            original_datasource?: boolean;
             eps: number;
             std: number;
         };
@@ -171,7 +172,6 @@ export interface SimulationDetailResponse {
                 seuil_par: number;
                 seuil_car: number;
                 pauvrete: number;
-                grande_pauvrete: number;
             };
         };
         status: string;

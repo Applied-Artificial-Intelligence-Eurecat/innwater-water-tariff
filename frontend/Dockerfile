@@ -3,6 +3,10 @@ FROM node:16 as build
 
 WORKDIR /app
 
+ARG configuration=production
+ARG base_href=/
+
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
@@ -13,7 +17,7 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN npm run build -- --configuration=${configuration} --base-href=${base_href}
 
 # Stage 2: Serve the application with Nginx
 FROM nginx:alpine

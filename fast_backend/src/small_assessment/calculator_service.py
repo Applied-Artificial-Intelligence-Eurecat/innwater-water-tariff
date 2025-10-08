@@ -114,7 +114,7 @@ class SimulationCalculator(AbstractSimulation):
         self.g1_df = g1_df
         self.g2_df = g2_df
         self.df = pd.concat([self.g1_df, self.g2_df])
-        self.df = self.affordability_initialization()
+        self.df = self.processing_household_indicators()
 
     def save_simulation_data(self, simulation_id):
         path = Path(f'data/simulation_data/{simulation_id}')
@@ -1012,7 +1012,7 @@ class SimulationCalculator(AbstractSimulation):
         taylor_rf_jour = df['Taylor Rev Jour'] - df['Taylor F jour']
         return taylor_rf_jour
 
-    def affordability_initialization(self) -> pd.DataFrame:
+    def processing_household_indicators(self) -> pd.DataFrame:
         df = self.consumption_per_trimestre()
         self.facture_ibt_c_pp(df)
         self.c_taylor(df)
@@ -1024,7 +1024,12 @@ class SimulationCalculator(AbstractSimulation):
         self.donnes(df)
         self.calculate_poor(df)
         self.environmental_cost_reduit()
+        self.consumption_for_economic_efficiency()
         return df
+
+    def consumption_for_economic_efficiency(self):
+        self.df['Consumption_Economic_Efficiency'] = self.df['C_PP BM']
+        pass
 
     def calculate_poor(self, df):
         df['UC OECD'] = 1 + (df['nbpers'] - df['nenf'] - 1) * 0.5 + df['nenf'] * 0.3

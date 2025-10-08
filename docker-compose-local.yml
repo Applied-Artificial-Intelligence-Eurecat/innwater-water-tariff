@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: ./fast_backend
+    image: water-tariff-api
+    hostname: water-tariff-backend
+    container_name: water-tariff-api-local
+    volumes:
+      - ./fast_backend:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DATABASE_PATH=/app/water_tariff.db
+      - PORT=8000
+    restart: unless-stopped
+    networks:
+      - proxy-network
+
+  frontend:
+    hostname: msm-frontend
+    container_name: msm-frontend-local
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - configuration=development
+        - base_href=/
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - API_URL=http://water-tariff-backend:8000
+    depends_on:
+      - backend
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    driver: bridge

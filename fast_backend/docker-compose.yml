@@ -25,3 +25,4 @@ volumes:
 networks:
   water-tariff-network:
     name: water-tariff-network
+    driver: bridge

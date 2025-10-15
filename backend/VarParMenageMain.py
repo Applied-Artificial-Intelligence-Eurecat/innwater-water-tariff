@@ -10,22 +10,26 @@ from Var_PAR_menages_ALAM import Var_PAR_menages_ALAM
 
 
 class VarParMenageMain:
-    def __init__(self):
-
+    def __init__(self, id_projet=1):
         db_path = "database.db"                    # ta base SQLite
-        excel_path = "Var_PAR_menages_NT.xls"  # ton fichier Excel
-
+        excel_path = "Var_PAR_menages_NT.xls"     # ton fichier Excel
+        
+        # Stockage de l'id_projet comme attribut de l'instance
+        self.id_projet = id_projet
+        
         self.tab_creator = VarParMenageTabCreator()
         self.excel_reloader = ExcelFileReloader()
-
+        
         # Initialisation des variables spécifiques
         self.nt = VarParMenageNT(db_path, excel_path)
-        self.uaa =Var_PAR_menages_UAA()
+        self.uaa = Var_PAR_menages_UAA()
         self.acah = Var_PAR_menages_ACAH()
-        self.aiaj =DatabaseManager()
-        self.alam = Var_PAR_menages_ALAM(database="database.db",
-        table_name="VarParMenageResult",
-        id_projet=1)
+        self.aiaj = DatabaseManager()
+        self.alam = Var_PAR_menages_ALAM(
+            database="database.db",
+            table_name="VarParMenageResult",
+            id_projet=id_projet  # Utilisation du paramètre
+        )
 
     def run(self):
 
@@ -74,12 +78,12 @@ class VarParMenageMain:
 
     
         # ID du projet à mettre à jour (à adapter selon vos besoins)
-        projet_id = 1
+        id_projet = 1
         
         # Méthode 1: Utilisation avec gestion manuelle de la connexion
         try:
             self.acah.connect()
-            success = self.acah.update_sepa_columns(projet_id)
+            success = self.acah.update_sepa_columns(id_projet)
             if success:
                 print("Opération terminée avec succès")
             else:

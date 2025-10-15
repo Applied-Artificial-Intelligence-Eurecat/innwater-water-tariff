@@ -1,14 +1,19 @@
 import pandas as pd
 import sqlite3
 
-class PovertyDataManager:
-    def __init__(self, db_name='poverty_data.db'):
+class SocialDataManager:
+    def __init__(self, db_name='database.db', id_projet=None):
+        """Initialisation avec le nom de la base de données et un id_projet"""
         self.db_name = db_name
+        self.id_projet = id_projet  # Attribut id_projet ajouté
         
-    def create_dataframe(self, id_projet=None):
-        """Crée le DataFrame avec la structure demandée"""
+    def create_dataframe(self):
+        """Crée le DataFrame avec la structure demandée, en utilisant id_projet"""
+        if self.id_projet is None:
+            raise ValueError("L'id_projet doit être fourni pour créer le DataFrame")
+        
         data = {
-            "id_projet": [id_projet] * 6 if id_projet is not None else [None] * 6,
+            "id_projet": [self.id_projet] * 6,
             "categorie": ["Ménages", "Ménages", "Individus", "Individus", "Enfants", "Enfants"],
             "groupe": ["Oxford", "OCDE", "Oxford", "OCDE", "Oxford", "OCDE"],
             "valeur": [52.8, 47.2, 59.3, 52.9, 65.9, 57.9]
@@ -56,13 +61,14 @@ class PovertyDataManager:
         conn.close()
         print(f"{len(df)} lignes insérées avec succès")
     
-    def get_data(self, id_projet=None):
+    def get_data(self):
         """Récupère les données depuis la table"""
         conn = sqlite3.connect(self.db_name)
         
-        if id_projet is not None:
+        # Si un id_projet est fourni, on filtre les résultats
+        if self.id_projet is not None:
             query = "SELECT id_projet, categorie, groupe, valeur FROM common_social_data WHERE id_projet = ?"
-            params = (int(id_projet),)
+            params = (self.id_projet,)
         else:
             query = "SELECT id_projet, categorie, groupe, valeur FROM common_social_data"
             params = ()
@@ -77,14 +83,14 @@ class PovertyDataManager:
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    # Initialisation
-    manager = PovertyDataManager(db_name='database.db')
+    # Initialisation avec id_projet=1
+    manager = SocialDataManager(db_name='database.db', id_projet=1)
     
-    # Création de la table (avec suppression si existe déjà)
+    # Création de la table (avec suppression si elle existe déjà)
     manager.create_table()
     
-    # Création d'un DataFrame avec id_projet = 1
-    df_data = manager.create_dataframe(id_projet=1)
+    # Création d'un DataFrame avec l'id_projet initialisé
+    df_data = manager.create_dataframe()
     print("DataFrame original:")
     print(df_data)
     
@@ -92,6 +98,6 @@ if __name__ == "__main__":
     manager.insert_data(df_data)
     
     # Récupération des données
-    loaded_data = manager.get_data(id_projet=1)
+    loaded_data = manager.get_data()
     print("\nDonnées récupérées:")
     print(loaded_data)

@@ -37,8 +37,8 @@ def affordability_general(df) -> AffordabilityGeneral:
             tbse=aparent_tbse
         ),
         efective_deficit=AffordabilityRow(
-            ibt=aparent_ibt / (df['VAR_PAR_Menages AP'].mean()),
-            tbse=aparent_tbse / (df['VAR_PAR_Menages AQ'].mean())
+            ibt=df.loc[df['VAR_PAR_Menages AX'] > 0, 'VAR_PAR_Menages AX'].mean(),
+            tbse=df.loc[df['VAR_PAR_Menages AY'] > 0, 'VAR_PAR_Menages AY'].mean()
         ),
         gini_index=AffordabilityRow(
             ibt=2 * cov_ibt / aparent_ibt,

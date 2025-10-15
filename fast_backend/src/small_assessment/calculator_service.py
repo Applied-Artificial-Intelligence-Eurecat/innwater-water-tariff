@@ -1198,6 +1198,7 @@ class SimulationCalculator(AbstractSimulation):
                 self.df['VAR_PAR_Menages AW']
         ).clip(lower=0)
 
+
         self.df['VAR_PAR_Menages AY'] = (
                 self.df['VAR_PAR_Menages AI'] -
                 self.df['VAR_PAR_Menages AW']

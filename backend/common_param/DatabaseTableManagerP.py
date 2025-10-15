@@ -6,14 +6,8 @@ from .comonNordinCreateSrv import comonNordinCreateSrv
 from .comonTarifTableCreateSrv import comonTarifTableCreateSrv
 from .ComonTvaRedevance import ComonTvaRedevance
 from .comonTvaRedTBSECreateSrv import comonTvaRedTBSECreateSrv
-from .CommoAbsrvinsert import CommoAbsrvinsert
-from .commonAbDataframe import CommonAbDataframe
-from .CommonTarifTBSE import CommonTarifTBSEModel
-from .comonNordinInsertSrv import comonNordinInsert
-from .ComonTarifTableInsertSrv import ComonTarifTableInsert
-from .CommonTarifTBSESrv import CommonTarifTBSESrv
-from .ComonTvaRedevanceInsertSrv import ComonTavaRedevanceInsertSrv
-from .ComonTvaRedTBSEInsertSrv import ComonTvaRedTBSEInsertSrv
+from .commonAbSrvCreate import c_Ab_srvCreate
+
 
 class DatabaseTableManagerP:
     """

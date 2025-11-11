@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 
 from src.small_assessment.calculator_service import SimulationCalculator

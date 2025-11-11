@@ -392,15 +392,16 @@ class SimulationPayload(BaseModel):
     @property
     def sanitation_fees_tva_per_unit_of_service(self):
         res = []
-        for tier in self.tariff.sanitation.usage_tiers:
-            res.append(tier.price * self.primitives.taxation.sanitation.vat / 100)
+        for price in self.sanitation_prix_tiers_tva:
+            res.append(price * self.primitives.taxation.sanitation.vat / 100)
         return res
 
     @property
     def epa_fees_tva_per_unit_of_service(self):
         res = []
-        for tier in self.tariff.epa().usage_tiers:
-            res.append(tier.price * self.primitives.taxation.epa().vat / 100)
+        for pw_price, s_price in zip(self.potable_water_fees_tva_per_unit_of_service,
+                                     self.sanitation_fees_tva_per_unit_of_service):
+            res.append(pw_price + s_price)
         return res
 
     @property
@@ -414,15 +415,15 @@ class SimulationPayload(BaseModel):
     @property
     def sanitation_prix_tiers_ttc(self):
         res = []
-        for tier in self.tariff.sanitation.usage_tiers:
-            res.append(tier.price * self.primitives.taxation.sanitation.vat / 100 + tier.price)
+        for price in self.sanitation_prix_tiers_tva:
+            res.append(price * self.primitives.taxation.sanitation.vat / 100 + price)
         return res
 
     @property
     def epa_prix_tiers_ttc(self):
         res = []
-        for tier in self.tariff.epa().usage_tiers:
-            res.append(tier.price * self.primitives.taxation.epa().vat / 100 + tier.price)
+        for pw_price, s_price in zip(self.potable_water_prix_tiers_ttc, self.sanitation_prix_tiers_ttc):
+            res.append(pw_price + s_price)
         return res
 
     @property
@@ -457,8 +458,8 @@ class SimulationPayload(BaseModel):
     @property
     def potable_water_fees_tva_per_unit_of_service(self):
         res = []
-        for tier in self.tariff.drinking_water.usage_tiers:
-            res.append(tier.price * self.primitives.taxation.drinking_water.vat / 100)
+        for price in self.potable_water_prix_tiers_tva:
+            res.append(price * self.primitives.taxation.drinking_water.vat / 100)
         return res
 
     @property
@@ -468,31 +469,29 @@ class SimulationPayload(BaseModel):
     @property
     def potable_water_prix_tiers_ttc(self):
         res = []
-        for tier in self.tariff.drinking_water.usage_tiers:
-            res.append(tier.price * self.primitives.taxation.drinking_water.vat / 100 + tier.price)
+        for price in self.potable_water_prix_tiers_tva:
+            res.append(price * self.primitives.taxation.drinking_water.vat / 100 + price)
         return res
 
     @property
-    def potable_water_tiers_prix_ttc(self):
+    def potable_water_prix_tiers_tva(self):
         res = []
-        for prix_tier, unit_of_service_tier in zip(self.potable_water_prix_tiers_ttc,
-                                                   self.potable_water_fees_tva_per_unit_of_service):
-            res.append(prix_tier + unit_of_service_tier)
+        for prix_tier in self.tariff.drinking_water.usage_tiers:
+            res.append(prix_tier.price + self.primitives.taxation.drinking_water.fees)
         return res
 
     @property
-    def sanitation_tiers_prix_ttc(self):
+    def sanitation_prix_tiers_tva(self):
         res = []
-        for prix_tier, unit_of_service_tier in zip(self.sanitation_prix_tiers_ttc,
-                                                   self.sanitation_fees_tva_per_unit_of_service):
-            res.append(prix_tier + unit_of_service_tier)
+        for prix_tier in self.tariff.sanitation.usage_tiers:
+            res.append(prix_tier.price + self.primitives.taxation.sanitation.fees)
         return res
 
     @property
-    def epa_tiers_prix_ttc(self):
+    def epa_prix_tiers_tva(self):
         res = []
-        for prix_tier, unit_of_service_tier in zip(self.epa_prix_tiers_ttc, self.epa_fees_tva_per_unit_of_service):
-            res.append(prix_tier + unit_of_service_tier)
+        for pw_price, s_price in zip(self.potable_water_prix_tiers_ttc, self.sanitation_prix_tiers_ttc):
+            res.append(pw_price + s_price)
         return res
 
     @property
@@ -502,10 +501,6 @@ class SimulationPayload(BaseModel):
     @property
     def tbse_a_variable_prix(self):
         return self.primitives.taxation.sanitation.fees + self.primitives.sanitation.variable_costs
-
-    @property
-    def tbse_epa_variable_prix(self):
-        return self.primitives.taxation.epa().fees + self.primitives.epa().variable_costs
 
     @property
     def tbse_potable_water_base_prix(self):

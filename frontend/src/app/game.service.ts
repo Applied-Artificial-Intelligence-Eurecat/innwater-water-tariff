@@ -13,7 +13,7 @@ export interface GameRoundParams {
 
 // Interface for the response when creating a new game round
 export interface GameRoundResponse {
-    round_id: number;
+    id: number;
 }
 
 // Interface for game round data

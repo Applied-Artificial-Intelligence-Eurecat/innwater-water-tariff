@@ -131,7 +131,7 @@ export class IncentiveEffectComponent implements OnInit {
 
     // Concentration indicators
     this.concentrationRows = [
-      L('Gini Schutz', 'gini_schutz')
+      L('Gini', 'gini_schutz')
     ];
   }
 

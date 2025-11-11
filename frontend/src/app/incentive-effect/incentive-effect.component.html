@@ -10,13 +10,13 @@
             <div class="col">
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Consumption per trimester (m3/trim)</mat-card-title>
+                        <mat-card-title>Consumption (m3/trim)</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="leftTableRows" class="mat-elevation-z1">
                             <ng-container matColumnDef="label">
                                 <th mat-header-cell *matHeaderCellDef> </th>
-                                <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                <td mat-cell *matCellDef="let r">Household</td>
                             </ng-container>
                             <ng-container matColumnDef="ibt">
                                 <th mat-header-cell *matHeaderCellDef> IBT </th>
@@ -39,7 +39,7 @@
 
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Dispersion indicators</mat-card-title>
+                        <mat-card-title>Dispersion</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="dispersionLeftRows" class="mat-elevation-z1">
@@ -100,7 +100,7 @@
             <div class="col">
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Bad management, effective over-spending € per quarter</mat-card-title>
+                        <mat-card-title>Effective Overconsumption</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="rightTableRows" class="mat-elevation-z1">
@@ -109,11 +109,11 @@
                                 <td mat-cell *matCellDef="let r">{{ r.label }}</td>
                             </ng-container>
                             <ng-container matColumnDef="per_abonne">
-                                <th mat-header-cell *matHeaderCellDef> effective overconsumption per subscriber </th>
+                                <th mat-header-cell *matHeaderCellDef> per subscriber </th>
                                 <td mat-cell *matCellDef="let r">{{ r.per_abonne | number:'1.2-2' }}</td>
                             </ng-container>
                             <ng-container matColumnDef="per_tete">
-                                <th mat-header-cell *matHeaderCellDef> effective overconsumption per capita </th>
+                                <th mat-header-cell *matHeaderCellDef>per capita </th>
                                 <td mat-cell *matCellDef="let r">{{ r.per_tete | number:'1.2-2' }}</td>
                             </ng-container>
 
@@ -125,7 +125,7 @@
 
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Dispersion indicators</mat-card-title>
+                        <mat-card-title>Effective Overconsumption</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="dispersionRightRows" class="mat-elevation-z1">
@@ -134,11 +134,11 @@
                                 <td mat-cell *matCellDef="let r">{{ r.label }}</td>
                             </ng-container>
                             <ng-container matColumnDef="per_abonne">
-                                <th mat-header-cell *matHeaderCellDef> effective overconsumption per subscriber </th>
+                                <th mat-header-cell *matHeaderCellDef> per subscriber </th>
                                 <td mat-cell *matCellDef="let r">{{ r.per_abonne | number:'1.2-2' }}</td>
                             </ng-container>
                             <ng-container matColumnDef="per_tete">
-                                <th mat-header-cell *matHeaderCellDef> effective overconsumption per capita </th>
+                                <th mat-header-cell *matHeaderCellDef> per capita </th>
                                 <td mat-cell *matCellDef="let r">{{ r.per_tete | number:'1.2-2' }}</td>
                             </ng-container>
                             <tr mat-header-row *matHeaderRowDef="['label','per_abonne','per_tete']"></tr>
@@ -152,13 +152,13 @@
             <div class="col"></div>
     </div>
     </mat-tab>
-    <mat-tab label="Variation of consumption compared to TBSE">
+    <mat-tab label="Variation in consumption compared to TBSE">
         <div class="delta-wrapper">
             <div class="delta-col">
                 <mat-card class="table-card">
                     <mat-card-header>
                         <mat-card-title>
-                            Variation de la consommation IBT comparé à la TBSE
+                            Upward vs. downward variations in consumption (IBT vs TBSE)
                         </mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
@@ -263,7 +263,7 @@
             <div class="delta-col">
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Overconsumption Decomposition - Overall</mat-card-title>
+                        <mat-card-title>Decomposition - Overall</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="decompOverallRows" class="mat-elevation-z1">
@@ -292,7 +292,7 @@
 
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Overconsumption Decomposition - By G1/G2</mat-card-title>
+                        <mat-card-title>Decomposition - By G1/G2</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="decompG1G2Rows" class="mat-elevation-z1">
@@ -321,7 +321,7 @@
 
                 <mat-card class="table-card">
                     <mat-card-header>
-                        <mat-card-title>Overconsumption Decomposition - Poor vs Non Poor</mat-card-title>
+                        <mat-card-title>Decomposition - Poor vs Non Poor</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <table mat-table [dataSource]="decompPoorRows" class="mat-elevation-z1">

@@ -1,29 +1,35 @@
 <mat-card class="table-card">
-  <mat-card-header>
-    <mat-card-title>Incentive Effect</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
-      <!-- Category Column -->
-      <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef> Category </th>
-        <td mat-cell *matCellDef="let element"> {{element.category_metric}} </td>
-      </ng-container>
+    <mat-card-header class="header-flex">
+        <mat-card-title class="title-left">
+            Incentive Effect
+        </mat-card-title>
+        <button mat-raised-button color="primary" [routerLink]="['/incentive-effect', simulationId]" class="button-right">
+            Details
+        </button>
+    </mat-card-header>
 
-      <!-- Average Consumption Column -->
-      <ng-container matColumnDef="averageConsumption">
-        <th mat-header-cell *matHeaderCellDef> Average Consumption (m³/trim) </th>
-        <td mat-cell *matCellDef="let element"> {{element.averageConsumption}} </td>
-      </ng-container>
+    <mat-card-content>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+            <!-- Category Column -->
+            <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef> Category</th>
+                <td mat-cell *matCellDef="let element"> {{ element.category_metric }}</td>
+            </ng-container>
 
-      <!-- Average Bill Column -->
-      <ng-container matColumnDef="averageBill">
-        <th mat-header-cell *matHeaderCellDef> Average Bill (€/trim) </th>
-        <td mat-cell *matCellDef="let element"> {{element.averageBill}} </td>
-      </ng-container>
+            <!-- Average Consumption Column -->
+            <ng-container matColumnDef="averageConsumption">
+                <th mat-header-cell *matHeaderCellDef> Average Consumption (m³/trim)</th>
+                <td mat-cell *matCellDef="let element"> {{ element.averageConsumption }}</td>
+            </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  </mat-card-content>
+            <!-- Average Bill Column -->
+            <ng-container matColumnDef="averageBill">
+                <th mat-header-cell *matHeaderCellDef> Average Bill (€/trim)</th>
+                <td mat-cell *matCellDef="let element"> {{ element.averageBill }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </mat-card-content>
 </mat-card> 

@@ -1,29 +1,25 @@
 <div class="simulation-details-container">
-    <h2>Simulation Details</h2>
+    <h1>Simulation Details</h1>
     <div class="simulation-status-row">
         <div class="status-column">
             <p>Status: {{ simulationData.status }}</p>
         </div>
 
+        <!--
+                <div class="button-column" *ngIf="simulationData.status === 'Initialized'">
+                    <button mat-raised-button color="primary"
+                            [routerLink]="['/simulation', simulationId, 'first-round-assessment']">
+                        First round evaluation
+                    </button>
+                </div>-->
+    </div>
 
-    <div class="button-column" style="margin-top: 20px;">
-        <button mat-raised-button color="primary" [routerLink]="['/incentive-effect', simulationId]">
-            Go to Incentive Effect Details
-        </button>
-    </div>
-<!--
-        <div class="button-column" *ngIf="simulationData.status === 'Initialized'">
-            <button mat-raised-button color="primary"
-                    [routerLink]="['/simulation', simulationId, 'first-round-assessment']">
-                First round evaluation
-            </button>
-        </div>-->
-    </div>
+    <h2>Aggregated dashboard</h2>
 
     <app-aggregated-dashboard [simulationId]="simulationId"></app-aggregated-dashboard>
 
 
-
+    <h2>Graphics</h2>
 
     <mat-expansion-panel (opened)="panelPopulationOpenState = true"
                          (closed)="panelPopulationOpenState = false"
@@ -37,7 +33,7 @@
 
     <mat-expansion-panel (opened)="panelInitializationOpenState = true"
                          (closed)="panelInitializationOpenState = false"
-    style="margin-bottom: 20px">
+                         style="margin-bottom: 20px">
         <mat-expansion-panel-header>
             <mat-panel-title>
                 TBSE results
@@ -87,6 +83,15 @@
         </div>
     </mat-expansion-panel>
 
+    <br>
+    <h2 class="pt-6">Serious Game</h2>
+
+    <p>
+        Simulations can be added to a serious game.
+        This allows to compare the results of the simulation with the results of other simulations made.
+    </p>
+
+
     <mat-expansion-panel (opened)="panelGameParticipationsOpenState = true"
                          (closed)="panelGameParticipationsOpenState = false"
                          style="margin-top: 20px">
@@ -96,10 +101,12 @@
 
         <div class="game-actions" style="margin-bottom: 15px;">
             <button mat-raised-button color="primary" (click)="openLinkGameModal()">
-                <mat-icon>link</mat-icon> Link to Existing Game
+                <mat-icon>link</mat-icon>
+                Link to Existing Game
             </button>
             <button mat-raised-button color="accent" (click)="openCreateGameModal()" style="margin-left: 10px;">
-                <mat-icon>add</mat-icon> Create New Game
+                <mat-icon>add</mat-icon>
+                Create New Game
             </button>
         </div>
 
@@ -108,13 +115,15 @@
             <p>Loading game participations...</p>
         </div>
 
-        <div *ngIf="!loadingParticipations && gameParticipations.length === 0" style="text-align: center; padding: 20px;">
+        <div *ngIf="!loadingParticipations && gameParticipations.length === 0"
+             style="text-align: center; padding: 20px;">
             <p>No game participations found for this simulation.</p>
         </div>
 
         <div *ngIf="!loadingParticipations && gameParticipations.length > 0">
             <table mat-table [dataSource]="gameParticipations" class="mat-elevation-z8" style="width: 100%;">
                 <!-- Alpha Column -->
+
                 <ng-container matColumnDef="alpha">
                     <th mat-header-cell *matHeaderCellDef>Alpha</th>
                     <td mat-cell *matCellDef="let element">{{ element.alpha }}</td>

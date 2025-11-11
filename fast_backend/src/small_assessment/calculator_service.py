@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from src.initial.schemas import SimulationPayload
+from src.small_assessment.effeco.gini_decomp import gini_decomp
 
 
 class AbstractSimulation(ABC):
@@ -115,6 +116,8 @@ class SimulationCalculator(AbstractSimulation):
         self.g2_df = g2_df
         self.df = pd.concat([self.g1_df, self.g2_df])
         self.df = self.processing_household_indicators()
+        print("GINIDECOMP", gini_decomp(self.df['VAR_PAR_Menages AX'], self.df[self.is_sanitation]))
+
 
     def save_simulation_data(self, simulation_id):
         path = Path(f'data/simulation_data/{simulation_id}')
@@ -1225,3 +1228,5 @@ class SimulationCalculator(AbstractSimulation):
     def environmental_cost_reduit(self):
         df = self.df
         pass
+
+

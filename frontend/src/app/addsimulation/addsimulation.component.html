@@ -15,8 +15,8 @@
         </li>
         <li><strong>Population Module</strong> - Load the household-level data needed for microsimulation.
         </li>
-        <li><strong>Tariff Module</strong> - Configure parameters for drinking water and (collective) sanitation.</li>
         <li><strong>Demand Module</strong> - Compute expected consumption.</li>
+        <li><strong>Tariff Module</strong> - Configure parameters for drinking water and (collective) sanitation.</li>
         <li><strong>Launch</strong> - Run the simulation.</li>
     </ol>
 </div>
@@ -36,7 +36,11 @@
                 <!-- Coût du service EPA Section -->
                 <div class="form-section">
                     <h3>Service Cost (Drinking Water & Collective Sanitation)</h3>
-
+                    <p class="description-text">Enter all relevant costs associated with providing drinking water and
+                        sanitation services. This
+                        includes environmental costs related to ecological impacts, operational and maintenance costs
+                        for water supply and wastewater treatment, and differentiates between households using only
+                        drinking water and those utilizing both drinking water and sanitation services.</p>
                     <div class="section-content">
                         <!-- Eau potable -->
                         <div class="subsection">
@@ -112,7 +116,12 @@
                 <!-- Fiscalité Section -->
                 <div class="form-section">
                     <h3>Taxation</h3>
+                    <p class="description-text">Input the applicable value-added tax (VAT) rate and any
+                        charges assessed per cubic meter of water consumed or treated wastewater. These figures
+                        determine the financial implications for consumers and ensure compliance with regulatory
+                        frameworks.
 
+                    </p>
                     <div class="section-content">
                         <!-- Eau potable -->
                         <div class="subsection">
@@ -159,7 +168,13 @@
                 <!-- Données sociales Section -->
                 <div class="form-section">
                     <h3>Social Data</h3>
+                    <p class="description-text">Provide the Conventional Affordability Ratio (CAR) and Potential
+                        Affordability Ratio (PAR) to assess how much of a household's income can be allocated to water
+                        services. Also, specify the Poverty Threshold, which defines the minimum income required for a
+                        decent standard of living. This information is essential for identifying vulnerable populations
+                        and ensuring equitable access to water resources.
 
+                    </p>
                     <div class="section-content">
                         <form [formGroup]="demandeForm">
                             <div class="form-group">
@@ -193,9 +208,13 @@
         <app-population [totalSubscribers]="tarificationForm.value.nombreAbonnes_ep"
                         [sanitationSubscribers]="tarificationForm.value.nombreAbonnes_a"></app-population>
     </mat-tab>
-    <mat-tab label="Demande">
+    <mat-tab label="Demand">
         <div class="demand-container">
             <h2>Demand Module</h2>
+            <p class="description-text">The demand equation in the dashboard of the water tariff tool utilizes a
+                specific econometric model to
+                estimate household water consumption based on various factors. The general functional form commonly
+                referenced is based on a linear expenditure system.</p>
             <p class="description-text">Set the values of the response coefficients of the demand function.</p>
 
             <form [formGroup]="demandeForm" class="demand-form">
@@ -215,6 +234,18 @@
 
                 <div class="perception-container">
                     <h3>Perception Parameter</h3>
+                    <p class="description-text">The perception parameter is a key factor in the demand model utilized in
+                        the water tariff tool,
+                        playing an essential role in understanding how consumers perceive and respond to water pricing.
+                        This parameter essentially reflects the nature of consumer behavior in relation to how they
+                        interpret the costs associated with water consumption.
+                    </p>
+                    <p class="description-text">
+                        When the perception parameter approaches 1, consumers behave like Nordin consumers, focusing on
+                        the marginal price of water and adjusting their consumption based on the price of the last unit
+                        consumed; when it approaches 0, they behave like Taylor consumers, considering the average price
+                        of water and being less responsive to price changes.
+                    </p>
                     <div class="form-field">
                         <label for="k">Parameter k:</label>
                         <input max="1.0" type="number" matInput id="k" placeholder="k" formControlName="k" step="0.05"

@@ -28,9 +28,19 @@ def gini(x, w=None):
     
     # Gini calculation
     gini = np.sum(nu[1:] * p[:-1]) - np.sum(nu[:-1] * p[1:])
-    return gini
+    return float(gini)
 
 def gini_decomp(x, z, w=None):
+    """
+
+    Args:
+        x:
+        z:
+        w:
+
+    Returns:
+
+    """
     if w is None:
         w = np.ones_like(x)
     
@@ -43,25 +53,25 @@ def gini_decomp(x, z, w=None):
     n_group = df.groupby('z')['w'].sum()
     
     # Means
-    x_mean = np.average(df['x'], weights=df['w'])
-    x_mean_group = {key: np.average(df_split[key]['x'], weights=df_split[key]['w']) for key in df_split}
-    share_group = {key: df_split[key]['w'].sum() / df['w'].sum() for key in df_split}
-    share_group_income = {key: share_group[key] * x_mean_group[key] / x_mean for key in df_split}
+    x_mean = float(np.average(df['x'], weights=df['w']))
+    x_mean_group = {int(key): float(np.average(df_split[key]['x'], weights=df_split[key]['w'])) for key in df_split}
+    share_group = {int(key): float(df_split[key]['w'].sum() / df['w'].sum()) for key in df_split}
+    share_group_income = {int(key): float(share_group[key] * x_mean_group[key] / x_mean) for key in df_split}
     
     # Gini calculations
     gini_total = gini(df['x'].values, df['w'].values)
-    gini_group = {key: gini(df_split[key]['x'].values, df_split[key]['w'].values) for key in df_split}
-    gini_group_contribution = {key: gini_group[key] * share_group[key] * share_group_income[key] for key in df_split}
+    gini_group = {int(key): gini(df_split[key]['x'].values, df_split[key]['w'].values) for key in df_split}
+    gini_group_contribution = {int(key): gini_group[key] * share_group[key] * share_group_income[key] for key in df_split}
     gini_within = sum(gini_group_contribution.values())
     gini_between = gini(np.array(list(x_mean_group.values())), n_group.values)
     gini_overlap = gini_total - gini_within - gini_between
     
     return {
         'gini_decomp': {
-            'gini_total': gini_total,
-            'gini_within': gini_within,
-            'gini_between': gini_between,
-            'gini_overlap': gini_overlap
+            'gini_total': float(gini_total),
+            'gini_within': float(gini_within),
+            'gini_between': float(gini_between),
+            'gini_overlap': float(gini_overlap)
         },
         'gini_group': {
             'gini_group': gini_group,
@@ -74,7 +84,7 @@ def gini_decomp(x, z, w=None):
         'share_groups': share_group,
         'share_income_groups': share_group_income,
         'number_cases': {
-            'n_weighted': df['w'].sum(),
-            'n_group_weighted': n_group
+            'n_weighted': float(df['w'].sum()),
+            'n_group_weighted': list(n_group)
         }
     }

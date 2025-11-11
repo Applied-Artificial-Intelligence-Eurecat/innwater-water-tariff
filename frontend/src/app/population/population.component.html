@@ -15,6 +15,9 @@
     </div>
 
     <div class="form-section">
+        <p>By clicking the checkbox, instead of generating a synthetic household population, you will be using the
+            original population. </p>
+
         <div class="form-field">
             <label for="useOriginalDatasource">Use original datasource</label>
             <input
@@ -44,6 +47,10 @@
         <div class="form-group">
             <label for="standardDeviation"><strong>Standard Deviation for Log-Normal Distribution of
                 income:</strong></label>
+            <p class="description-text">
+                The standard deviation is a value that will be used to modify the income of the randomly selected
+                household.
+            </p>
             <select
                     id="standardDeviation"
                     class="form-control"
@@ -52,10 +59,7 @@
                 <option *ngFor="let sd of standardDeviationOptions" [value]="sd">{{ sd }}</option>
             </select>
             <small class="form-text text-muted">Select a value between 0.01 and 0.20.</small>
-            <p class="description-text">
-                The standard deviation is a value that will be used to modify the income of the randomly selected
-                household.
-            </p>
+
         </div>
     </div>
 

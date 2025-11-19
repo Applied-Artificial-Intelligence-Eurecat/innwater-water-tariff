@@ -5,6 +5,7 @@ import { ChatService } from "../services/chat.service";
 import { DomSanitizer } from "@angular/platform-browser";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { HintService } from "../services/hint.service";
 
 @Component({
     selector: 'app-population',
@@ -32,7 +33,23 @@ export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDa
     showScatterPlot: boolean = false;
     imageSrc: any;
 
-    constructor(private chatService: ChatService, private sanitizer: DomSanitizer, private http: HttpClient) {
+    constructor(
+        private chatService: ChatService, 
+        private sanitizer: DomSanitizer, 
+        private http: HttpClient,
+        private hintService: HintService
+    ) {
+    }
+
+    /**
+     * Shows a hint about the population module
+     */
+    showPopulationHint() {
+        this.hintService.showHint(
+            'Population Module',
+            '<p>Population module describes the population of households with regard to some relevant variables for calculation and decomposition of (i) water consumptions, (ii) water bills and (iii) indicators making up the dashboard.</p>',
+            true
+        );
     }
 
     ngOnChanges(changes: any): void {

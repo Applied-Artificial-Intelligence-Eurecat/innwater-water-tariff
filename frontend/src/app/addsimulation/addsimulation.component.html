@@ -5,13 +5,13 @@
     <p>The initialization part of the Water Tariff Dashboard involves configuring several essential components to define
         the socio-economic simulation environment.</p>
 
-    <p><strong>How to proceed:</strong> First the primitives, then the population, then usage tarification, then the
+    <p><strong>How to proceed:</strong> First the primitives, then the population, then tarification, then the
         demand and finally, the launch.</p>
 
     <ol>
         <li><strong>Tariff Module Initialization (Primitives)</strong> sets the general environment within which the
             pricing of the public
-            water service will be assessed.
+            water and wastewater services will be assessed.
         </li>
         <li><strong>Population Module</strong> - Load the household-level data needed for microsimulation.
         </li>
@@ -35,7 +35,14 @@
             <form [formGroup]="tarificationForm">
                 <!-- Coût du service EPA Section -->
                 <div class="form-section">
-                    <h3>Service Cost (Drinking Water & Collective Sanitation)</h3>
+                    <div class="section-header">
+                        <h3>Service Cost (Drinking Water & Collective Sanitation)</h3>
+                        <button mat-icon-button color="primary" class="hint-button"
+                                (click)="showHint('Drinking Water and Wastewater Cost Modelling', '<p>You are asked to declare:</p><p>(1) the production and distribution costs of the drinking water service with the amount of fixed costs and the unit variable cost (assumed to be constant)</p><p>(2) the production and distribution costs of the (collective) wastewater service with the related amount of fixed costs and the related unit variable cost (assumed to be constant)</p><p>You have also to inform:</p><p>(3) the number of domestic subscribers (households) to the drinking water service</p><p>(4) the number of domestic subscribers (households) to the sewerage service</p><p>Note that the domestic subscribers who are not connected to the sewerage network form a specific group of Subscribers denoted G1. The domestic subscribers who are connected to the sewerage network forms another specific group of Subscribers known as G2.</p>', true)"
+                                aria-label="Show hint about service cost">
+                            <mat-icon>help</mat-icon>
+                        </button>
+                    </div>
                     <p class="description-text">Enter all relevant costs associated with providing drinking water and
                         sanitation services. This
                         includes environmental costs related to ecological impacts, operational and maintenance costs
@@ -94,13 +101,14 @@
 
                         <!-- Environnement -->
                         <div class="subsection">
-                            <h4>Environmental Cost</h4>
-                            <div class="form-group">
-                                <mat-form-field appearance="fill">
-                                    <mat-label>Fixed Costs (per year)</mat-label>
-                                    <input type="number" min="0" matInput formControlName="env_fixed_costs"
-                                           [defaultValue]="0">
-                                </mat-form-field>
+                            <div class="section-header">
+
+                                <h4>Environmental Cost</h4>
+                                <button mat-icon-button color="primary" class="hint-button"
+                                        (click)="showHint('Environmental Cost Modelling', '<p>Environmental cost stands for the unit cost of complete depollution, assumed to be constant, of one cubic metre of drinking water used by the household.</p><p>Please, refer to the technical documentation for the modelling of the residual (not recovered) environmental cost that change according to the household is connected or not to the collective sanitation network.</p>', true)"
+                                        aria-label="Show hint about environmental cost">
+                                    <mat-icon>help</mat-icon>
+                                </button>
                             </div>
 
                             <div class="form-group">
@@ -115,7 +123,14 @@
 
                 <!-- Fiscalité Section -->
                 <div class="form-section">
-                    <h3>Taxation</h3>
+                    <div class="section-header">
+                        <h3>Taxation</h3>
+                        <button mat-icon-button color="primary" class="hint-button"
+                                (click)="showHint('Taxation', '<p>The price of water and wastewater services is also afected by taxation, with a value-added tax (VAT) and ecological taxes (excise duties).</p><p>VAT (Value Added Tax) is an indirect tax (collected by the operator and paid to the State) which relates to the value of the goods (ad valorem tax). The amount of VAT is calculated by applying a specific rate to the drinking water tariff on the one hand, e.g. 5.5%, and a specific rate to the wastewater service on the other, e.g. 10%.</p><p>Drinking water and wastewater services are also subject to taxes in the form of excise duties, i.e. a sum in euros per unit consumed. These taxes (one for the drinking water service and one for the wastewater service) are collected by the operator for the benefit of the local Water Agency, which uses them to finance various actions (such as investment aid to protect water resources).</p><p>A special feature of French law is that these charges are also subject to VAT.</p>', true)"
+                                aria-label="Show hint about taxation">
+                            <mat-icon>help</mat-icon>
+                        </button>
+                    </div>
                     <p class="description-text">Input the applicable value-added tax (VAT) rate and any
                         charges assessed per cubic meter of water consumed or treated wastewater. These figures
                         determine the financial implications for consumers and ensure compliance with regulatory
@@ -167,7 +182,16 @@
 
                 <!-- Données sociales Section -->
                 <div class="form-section">
-                    <h3>Social Data</h3>
+                    <div class="section-header">
+                        <h3>Social Data</h3>
+                        <button mat-icon-button color="primary" class="hint-button"
+                                (click)="showHint('Social Data', '<p>In this section, you are asked to enter the value of the poverty line (for the (modified) OECD equivalence scale) below which a household is considered to be poor, the threshold value for the CAR (weight of the water or water and wastewater bill in household income) above which the user considers the household is facing an affordability issue in the CAR sense, the threshold value for the PAR (weight of the water or water and wastewater bill in household income to meet its basic water needs) beyond which the user considers the household is facing an affordability issue in the PAR sense.</p>'
+                                , true)"
+                                aria-label="Show hint about social data">
+                            <mat-icon>help</mat-icon>
+                        </button>
+
+                    </div>
                     <p class="description-text">Provide the Conventional Affordability Ratio (CAR) and Potential
                         Affordability Ratio (PAR) to assess how much of a household's income can be allocated to water
                         services. Also, specify the Poverty Threshold, which defines the minimum income required for a

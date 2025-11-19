@@ -100,3 +100,13 @@ h2 {
   text-align: center;
   color: #333;
 }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hint-button {
+  font-size: 20px;
+}

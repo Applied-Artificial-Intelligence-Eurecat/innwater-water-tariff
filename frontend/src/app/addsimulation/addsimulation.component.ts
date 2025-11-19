@@ -6,6 +6,9 @@ import {InitialAPIService, SimulationPayload} from '../initial-api.service';
 import {DomSanitizer} from "@angular/platform-browser";
 import {PopulationComponent} from '../population/population.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmDialogComponent} from '../components/confirm-dialog/confirm-dialog.component';
+import {HintService} from '../services/hint.service';
 
 @Component({
     selector: 'app-addsimulation',
@@ -44,8 +47,21 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         private initialApiService: InitialAPIService,
         private sanitizer: DomSanitizer,
         private snackBar: MatSnackBar,
+        private dialog: MatDialog,
+        private hintService: HintService,
     ) {
     }
+
+    /**
+     * Shows a hint dialog with the specified title and message
+     * @param title The title of the hint dialog
+     * @param message The message to display in the hint dialog
+     * @param isHtml Whether the message contains HTML content
+     */
+    showHint(title: string, message: string, isHtml: boolean = false) {
+        this.hintService.showHint(title, message, isHtml);
+    }
+
 
     demandeForm = this.fb.group({
         a0: new FormControl({value: -2.56, disabled: this.disabled}, {validators: [Validators.required]}),
@@ -599,4 +615,3 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
     }
 
 }
-

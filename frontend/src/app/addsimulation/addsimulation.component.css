@@ -352,6 +352,16 @@ mat-hint {
     font-size: 12px;
 }
 
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hint-button {
+    font-size: 20px;
+}
+
 /* Make form fields in thresholds table more compact */
 .threshold-inputs mat-form-field {
     width: 100%;

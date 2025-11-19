@@ -1,13 +1,15 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, Validators } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-confirm-dialog',
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
-      <p>{{ data.message }}</p>
+      <p *ngIf="!data.isHtml">{{ data.message }}</p>
+      <p *ngIf="data.isHtml" [innerHTML]="sanitizedMessage"></p>
       <mat-form-field *ngIf="data.showInput" appearance="fill" style="width: 100%;">
         <mat-label>{{ data.inputLabel || 'Name' }}</mat-label>
         <input matInput [formControl]="inputControl" required>
@@ -34,6 +36,7 @@ import { FormControl, Validators } from '@angular/forms';
 })
 export class ConfirmDialogComponent {
   inputControl = new FormControl('', Validators.required);
+  sanitizedMessage: SafeHtml;
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
@@ -44,6 +47,10 @@ export class ConfirmDialogComponent {
       cancelText: string;
       showInput?: boolean;
       inputLabel?: string;
-    }
-  ) {}
+      isHtml?: boolean;
+    },
+    private sanitizer: DomSanitizer
+  ) {
+    this.sanitizedMessage = this.data.isHtml ? this.sanitizer.bypassSecurityTrustHtml(this.data.message) : '';
+  }
 }

@@ -139,7 +139,7 @@ class DataReaderExcel:
 
 
 def main():
-    filepath = "surplusagregeData3.xls"
+    filepath = "../../../../data/surplusagregeData3.xls"
     reader = DataReaderExcel(filepath)
 
     # Chargement avec conversion automatique des colonnes numériques

@@ -34,10 +34,17 @@ async def get_rounds(db: Session = Depends(get_db)):
         RoundSchemaResponse(
             round_id=game_round.id,
             alpha=float(game_round.alpha),
-                    ratio_tbse=float(game_round.ratio_tbse),
-                    threshold_res=float(game_round.threshold_res))
+            ratio_tbse=float(game_round.ratio_tbse),
+            threshold_res=float(game_round.threshold_res))
         for game_round in game_rounds
     ]
+
+
+@game_router.delete("/round/{game_round_id}")
+async def delete_round(game_round_id: int, current_user: User = Depends(get_current_active_user),
+                       db: Session = Depends(get_db)):
+    db.query(GameRound).filter(GameRound.id == game_round_id).delete()
+    db.commit()
 
 
 @game_router.get("/round/{game_round_id}/participation/{simulation_id}")
@@ -59,13 +66,14 @@ async def link_round_to_simulation(game_round_id: int, simulation_id: int,
     simulation_finished = SimulationFinished(simulation_id, simulation_payload)
     rex_value = (await calculate_rex(simulation_finished, simulation_payload))['total_cost']
     if abs(rex_value) > game_round.threshold_res:
-        raise HTTPException(status_code=400, detail="REX value is too high")
-    general_ieffect = incentive_effect_consumption(simulation_finished.df)
-    targeted_consumption_level = general_ieffect.mean.tbse * game_round.ratio_tbse
-    squared_error = (targeted_consumption_level - general_ieffect.mean.ibt) ** 2
-    right_part = game_round.alpha * squared_error
-    left_part = affordability_general(simulation_finished.df).aparent_deficit.ibt * (1 - game_round.alpha)
-    score = right_part + left_part
+        score = 9999999999999999
+    else:
+        general_ieffect = incentive_effect_consumption(simulation_finished.df)
+        targeted_consumption_level = general_ieffect.mean.tbse * game_round.ratio_tbse
+        squared_error = (targeted_consumption_level - general_ieffect.mean.ibt) ** 2
+        right_part = game_round.alpha * squared_error
+        left_part = affordability_general(simulation_finished.df).aparent_deficit.ibt * (1 - game_round.alpha)
+        score = right_part + left_part
 
     simulation.status = "completed"
     game_participant = GameParticipant(game_round_id=game_round_id, simulation_id=simulation_id, game_score=score, )
@@ -89,7 +97,8 @@ async def get_round_participation(game_round_id: int,
         simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == game_part.simulation_id).first()
         if simulation is None:
             continue
-        res.append(ParticipationSchema(round_id=int(game_part.game_round_id), simulation_name=simulation.name, score=float(game_part.game_score)))
+        res.append(ParticipationSchema(round_id=int(game_part.game_round_id), simulation_name=simulation.name,
+                                       score=float(game_part.game_score)))
 
     return res
 
@@ -112,10 +121,10 @@ async def get_participations(simulation_id: int,
         res.append(ParticipationRound(
             round_id=game_round.id,
             alpha=float(game_round.alpha),
-                                      ratio_tbse=float(game_round.ratio_tbse),
-                                      threshold_res=float(game_round.threshold_res),
-                                      simulation_name=simulation.name,
-                                      score=float(game_part.game_score)))
+            ratio_tbse=float(game_round.ratio_tbse),
+            threshold_res=float(game_round.threshold_res),
+            simulation_name=simulation.name,
+            score=float(game_part.game_score)))
     return res
 
 

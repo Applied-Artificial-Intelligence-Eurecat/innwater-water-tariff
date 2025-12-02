@@ -438,8 +438,8 @@ class SimulationPayload(BaseModel):
     @property
     def potable_water_nordin_tiers(self):
         res = [0]
-        last_prix = self.potable_water_tiers_prix_ttc[0]
-        for prix_tier, tier in zip(self.potable_water_tiers_prix_ttc[1:], self.tariff.drinking_water.usage_tiers[1:]):
+        last_prix = self.potable_water_prix_tiers_ttc[0]
+        for prix_tier, tier in zip(self.potable_water_prix_tiers_ttc[1:], self.tariff.drinking_water.usage_tiers[1:]):
             res.append(res[-1] + (prix_tier - last_prix) * tier.threshold)
             last_prix = prix_tier
         return res

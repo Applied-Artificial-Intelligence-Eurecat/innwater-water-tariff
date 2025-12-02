@@ -1,10 +1,15 @@
-from typing import List, Iterable
+import time
+from collections import defaultdict
+from typing import List
 
 import numpy as np
 import pandas as pd
 
 from calculator_service import AbstractSimulation
 from src.initial.schemas import SimulationPayload
+from src.small_assessment.mock_simulation import PAYLOAD
+
+SANITATION_COLUMN = 'Assainissement Collectif (1 = oui)'
 
 
 def decompose_value_carry(thresholds):
@@ -76,9 +81,12 @@ class NewSimulation(AbstractSimulation):
         self.calculate_taylor_consumption()
         self.calculate_bcp_consumption()
         self.calculate_overconsumption()
+        self.calculate_receipts()
+        self.calculate_par()
+        self.calculate_first_tier_consumption()
 
-    def is_sanitation(self) -> Iterable[bool]:
-        return self.df['Assainissement Collectif (1 = oui)'] == 1
+    def is_sanitation(self) -> np.array[bool]:
+        return (self.df[SANITATION_COLUMN] == 1)
 
     def calculate_captive_consumption(self):
         self.captive_consumption = (self.simulation.demand.coefficients.a0 +
@@ -101,7 +109,7 @@ class NewSimulation(AbstractSimulation):
         self.base_consumption_per_trim = self.base_consumption_per_day * 90
 
     def calculate_tbse_consumption(self):
-        daily_income = self.reself.df['Revenu_Imputé_2'] / 30
+        daily_income = self.df['Revenu_Imputé_2'] / 30
         bill_tbse = ((self.simulation.tbse_potable_water_base_prix + self.df[
             self.is_sanitation()] * self.simulation.tbse_sanitation_base_prix) / 90)
         diff_tbse = daily_income - bill_tbse
@@ -119,15 +127,15 @@ class NewSimulation(AbstractSimulation):
         def apply(row):
             daily_income = row['Revenu_Imputé_2'] / 30
             daily_subscription = (self.simulation.epa_prix_base_ttc if row[
-                self.is_sanitation()] else self.simulation.potable_water_prix_base_ttc) / 90
+                SANITATION_COLUMN] else self.simulation.potable_water_prix_base_ttc) / 90
             daily_subscription_tier = (
-                                          epa_nordin_tier_ttc if row[self.is_sanitation()] else ep_nordin_tier_ttc
+                                          epa_nordin_tier_ttc if row[SANITATION_COLUMN] else ep_nordin_tier_ttc
                                       ) / 90
-            daily_virtual_income = (daily_income - daily_subscription + daily_subscription_tier).apply(
-                np.log) * self.simulation.demand.coefficients.a6
-            prix_ttc = (epa_prix_ttc if row[self.is_sanitation()] else ep_prix_ttc).apply(
-                np.log) * self.simulation.demand.coefficients.a5
-            return daily_subscription_tier, 90 * (prix_ttc + daily_virtual_income + captive_consumption).apply(np.exp)
+            daily_virtual_income = np.log(
+                daily_income - daily_subscription + daily_subscription_tier) * self.simulation.demand.coefficients.a6
+            prix_ttc = np.log(
+                epa_prix_ttc if row[SANITATION_COLUMN] else ep_prix_ttc) * self.simulation.demand.coefficients.a5
+            return daily_subscription_tier, 90 * np.exp(prix_ttc + daily_virtual_income + captive_consumption)
 
         return apply
 
@@ -135,17 +143,17 @@ class NewSimulation(AbstractSimulation):
         thresholds = list(map(lambda x: x.threshold, self.simulation.tariff.drinking_water.usage_tiers))
         consumptions = []
 
-        daily_subscription_ibt_pp_results = []
+        daily_subscription_ibt_pp_results = defaultdict(list)
 
         for i, row in self.df.iterrows():
             results = []
-            for (ep_prix_ttc,
-                 epa_prix_ttc,
-                 ep_nordin_tier,
-                 epa_nordin_tier) in zip(self.simulation.potable_water_prix_tiers_ttc,
-                                         self.simulation.epa_prix_tiers_ttc,
-                                         self.simulation.potable_water_nordin_tiers,
-                                         self.simulation.epa_nordin_tiers):
+            for i_tier, (ep_prix_ttc,
+                         epa_prix_ttc,
+                         ep_nordin_tier,
+                         epa_nordin_tier) in enumerate(zip(self.simulation.potable_water_prix_tiers_ttc,
+                                                           self.simulation.epa_prix_tiers_ttc,
+                                                           self.simulation.potable_water_nordin_tiers,
+                                                           self.simulation.epa_nordin_tiers)):
                 daily_subscription_tier, ibt_pp_consumption = self.calculate_nordin_ibt_pp_consumption(
                     self.captive_consumption[i],
                     ep_prix_ttc,
@@ -154,7 +162,7 @@ class NewSimulation(AbstractSimulation):
                     epa_nordin_tier
                 )(row)
                 results.append(ibt_pp_consumption)
-                daily_subscription_ibt_pp_results.append(daily_subscription_tier)
+                daily_subscription_ibt_pp_results[i_tier].append(daily_subscription_tier)
 
             found = False
 
@@ -183,8 +191,8 @@ class NewSimulation(AbstractSimulation):
                                                                                tva_tiers)
         sanitation_tiers, sanitation_results = self.__calculate_bill_ibt(fee, prices, thresholds,
                                                                          tva_base, tva_tiers)
-        sanitation_tiers = sanitation_tiers * self.df[self.is_sanitation()]
-        sanitation_results = sanitation_results * self.df[self.is_sanitation()]
+        sanitation_tiers = sanitation_tiers * self.is_sanitation()
+        sanitation_results = sanitation_results * self.is_sanitation()
 
         self.ibt_pp_tiers_receipt = water_potable_tiers + sanitation_tiers
         self.ibt_pp_receipt = water_potable_results + sanitation_results
@@ -216,8 +224,11 @@ class NewSimulation(AbstractSimulation):
         last_cv_taylor = self.ibt_pp_consumption
         cvm = cv / last_cv_taylor
         self.taylor_consumptions = [last_cv_taylor]
+        daily_subscription_ttc = (self.df[SANITATION_COLUMN].apply(
+            lambda x: self.simulation.epa_prix_base_ttc if x else self.simulation.potable_water_prix_base_ttc)) / 90
+
         for i in range(num_periods):
-            log_revenue = (self.df['Revenu_Imputé_2'] - self.ibt_pp_daily_subscription_all_taxes).apply(
+            log_revenue = (self.df['Revenu_Imputé_2'] / 30 - daily_subscription_ttc).apply(
                 np.log) * self.simulation.demand.coefficients.a6
             log_avg_price = cvm.apply(np.log) * self.simulation.demand.coefficients.a5
 
@@ -228,7 +239,7 @@ class NewSimulation(AbstractSimulation):
                 thresholds=list(map(lambda x: x.threshold, self.simulation.tariff.drinking_water.usage_tiers)),
                 potable_water_prix_ttc=self.simulation.potable_water_prix_tiers_ttc,
                 sanitation_prix_ttc=self.simulation.sanitation_prix_tiers_ttc
-            ))
+            ), axis=1)
             cvm = cv / last_cv_taylor
         return self.taylor_consumptions[num_periods]
 
@@ -237,13 +248,14 @@ class NewSimulation(AbstractSimulation):
             return self.ibt_pp_consumption
         taylor_consumption = self.taylor_consumptions[1] / 90
         ibt_pp_consumption = self.ibt_pp_consumption / 90
-        ibt_pp_ln = ibt_pp_consumption.apply(np.log)
-        daily_subscription = (self.simulation.potable_water_prix_base_ttc + self.simulation.sanitation_prix_base_ttc *
-                              self.df[self.is_sanitation()]) / 90
-        log_revenue_taylor = ((self.df['Revenu_Imputé_2'] / 30 - daily_subscription).apply(
-            np.log) * self.simulation.demand.coefficients.a6)
 
         taylor_ln = taylor_consumption.apply(np.log)
+        ibt_pp_ln = ibt_pp_consumption.apply(np.log)
+
+        daily_subscription = (self.simulation.potable_water_prix_base_ttc + self.simulation.sanitation_prix_base_ttc *
+                              self.is_sanitation()) / 90
+        log_revenue_taylor = ((self.df['Revenu_Imputé_2'] / 30 - daily_subscription).apply(
+            np.log) * self.simulation.demand.coefficients.a6)
 
         self.bcp_consumptions = [self.ibt_pp_consumption]
 
@@ -256,7 +268,7 @@ class NewSimulation(AbstractSimulation):
                 thresholds=list(map(lambda x: x.threshold, self.simulation.tariff.drinking_water.usage_tiers)),
                 potable_water_prix_ttc=self.simulation.potable_water_prix_tiers_ttc,
                 sanitation_prix_ttc=self.simulation.sanitation_prix_tiers_ttc
-            ))
+            ), axis=1)
             cvm = cv / last_bcp
             ln_taylor_price = cvm.apply(np.log) * self.simulation.demand.coefficients.a5
             taylor_ln = log_revenue_taylor + ln_taylor_price + self.captive_consumption
@@ -266,30 +278,87 @@ class NewSimulation(AbstractSimulation):
         self.overconsumption = self.ibt_pp_consumption - self.bcp_consumptions[self.simulation.launch.periods]
         return self.overconsumption
 
+    def calculate_first_tier_consumption(self):
+        a_i = ((self.df['Revenu_Imputé_2'] / 30) ** self.simulation.demand.coefficients.a5) * self.captive_consumption
+        self.first_tier_consumption_per_day = (
+                ((self.simulation.primitives.drinking_water.variable_costs +
+                  self.simulation.primitives.environment.average_variable_cost)
+                 ** self.simulation.demand.coefficients.a6) * a_i)
+        self.first_tier_consumption_per_trim = self.first_tier_consumption_per_day * 90
+
     def __calculate_generic_tbse_receipt(self, consumption):
         potable_receipt = self.simulation.tbse_potable_water_base_prix + consumption * self.simulation.tbse_potable_water_variable_prix
-        sanitation_receipt = self.df[self.is_sanitation()] * (self.simulation.tbse_sanitation_base_prix + consumption *
-                                                              self.simulation.tbse_sanitation_variable_prix)
+        sanitation_receipt = self.is_sanitation().astype(float) * (
+                self.simulation.tbse_sanitation_base_prix + consumption *
+                self.simulation.tbse_sanitation_variable_prix)
         return potable_receipt + sanitation_receipt
 
     def __calculate_generic_ibt_receipt(self, consumption):
         thresholds = list(map(lambda x: x.threshold, self.simulation.tariff.drinking_water.usage_tiers))
 
-        potable_water_receipt = self.simulation.tariff.drinking_water.subscription + self.simulation.potable_water_base_tva_per_unit_of_service
-        for ttc_tier, consumption_tier in zip(self.simulation.potable_water_prix_tiers_ttc,
-                                              decompose_value(consumption, thresholds)):
-            potable_water_receipt += consumption_tier * ttc_tier
+        res = []
 
-        sanitation_receipt = self.simulation.tariff.sanitation.subscription + self.simulation.sanitation_base_tva_per_unit_of_service
-        for ttc_tier, consumption_tier in zip(self.simulation.sanitation_prix_tiers_ttc,
-                                              decompose_value(consumption, thresholds)):
-            sanitation_receipt += consumption_tier * ttc_tier
-        sanitation_receipt *= self.df[self.is_sanitation()]
+        for j, consumption_value in enumerate(consumption):
+            potable_water_receipt = self.simulation.tariff.drinking_water.subscription + self.simulation.potable_water_base_tva_per_unit_of_service
+            for ttc_tier, consumption_tier in zip(self.simulation.potable_water_prix_tiers_ttc,
+                                                  decompose_value(consumption_value, thresholds)):
+                potable_water_receipt += consumption_tier * ttc_tier
 
-        return potable_water_receipt + sanitation_receipt
+            sanitation_receipt = self.simulation.tariff.sanitation.subscription + self.simulation.sanitation_base_tva_per_unit_of_service
+            for ttc_tier, consumption_tier in zip(self.simulation.sanitation_prix_tiers_ttc,
+                                                  decompose_value(consumption_value, thresholds)):
+                sanitation_receipt += consumption_tier * ttc_tier
+            sanitation_receipt *= self.is_sanitation()[j]
+
+            total_receipt = potable_water_receipt + sanitation_receipt
+            res.append(total_receipt)
+        return np.array(res)
 
     def calculate_receipts(self):
-        self.tbse_captive_receipt = self.__calculate_generic_tbse_receipt(self.captive_consumption)
-        self.tbse_base_receipt = self.__calculate_generic_tbse_receipt(self.base_consumption)
+        self.tbse_captive_receipt = self.__calculate_generic_tbse_receipt(self.captive_consumption_per_trim)
+        self.tbse_base_receipt = self.__calculate_generic_tbse_receipt(self.base_consumption_per_trim)
+        self.ibt_captive_recept = self.__calculate_generic_ibt_receipt(self.captive_consumption_per_trim)
+        self.ibt_base_receipt = self.__calculate_generic_ibt_receipt(self.base_consumption_per_trim)
 
-        
+    def calculate_par(self):
+        self.par_ibt = self.ibt_base_receipt / self.df['Revenu_Imputé_2'] * 100
+        self.par_tbse = self.tbse_base_receipt / self.df['Revenu_Imputé_2'] * 100
+
+        self.ibt_par_headcount = (self.par_ibt > self.simulation.primitives.social_data.threshold_par).astype(float)
+        self.tbse_par_headcount = (self.par_tbse > self.simulation.primitives.social_data.threshold_par).astype(float)
+
+        par_threshold = self.simulation.primitives.social_data.threshold_par / 100 * 3 * self.df['Revenu_Imputé_2']
+
+        self.ibt_par_excess = (self.ibt_base_receipt - par_threshold).clip(lower=0)
+        self.tbse_par_excess = (self.tbse_base_receipt - par_threshold).clip(lower=0)
+
+        self.ibt_par_excess_rank = get_rank(self.ibt_par_excess)
+        self.tbse_par_excess_rank = get_rank(self.tbse_par_excess)
+
+
+def get_rank(excess):
+    df_ = pd.DataFrame({
+        "ibt_par_excess": excess,
+    })
+    df_.sort_values(by="ibt_par_excess", inplace=True)
+    df_['rank'] = list(range(len(df_)))
+    df_['rank'] = df_["rank"] / len(excess)
+    df_.sort_index(inplace=True)
+    return df_["rank"].values
+
+
+if __name__ == '__main__':
+    df = pd.read_csv(
+        '/Users/oriol.alas/PROJECTS/INNWATER/innwater-water-tariff/fast_backend/data/data.csv',
+        index_col=0
+    )
+    is_g1 = df['Assainissement Collectif (1 = oui)'] == 0
+    g1_df = df[is_g1]
+    g2_df = df[~is_g1]
+    start = time.time()
+    simulation = NewSimulation(PAYLOAD, g1_df, g2_df)
+    print(time.time() - start)
+    import pickle
+
+    with open("simulation.pickle", "rb") as f:
+        obj = pickle.load(f)

@@ -20,7 +20,7 @@ export class PopulationComponent implements OnInit, OnDestroy, OnChanges, ChatDa
     private apiUrl: string = environment.apiUrl;
 
     // Flag to control whether to use original datasource
-    useOriginalDatasource: boolean = false;
+    useOriginalDatasource: boolean = true;
 
     expectedPopulationSize: number = 1000;
     populationSizeOptions: number[] = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000];

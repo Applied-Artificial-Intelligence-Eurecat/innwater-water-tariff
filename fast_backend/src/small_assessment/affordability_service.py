@@ -1,6 +1,8 @@
 import numpy as np
 from pydantic import BaseModel
 
+from src.small_assessment.new_calculator_service import NewSimulation
+
 
 class AffordabilityRow(BaseModel):
     ibt: float
@@ -21,27 +23,24 @@ class AffordabilityGeneral(BaseModel):
     gini_index: AffordabilityRow
 
 
-def affordability_general(df) -> AffordabilityGeneral:
-    aparent_ibt = df['VAR_PAR_Menages AX'].mean()
-    cov_ibt = np.cov(df['VAR_PAR_Menages AX'].sort_values(), df['VAR_PAR_Menages BU'], bias=True)[0, 1]
-    cov_tbse = np.cov(df['VAR_PAR_Menages AY'].sort_values(), df['VAR_PAR_Menages BD'], bias=True)[0, 1]
-    aparent_tbse = df['VAR_PAR_Menages AY'].mean()
+def affordability_general(simulation: NewSimulation) -> AffordabilityGeneral:
+    cov_ibt = np.cov(simulation.ibt_par_excess, simulation.ibt_par_excess_rank, bias=True)[0, 1]
+    cov_tbse = np.cov(simulation.tbse_par_excess, simulation.tbse_par_excess_rank, bias=True)[0, 1]
     return AffordabilityGeneral(
         headcount_ratio=AffordabilityRow(
-            ibt=df['VAR_PAR_Menages AP'].sum() * 100 / len(df),
-            tbse=df['VAR_PAR_Menages AQ'].sum() * 100 / len(df),
+            ibt=simulation.ibt_par_headcount.sum() * 100 / len(simulation.ibt_par_headcount),
+            tbse=simulation.tbse_par_headcount.sum() * 100 / len(simulation.tbse_par_headcount),
         ),
-        # PROMEDIO('Var_PAR Ménages'!AX8:AX465)
         aparent_deficit=AffordabilityRow(
-            ibt=aparent_ibt,
-            tbse=aparent_tbse
+            ibt=simulation.ibt_par_excess.mean(),
+            tbse=simulation.tbse_par_excess.mean()
         ),
         efective_deficit=AffordabilityRow(
-            ibt=df.loc[df['VAR_PAR_Menages AX'] > 0, 'VAR_PAR_Menages AX'].mean(),
-            tbse=df.loc[df['VAR_PAR_Menages AY'] > 0, 'VAR_PAR_Menages AY'].mean()
+            ibt=simulation.ibt_par_excess[simulation.ibt_par_excess > 0].mean(),
+            tbse=simulation.tbse_par_excess[simulation.tbse_par_excess > 0].mean()
         ),
         gini_index=AffordabilityRow(
-            ibt=2 * cov_ibt / aparent_ibt,
-            tbse=2 * cov_tbse / aparent_tbse,
-        ),
+            ibt=2 * cov_ibt / simulation.ibt_par_excess.mean(),
+            tbse=2 * cov_tbse / simulation.tbse_par_excess.mean()
+        )
     )

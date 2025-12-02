@@ -85,7 +85,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
         coutsFixe_ep: new FormControl({value: 9000000, disabled: this.disabled}, {validators: [Validators.required]}),
         coutsVariable_ep: new FormControl(0.9, {validators: [Validators.required]}),
         montantAbo_ep: new FormControl(18.69, {validators: [Validators.required]}),
-        nombreAbonnes_ep: new FormControl(47847, {validators: [Validators.required]}),
+        nombreAbonnes_ep: new FormControl(45800, {validators: [Validators.required]}),
         redevances_ep: new FormControl(0.12, {validators: [Validators.required]}),
         tva_ep: new FormControl(2.1, {validators: [Validators.required]}),
         seuils_ep: this.fb.array([]),
@@ -93,7 +93,7 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
         coutsFixe_a: new FormControl(6000000, {validators: [Validators.required]}),
         coutsVariable_a: new FormControl(0.40, {validators: [Validators.required]}),
-        nombreAbonnes_a: new FormControl(25300, {validators: [Validators.required]}),
+        nombreAbonnes_a: new FormControl(21000, {validators: [Validators.required]}),
         montantAbo_a: new FormControl(15.545, {validators: [Validators.required]}),
         redevances_a: new FormControl(0.04, {validators: [Validators.required]}),
 

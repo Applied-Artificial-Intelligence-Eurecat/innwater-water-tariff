@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { ResultsService, WaterAgency } from '../../results.service';
 
 export interface WaterAgencyData {
@@ -14,11 +14,12 @@ export interface WaterAgencyData {
 export class WaterAgencyTableComponent implements OnInit {
   displayedColumns: string[] = ['category', 'totalAnnuel'];
   dataSource: WaterAgencyData[] = [];
+  @Input() simulationId!: number | null;
 
   constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
-    const simulationId = 2; // Replace with dynamic value if needed
+    const simulationId = this.simulationId!; // Replace with dynamic value if needed
 
     this.resultsService.getWaterAgency(simulationId).subscribe({
       next: (data: WaterAgency) => {

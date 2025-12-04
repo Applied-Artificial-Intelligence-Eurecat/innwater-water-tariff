@@ -23,7 +23,7 @@ from src.initial.schemas import SimulationPayload, DuplicationSchema, GetSimulat
 from src.initial.schemas import UserCreate, Token, DemandModel, CoefficientModel, \
     WaterServiceCostModel, PrimitivesModel, EnvironmentalModel, TaxSectionModel, TaxModel, SocialDataModel, TariffModel, \
     TariffSectionModel, ConsumptionThresholds
-from src.small_assessment.calculator_service import SimulationFinished
+from src.small_assessment.new_calculator_service import get_or_create_simulation_from_payload
 
 initial_router = APIRouter(
     prefix="/initial",
@@ -151,7 +151,7 @@ async def create_and_save_simulation(
     await create_ibt_parameters(db, payload, simulation)
     db.commit()
 
-    await save_population_data_given_simulation_info(
+    df = await save_population_data_given_simulation_info(
         total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
         sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
         bd=simulation.population.database_path,
@@ -161,7 +161,7 @@ async def create_and_save_simulation(
         simulation_id=simulation.id,
     )
 
-    asyncio.create_task(start_processing_and_calculating_simulation(simulation.id, payload, db),
+    asyncio.create_task(start_processing_and_calculating_simulation(simulation.id, payload, df, db),
                         name=f"start processing {simulation.id}")
 
     return {
@@ -365,7 +365,17 @@ async def edit_simulation(simulation_id: int, payload: SimulationPayload,
 
     db.commit()
 
-    asyncio.create_task(start_processing_and_calculating_simulation(simulation.id, payload, db),
+    df = await save_population_data_given_simulation_info(
+        total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
+        sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
+        bd=simulation.population.database_path,
+        eps=simulation.population.eps,
+        std=simulation.population.std,
+        use_original_datasource=simulation.population.original_datasource,
+        simulation_id=simulation.id,
+    )
+
+    asyncio.create_task(start_processing_and_calculating_simulation(simulation.id, payload, df, db),
                         name=f"start processing {simulation.id}")
 
     return {
@@ -393,7 +403,7 @@ async def get_simulation(simulation_id: int, current_user: User = Depends(get_cu
     }
 
 
-async def get_simulation_payload_from_db(current_user, db, simulation_id):
+async def get_simulation_payload_from_db(current_user, db, simulation_id, get_simulation_db=False):
     simulation: Simulation | None = db.query(Simulation).filter(Simulation.id == simulation_id).join(Project).filter(
         Project.user_id == current_user.id).first()
     if simulation is None:
@@ -436,6 +446,8 @@ async def get_simulation_payload_from_db(current_user, db, simulation_id):
                                                   status=simulation.status.value,
                                                   tarification=await create_tariff_model_payload_from_simulation(
                                                       simulation))
+    if get_simulation_db:
+        return get_simulation_payload, simulation
     return get_simulation_payload
 
 
@@ -495,9 +507,10 @@ async def get_tbse_par_plot(simulation_id: int, current_user: User = Depends(get
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
     print(simulation.id, simulation_payload)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
 
-    buf = generate_par_affordability_plot(simulation_payload, simulation_finished.df)
+    buf = generate_par_affordability_plot(simulation_payload, simulation_finished.level_oecd,
+                                          simulation_finished.par_tbse, 'TBSE')
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -509,9 +522,10 @@ async def get_ibt_par_plot(simulation_id: int, current_user: User = Depends(get_
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
 
-    buf = generate_par_affordability_plot(simulation_payload, simulation_finished.df, 'VAR_PAR_Menages AM', 'IBT')
+    buf = generate_par_affordability_plot(simulation_payload, simulation_finished.level_oecd,
+                                          simulation_finished.par_ibt, 'IBT')
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -523,8 +537,9 @@ async def get_tbse_consumption_plot(simulation_id: int, current_user: User = Dep
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
-    buf = generate_consumption_plot(simulation_finished.df, 'C_et_F_TBSE P', feat='TBSE')
+    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    buf = generate_consumption_plot(simulation_finished.level_oecd, simulation_finished.tbse_consumption, feat='TBSE')
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -536,8 +551,11 @@ async def get_ibt_consumption_plot(simulation_id: int, current_user: User = Depe
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
-    buf = generate_consumption_plot(simulation_finished.df, 'C_EP_BCP HM', feat='IBT')
+    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    buf = generate_consumption_plot(simulation_finished.level_oecd,
+                                    simulation_finished.bcp_consumptions[simulation_finished.simulation.launch.periods],
+                                    feat='IBT')
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -549,8 +567,8 @@ async def get_pens_parade_consumption_plot(simulation_id: int, current_user: Use
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
-    buf = generate_tbse_pens_parade_consumptions_plot(simulation_finished.df)
+    calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+    buf = generate_tbse_pens_parade_consumptions_plot(calculator)
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -562,8 +580,10 @@ async def get_pens_parade_consumption_plot(simulation_id: int, current_user: Use
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
-    buf = generate_ibt_pens_parade_consumptions_plot(simulation_finished.df)
+
+    calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    buf = generate_ibt_pens_parade_consumptions_plot(calculator)
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -576,9 +596,10 @@ async def get_consumption_deviation_loses_cost_recovery_plot(simulation_id: int,
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
+    calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
 
-    buf = generate_tbse_consumption_deviation_losses_cost_recovery_plot(simulation_finished, 'C_et_F_TBSE P', 'TBSE')
+    buf = generate_tbse_consumption_deviation_losses_cost_recovery_plot(calculator,
+                                                                        calculator.tbse_consumption_per_trim, 'TBSE')
     return StreamingResponse(buf, media_type="image/png")
 
 
@@ -591,9 +612,12 @@ async def get_consumption_deviation_loses_cost_recovery_plot(simulation_id: int,
     if simulation is None:
         raise HTTPException(status_code=404, detail="Simulation not found")
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation.id, simulation_payload)
-    buf = generate_tbse_consumption_deviation_losses_cost_recovery_plot(simulation_finished, 'C_EP_BCP HM', 'IBT')
+    calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    buf = generate_tbse_consumption_deviation_losses_cost_recovery_plot(calculator, calculator.bcp_consumptions[
+        calculator.simulation.launch.periods], 'IBT')
     return StreamingResponse(buf, media_type="image/png")
+
 
 @initial_router.delete("/simulation/{simulation_id}")
 async def delete_simulation(simulation_id: int, current_user: User = Depends(get_current_active_user),

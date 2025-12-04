@@ -38,9 +38,40 @@
   gap: 20px;
 }
 
+/* Gini grid layout */
+.gini-grid {
+  width: min(1200px, 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .gini-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Button container styling */
 .button-container {
   margin-bottom: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* Table header styling */
+th.mat-header-cell {
+  font-weight: bold;
+  color: #3f51b5;
+}
+
+/* Add some padding to the tables */
+.mat-card-content {
+  padding: 10px;
+}
+
+/* Make sure tables take full width */
+table {
+  width: 100%;
 }

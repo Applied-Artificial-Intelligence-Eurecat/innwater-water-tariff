@@ -10,7 +10,6 @@ import {HomeComponent} from './pages/home/home.component';
 import {NotFoundComponent} from './pages/not-found/not-found.component';
 import {LastSimComponent} from './last-sim/last-sim.component';
 import {DataDisplayComponent} from './data-display/data-display.component';
-import {AffordabilityComponent} from "./evaluation/affordability/affordability.component";
 import {SimulationDetailsComponent} from './simulation-details/simulation-details.component';
 import {AuthGuard} from './auth.guard';
 import {SimplifiedDashboardComponent} from "./simplified-dashboard/simplified-dashboard.component";
@@ -19,6 +18,7 @@ import {AggregatedDashboardComponent} from "./aggregated-dashboard/aggregated-da
 import {IncentiveEffectComponent} from "./incentive-effect/incentive-effect.component";
 import {RoundDetailComponent} from "./round-detail/round-detail.component";
 import {GameDetailComponent} from "./game-detail/game-detail.component";
+import {AffordabilityDetailsComponent} from "./affordability-details/affordability-details.component";
 
 const routes: Routes = [
     {
@@ -57,10 +57,6 @@ const routes: Routes = [
         component: DataDisplayComponent
     },
     {
-        path: 'affordability',
-        component: AffordabilityComponent,
-    },
-    {
         path: 'evaluation',
         component: EvaluationComponent,
     },
@@ -91,6 +87,10 @@ const routes: Routes = [
     {
         path: 'incentive-effect/:id',
         component: IncentiveEffectComponent,
+    },
+    {
+        path: 'affordability-details/:id',
+        component: AffordabilityDetailsComponent,
     },
     {
         path: 'round-detail/:id',

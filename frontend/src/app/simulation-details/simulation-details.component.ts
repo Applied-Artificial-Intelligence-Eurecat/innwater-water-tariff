@@ -3,10 +3,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {InitialAPIService} from "../initial-api.service";
 import {environment} from "../../environments/environment";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
-import {GameService, GameRound, GameRoundParams} from "../game.service";
+import {GameRound, GameRoundParams, GameService} from "../game.service";
 import {MatDialog} from '@angular/material/dialog';
-import { LinkGameDialogComponent } from './link-game-dialog/link-game-dialog.component';
-import { CreateGameDialogComponent } from './create-game-dialog/create-game-dialog.component';
+import {LinkGameDialogComponent} from './link-game-dialog/link-game-dialog.component';
+import {CreateGameDialogComponent} from './create-game-dialog/create-game-dialog.component';
+import {ImagePopupDialogComponent} from './image-popup-dialog/image-popup-dialog.component';
+import {ResultsService} from "../results.service";
 
 @Component({
     selector: 'app-simulation-details',
@@ -50,9 +52,10 @@ export class SimulationDetailsComponent implements OnInit {
     ibtConsumptionDeviationLosesCostRecoveryPlot: SafeResourceUrl | null = null;
 
     constructor(
-        private route: ActivatedRoute,
-        private router: Router,
+        public route: ActivatedRoute,
+        public router: Router,
         private initialApiService: InitialAPIService,
+        private resultsService: ResultsService,
         private gameService: GameService,
         private dialog: MatDialog,
         private sanitizer: DomSanitizer
@@ -199,4 +202,49 @@ export class SimulationDetailsComponent implements OnInit {
             }
         });
     }
+
+    /**
+     * Opens an image in a popup dialog with zoom functionality
+     * @param imageUrl The URL of the image to display
+     * @param title Optional title for the dialog
+     */
+    openImagePopup(imageUrl: SafeResourceUrl | null, title?: string): void {
+        this.dialog.open(ImagePopupDialogComponent, {
+            width: '90vw',
+            maxWidth: '1200px',
+            data: {
+                imageUrl: imageUrl,
+                title: title
+            }
+        });
+    }
+
+downloadCSV() {
+    if (this.simulationId !== null) {
+        console.log("Downloading...", this.simulationId);
+        this.resultsService.downloadCSV(this.simulationId).subscribe({
+            next: (blob: Blob) => {
+                // Create a URL for the blob
+                const url = window.URL.createObjectURL(blob);
+
+                // Create a temporary anchor element and trigger download
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `simulation_${this.simulationId}_results.csv`;
+                link.style.display = 'none';
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Clean up the URL
+                window.URL.revokeObjectURL(url);
+            },
+            error: (error) => {
+                console.error('Error downloading CSV:', error);
+                // You might want to show a user-friendly error message here
+            }
+        });
+    }
+}
 }

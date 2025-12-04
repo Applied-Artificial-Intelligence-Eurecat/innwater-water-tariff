@@ -556,5 +556,5 @@ pyrightconfig.json
 # Ignore all local history of files
 .history
 .ionide
-
+pgdata/**
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,pycharm+all,visualstudiocode,python,pythonvanilla,angular,node

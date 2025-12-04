@@ -7,12 +7,12 @@ PAYLOAD = SimulationPayload(
         ep=WaterServiceCostModel(
             couts_fixes=9000000,
             couts_variables=0.9,
-            nombre_abonnes=47847,
+            nombre_abonnes=45800,
         ),
         assainissement=WaterServiceCostModel(
             couts_fixes=6000000,
             couts_variables=0.40,
-            nombre_abonnes=25300,
+            nombre_abonnes=21000,
         ),
         environnement=EnvironmentalModel(
             couts_fixes_par_an=0,
@@ -98,7 +98,7 @@ PAYLOAD = SimulationPayload(
         jardin=False
     ),
     launch=LaunchModel(
-        periodes=4,
+        periodes=8,
         nom_simulation="MockSimulation"
     )
 )

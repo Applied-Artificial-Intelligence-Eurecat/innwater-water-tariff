@@ -5,6 +5,16 @@
             <p>Status: {{ simulationData.status }}</p>
         </div>
 
+        <div class="button-column">
+            <button mat-raised-button color="primary" class="edit-btn"
+                    (click)="router.navigate(['/edit-simulation', simulationId])"
+            style="margin-right: 10px">Edit
+            </button>
+            <button mat-raised-button color="primary" (click)="downloadCSV()">
+                Get CSV
+            </button>
+        </div>
+
         <!--
                 <div class="button-column" *ngIf="simulationData.status === 'Initialized'">
                     <button mat-raised-button color="primary"
@@ -27,7 +37,8 @@
         <mat-expansion-panel-header>
             <mat-panel-title>Population</mat-panel-title>
         </mat-expansion-panel-header>
-        <img [src]="populationPlotUrl" style="width: 100%"/>
+        <img [src]="populationPlotUrl" style="width: 100%; cursor: pointer;"
+             (click)="openImagePopup(populationPlotUrl, 'Population')"/>
 
     </mat-expansion-panel>
 
@@ -43,16 +54,20 @@
         </mat-expansion-panel-header>
         <div class="row median-statistics-row">
             <div class="col-md-6">
-                <img [src]="tbseParPlotUrl" style="width: 100%;"/>
+                <img [src]="tbseParPlotUrl" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(tbseParPlotUrl, 'TBSE PAR Plot')"/>
             </div>
             <div class="col-md-6">
-                <img [src]="tbseConsumptionPlotUrl" style="width: 100%;"/>
+                <img [src]="tbseConsumptionPlotUrl" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(tbseConsumptionPlotUrl, 'TBSE Consumption Plot')"/>
             </div>
             <div class="col-md-6">
-                <img [src]="tbsePensParadePlotUrl" style="width: 100%;"/>
+                <img [src]="tbsePensParadePlotUrl" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(tbsePensParadePlotUrl, 'TBSE Pens Parade Plot')"/>
             </div>
             <div class="col-md-6">
-                <img [src]="tbseConsumptionDeviationLosesCostRecoveryPlot" style="width: 100%;"/>
+                <img [src]="tbseConsumptionDeviationLosesCostRecoveryPlot" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(tbseConsumptionDeviationLosesCostRecoveryPlot, 'TBSE Consumption Deviation Plot')"/>
             </div>
         </div>
     </mat-expansion-panel>
@@ -69,16 +84,20 @@
         </mat-expansion-panel-header>
         <div class="row median-statistics-row">
             <div class="col-md-6">
-                <img [src]="ibtParPlotUrl" style="width: 100%;"/>
+                <img [src]="ibtParPlotUrl" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(ibtParPlotUrl, 'IBT PAR Plot')"/>
             </div>
             <div class="col-md-6">
-                <img [src]="ibtConsumptionPlotUrl" style="width: 100%;"/>
+                <img [src]="ibtConsumptionPlotUrl" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(ibtConsumptionPlotUrl, 'IBT Consumption Plot')"/>
             </div>
             <div class="col-md-6">
-                <img [src]="ibtPensParadePlotUrl" style="width: 100%;"/>
+                <img [src]="ibtPensParadePlotUrl" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(ibtPensParadePlotUrl, 'IBT Pens Parade Plot')"/>
             </div>
             <div class="col-md-6">
-                <img [src]="ibtConsumptionDeviationLosesCostRecoveryPlot" style="width: 100%;"/>
+                <img [src]="ibtConsumptionDeviationLosesCostRecoveryPlot" style="width: 100%; cursor: pointer;"
+                     (click)="openImagePopup(ibtConsumptionDeviationLosesCostRecoveryPlot, 'IBT Consumption Deviation Plot')"/>
             </div>
         </div>
     </mat-expansion-panel>

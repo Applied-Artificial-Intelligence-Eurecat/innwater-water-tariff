@@ -9,8 +9,8 @@ from src.game.schemas import RoundSchema, ParticipationSchema, ParticipationRoun
 from src.initial.routers import get_simulation_payload_from_db
 from src.results.routers import calculate_rex
 from src.small_assessment.affordability_service import affordability_general
-from src.small_assessment.calculator_service import SimulationFinished
 from src.small_assessment.incentive_service import incentive_effect_consumption
+from src.small_assessment.new_calculator_service import get_or_create_simulation_from_payload
 
 game_router = APIRouter(prefix="/game",
                         tags=["game"],
@@ -63,16 +63,17 @@ async def link_round_to_simulation(game_round_id: int, simulation_id: int,
         raise HTTPException(status_code=400, detail="Game participant already exists")
 
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
-    simulation_finished = SimulationFinished(simulation_id, simulation_payload)
-    rex_value = (await calculate_rex(simulation_finished, simulation_payload))['total_cost']
+    calculation = await get_or_create_simulation_from_payload(simulation_id, simulation, simulation_payload)
+
+    rex_value = (await calculate_rex(calculation))['total_cost']
     if abs(rex_value) > game_round.threshold_res:
         score = 9999999999999999
     else:
-        general_ieffect = incentive_effect_consumption(simulation_finished.df)
+        general_ieffect = incentive_effect_consumption(calculation)
         targeted_consumption_level = general_ieffect.mean.tbse * game_round.ratio_tbse
         squared_error = (targeted_consumption_level - general_ieffect.mean.ibt) ** 2
         right_part = game_round.alpha * squared_error
-        left_part = affordability_general(simulation_finished.df).aparent_deficit.ibt * (1 - game_round.alpha)
+        left_part = affordability_general(calculation).aparent_deficit.ibt * (1 - game_round.alpha)
         score = right_part + left_part
 
     simulation.status = "completed"

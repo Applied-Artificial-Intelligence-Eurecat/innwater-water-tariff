@@ -12,6 +12,22 @@ h2 {
   margin-bottom: 20px;
 }
 
+
+.edit-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 8px;
+}
+
+.edit-btn:hover {
+  background-color: #218838;
+}
+
 .loading-indicator {
   text-align: center;
   padding: 20px;

@@ -10,12 +10,33 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_PATH=/app/water_tariff.db
+      - DATABASE_URL=postgresql://postgres:password@database:5432/watertariff
       - PORT=8000
     restart: unless-stopped
+    depends_on:
+      - database
     networks:
       - proxy-network
-
+  database:
+    image: postgres:13
+    restart: always
+    hostname: database
+    environment:
+      POSTGRES_DB: watertariff
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    networks:
+      - proxy-network
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d watertariff" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   frontend:
     hostname: msm-frontend
     container_name: msm-frontend-local

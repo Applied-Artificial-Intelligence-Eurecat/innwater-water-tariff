@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { ResultsService, StateFunding } from '../../results.service';
 
 export interface StateData {
@@ -14,11 +14,12 @@ export interface StateData {
 export class StateTableComponent implements OnInit {
   displayedColumns: string[] = ['category', 'totalAnnuel'];
   dataSource: StateData[] = [];
+    @Input() simulationId!: number | null;
 
   constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
-    const simulationId = 2; // Replace with a dynamic ID if needed
+    const simulationId = this.simulationId!; // Replace with a dynamic ID if needed
 
     this.resultsService.getStateFunding(simulationId).subscribe({
       next: (data: StateFunding) => {

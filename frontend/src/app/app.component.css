@@ -11,6 +11,8 @@ mat-toolbar {
     z-index: 1000;
 }
 
+
+
 .toolbar-title {
     margin-right: 24px;
     font-size: 1.5rem;

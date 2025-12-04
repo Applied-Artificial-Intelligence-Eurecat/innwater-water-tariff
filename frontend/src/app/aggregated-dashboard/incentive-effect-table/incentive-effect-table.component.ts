@@ -37,7 +37,7 @@ export class IncentiveEffectTableComponent implements OnInit {
                 averageBill: this.format(consumption.ibt_pp.average_bill_eur_trim)
               },
               {
-                category_metric: 'IBT TBSE',
+                category_metric: 'TBSE',
                 averageConsumption: this.format(consumption.ibt_tbse.average_consumption_m3_trim),
                 averageBill: this.format(consumption.ibt_tbse.average_bill_eur_trim)
               },

@@ -1,8 +1,18 @@
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
-from src.small_assessment.calculator_service import AbstractSimulation
+from src.small_assessment.new_calculator_service import NewSimulation
+
+
+def check_zero_devision(func, args=[]):
+    try:
+        result = func(*args)
+    except ZeroDivisionError:
+        return None
+    if np.isnan(result).any():
+        return None
+    return result
 
 
 class IncentiveConsumptionRow(BaseModel):
@@ -14,10 +24,17 @@ class IncentiveConsumptionRow(BaseModel):
 
 
 class DeltaIncentiveConsumptionRow(BaseModel):
-    delta_ibt_plus: float
-    delta_ibt_minus: float
-    delta_ibt_pp_plus: float
-    delta_ibt_pp_minus: float
+    delta_ibt_plus: float | None
+    delta_ibt_minus: float | None
+    delta_ibt_pp_plus: float | None
+    delta_ibt_pp_minus: float | None
+
+    @field_validator('delta_ibt_plus', 'delta_ibt_minus', 'delta_ibt_pp_plus', 'delta_ibt_pp_minus')
+    @classmethod
+    def convert_nan_to_none(cls, v):
+        if v is not None and np.isnan(v).any():
+            return None
+        return v
 
 
 class IncentiveConsumption(BaseModel):
@@ -41,10 +58,16 @@ class IncentiveConsumption(BaseModel):
 
 
 class OverconsumptionDecompositionRow(BaseModel):
-    frequency: float
-    delta_c_moyen: float | str
-    variance: float | str
+    frequency: float | None
+    delta_c_moyen: float  | None
+    variance: float  | None
 
+    @field_validator('frequency', 'delta_c_moyen', 'variance')
+    @classmethod
+    def convert_nan_to_none(cls, v):
+        if v is not None and np.isnan(v).any():
+            return None
+        return v
 
 class GroupDecomposition(BaseModel):
     ensemble: OverconsumptionDecompositionRow
@@ -108,25 +131,29 @@ def desvprom(series: pd.Series) -> float:
     return np.abs(series - m).mean()
 
 
-def delta_incentive_effect_consumption(df) -> IncentiveConsumption:
-    delta_ibt = df['C_EP_BCP HM'] - df['C_et_F_TBSE P']
-    delta_ibt_pp = df['C_PP BM'] - df['C_et_F_TBSE P']
-    delta_ibt_plus = delta_ibt[delta_ibt >= 0]
-    delta_ibt_minus = delta_ibt[delta_ibt < 0]
-    delta_ibt_pp_plus = delta_ibt_pp[delta_ibt_pp >= 0]
-    delta_ibt_pp_minus = delta_ibt_pp[delta_ibt_pp < 0]
+def delta_incentive_effect_consumption(calculator: NewSimulation) -> IncentiveConsumption:
+    # Consumption BCP (t) - TBSE consumption
+
+    delta = calculator.bcp_consumptions[calculator.simulation.launch.periods] - calculator.tbse_consumption_per_trim
+    delta_pp = calculator.ibt_pp_consumption - calculator.tbse_consumption_per_trim
+
+    delta_ibt_plus = delta[delta > 0]
+    delta_ibt_minus = delta[delta < 0]
+
+    delta_ibt_pp_plus = delta_pp[delta_pp > 0]
+    delta_ibt_pp_minus = delta_pp[delta_pp < 0]
 
     q1_row = DeltaIncentiveConsumptionRow(
-        delta_ibt_plus=df['C_EP_BCP HM'].quantile(0.25),
-        delta_ibt_minus=df['C_EP_BCP HM'].quantile(0.25),
-        delta_ibt_pp_plus=df['C_PP BM'].quantile(0.25),
-        delta_ibt_pp_minus=df['C_PP BM'].quantile(0.25)
+        delta_ibt_plus=check_zero_devision(lambda: delta_ibt_plus.quantile(0.25)),
+        delta_ibt_minus=check_zero_devision(lambda: delta_ibt_minus.quantile(0.25)),
+        delta_ibt_pp_plus=check_zero_devision(lambda: delta_ibt_pp_plus.quantile(0.25)),
+        delta_ibt_pp_minus=check_zero_devision(lambda: delta_ibt_pp_minus.quantile(0.25))
     )
     q3_row = DeltaIncentiveConsumptionRow(
-        delta_ibt_plus=df['C_EP_BCP HM'].quantile(0.75),
-        delta_ibt_minus=df['C_EP_BCP HM'].quantile(0.75),
-        delta_ibt_pp_plus=df['C_PP BM'].quantile(0.75),
-        delta_ibt_pp_minus=df['C_PP BM'].quantile(0.75)
+        delta_ibt_plus=check_zero_devision(lambda: delta_ibt_plus.quantile(0.75)),
+        delta_ibt_minus=check_zero_devision(lambda: delta_ibt_minus.quantile(0.75)),
+        delta_ibt_pp_plus=check_zero_devision(lambda: delta_ibt_pp_plus.quantile(0.75)),
+        delta_ibt_pp_minus=check_zero_devision(lambda: delta_ibt_pp_minus.quantile(0.75))
     )
     mape_row = DeltaIncentiveConsumptionRow(
         delta_ibt_plus=desvprom(delta_ibt_plus),
@@ -161,16 +188,16 @@ def delta_incentive_effect_consumption(df) -> IncentiveConsumption:
         q1=q1_row,
         q3=q3_row,
         d1=DeltaIncentiveConsumptionRow(
-            delta_ibt_plus=df['C_EP_BCP HM'].quantile(0.1) - df['C_EP_BCP HM'].quantile(0.1),
-            delta_ibt_minus=df['C_EP_BCP HM'].quantile(0.1) - df['C_EP_BCP HM'].quantile(0.1),
-            delta_ibt_pp_plus=df['C_PP BM'].quantile(0.1) - df['C_PP BM'].quantile(0.1),
-            delta_ibt_pp_minus=df['C_PP BM'].quantile(0.1) - df['C_PP BM'].quantile(0.1)
+            delta_ibt_plus=delta_ibt_plus.quantile(0.1),
+            delta_ibt_minus=delta_ibt_minus.quantile(0.1),
+            delta_ibt_pp_plus=delta_ibt_pp_plus.quantile(0.1),
+            delta_ibt_pp_minus=delta_ibt_pp_minus.quantile(0.1)
         ),
         d9=DeltaIncentiveConsumptionRow(
-            delta_ibt_plus=df['C_EP_BCP HM'].quantile(0.9),
-            delta_ibt_minus=df['C_EP_BCP HM'].quantile(0.9),
-            delta_ibt_pp_plus=df['C_PP BM'].quantile(0.9),
-            delta_ibt_pp_minus=df['C_PP BM'].quantile(0.9)
+            delta_ibt_plus=delta_ibt_plus.quantile(0.9),
+            delta_ibt_minus=delta_ibt_minus.quantile(0.9),
+            delta_ibt_pp_plus=delta_ibt_pp_plus.quantile(0.9),
+            delta_ibt_pp_minus=delta_ibt_pp_minus.quantile(0.9)
         ),
         percentile_rank=DeltaIncentiveConsumptionRow(
             delta_ibt_plus=percentrank_inc(delta_ibt_plus, delta_ibt_plus.mean()),
@@ -210,17 +237,18 @@ def delta_incentive_effect_consumption(df) -> IncentiveConsumption:
             delta_ibt_pp_minus=delta_ibt_pp_minus.quantile(0.9) / delta_ibt_pp_minus.quantile(0.1),
         ),
         yule_coeff=DeltaIncentiveConsumptionRow(
-            delta_ibt_plus=((q3_row.delta_ibt_plus - median_row.delta_ibt_plus) - (
+            delta_ibt_plus=check_zero_devision(lambda: ((q3_row.delta_ibt_plus - median_row.delta_ibt_plus) - (
                     median_row.delta_ibt_plus - q1_row.delta_ibt_plus)) / (
-                                   q3_row.delta_ibt_plus - q1_row.delta_ibt_plus),
-            delta_ibt_minus=((q3_row.delta_ibt_minus - median_row.delta_ibt_minus) - (
+                                                               q3_row.delta_ibt_plus - q1_row.delta_ibt_plus)),
+            delta_ibt_minus=check_zero_devision(lambda: ((q3_row.delta_ibt_minus - median_row.delta_ibt_minus) - (
                     median_row.delta_ibt_minus - q1_row.delta_ibt_minus)) / (
-                                    q3_row.delta_ibt_minus - q1_row.delta_ibt_minus),
-            delta_ibt_pp_plus=((q3_row.delta_ibt_pp_plus - median_row.delta_ibt_pp_plus) - (
+                                                                q3_row.delta_ibt_minus - q1_row.delta_ibt_minus)),
+            delta_ibt_pp_plus=check_zero_devision(lambda: ((q3_row.delta_ibt_pp_plus - median_row.delta_ibt_pp_plus) - (
                     median_row.delta_ibt_pp_plus - q1_row.delta_ibt_pp_plus)) / (
-                                      q3_row.delta_ibt_pp_plus - q1_row.delta_ibt_pp_plus),
-            delta_ibt_pp_minus=((q3_row.delta_ibt_pp_minus - median_row.delta_ibt_pp_minus) - (
-                    median_row.delta_ibt_pp_minus - q1_row.delta_ibt_pp_minus)) / (
+                                                                  q3_row.delta_ibt_pp_plus - q1_row.delta_ibt_pp_plus)),
+            delta_ibt_pp_minus=check_zero_devision(
+                lambda: (q3_row.delta_ibt_pp_minus - median_row.delta_ibt_pp_minus) - (
+                        median_row.delta_ibt_pp_minus - q1_row.delta_ibt_pp_minus)) / (
                                        q3_row.delta_ibt_pp_minus - q1_row.delta_ibt_pp_minus),
         ),
         gini_schutz=DeltaIncentiveConsumptionRow(
@@ -232,105 +260,113 @@ def delta_incentive_effect_consumption(df) -> IncentiveConsumption:
     )
 
 
-def incentive_effect_consumption(df) -> IncentiveConsumption:
-    actual_overconsumption = (df['C_EP_BCP HM'] - df['C_PP BM']).replace(0, pd.NA)
-    consumption_per_capita = actual_overconsumption / df['nbpers']
-    mean_row = IncentiveConsumptionRow(ibt=df['C_EP_BCP HM'].mean(), ibt_pp=df['C_PP BM'].mean(),
-                                       tbse=df['C_et_F_TBSE P'].mean(),
+def incentive_effect_consumption(calculator: NewSimulation) -> IncentiveConsumption:
+    # (Consumption BCP (EPA) - Consumptiopn IBT PP)
+
+    ibt = calculator.bcp_consumptions[calculator.simulation.launch.periods]
+    ibt_pp = calculator.ibt_pp_consumption
+    tbse = calculator.tbse_consumption_per_trim
+    actual_overconsumption = calculator.bcp_consumptions[
+                                 calculator.simulation.launch.periods] - calculator.ibt_pp_consumption
+    consumption_per_capita = actual_overconsumption / calculator.df['nbpers']
+
+    mean_row = IncentiveConsumptionRow(ibt=ibt.mean(),
+                                       ibt_pp=ibt_pp.mean(),
+                                       tbse=tbse.mean(),
                                        actual_overconsumption=actual_overconsumption.mean(),
                                        overconsumption_per_capita=(consumption_per_capita).mean())
-    median_row = IncentiveConsumptionRow(ibt=df['C_EP_BCP HM'].median(), ibt_pp=df['C_PP BM'].median(),
-                                         tbse=df['C_et_F_TBSE P'].median(),
+    median_row = IncentiveConsumptionRow(ibt=ibt.median(), ibt_pp=ibt_pp.median(),
+                                         tbse=tbse.median(),
                                          actual_overconsumption=actual_overconsumption.median(),
                                          overconsumption_per_capita=(consumption_per_capita).median())
-    q1_row = IncentiveConsumptionRow(ibt=df['C_EP_BCP HM'].quantile(0.25), ibt_pp=df['C_PP BM'].quantile(0.25),
-                                     tbse=df['C_et_F_TBSE P'].quantile(0.25),
+    q1_row = IncentiveConsumptionRow(ibt=ibt.quantile(0.25), ibt_pp=ibt_pp.quantile(0.25),
+                                     tbse=tbse.quantile(0.25),
                                      actual_overconsumption=actual_overconsumption.quantile(0.25),
                                      overconsumption_per_capita=(consumption_per_capita).quantile(0.25))
-    q3_row = IncentiveConsumptionRow(ibt=df['C_EP_BCP HM'].quantile(0.75), ibt_pp=df['C_PP BM'].quantile(0.75),
-                                     tbse=df['C_et_F_TBSE P'].quantile(0.75),
+    q3_row = IncentiveConsumptionRow(ibt=ibt.quantile(0.75), ibt_pp=ibt_pp.quantile(0.75),
+                                     tbse=tbse.quantile(0.75),
                                      actual_overconsumption=actual_overconsumption.quantile(0.75),
                                      overconsumption_per_capita=(consumption_per_capita).quantile(0.75))
-    mape_row = IncentiveConsumptionRow(ibt=desvprom(df['C_EP_BCP HM']), ibt_pp=desvprom(df['C_PP BM']),
-                                       tbse=desvprom(df['C_et_F_TBSE P']),
+    mape_row = IncentiveConsumptionRow(ibt=desvprom(ibt), ibt_pp=desvprom(ibt_pp),
+                                       tbse=desvprom(tbse),
                                        actual_overconsumption=desvprom(actual_overconsumption),
                                        overconsumption_per_capita=desvprom(consumption_per_capita))
     return IncentiveConsumption(
         mean=mean_row,
         median=median_row,
         min=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].min(),
-            ibt_pp=df['C_PP BM'].min(),
-            tbse=df['C_et_F_TBSE P'].min(),
+            ibt=ibt.min(),
+            ibt_pp=ibt_pp.min(),
+            tbse=tbse.min(),
             actual_overconsumption=actual_overconsumption.min(),
             overconsumption_per_capita=(consumption_per_capita).min()
         ),
         max=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].max(),
-            ibt_pp=df['C_PP BM'].max(),
-            tbse=df['C_et_F_TBSE P'].max(),
+            ibt=ibt.max(),
+            ibt_pp=ibt_pp.max(),
+            tbse=tbse.max(),
             actual_overconsumption=actual_overconsumption.max(),
             overconsumption_per_capita=(consumption_per_capita).max()
         ),
         q1=q1_row,
         q3=q3_row,
         d1=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].quantile(0.1) - df['C_EP_BCP HM'].quantile(0.1),
-            ibt_pp=df['C_PP BM'].quantile(0.1) - df['C_PP BM'].quantile(0.1),
-            tbse=df['C_et_F_TBSE P'].quantile(0.1) - df['C_et_F_TBSE P'].quantile(0.1),
+            ibt=ibt.quantile(0.1),
+            ibt_pp=ibt_pp.quantile(0.1),
+            tbse=tbse.quantile(0.1),
             actual_overconsumption=actual_overconsumption.quantile(0.1),
             overconsumption_per_capita=(consumption_per_capita).quantile(0.1)
         ),
         d9=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].quantile(0.9),
-            ibt_pp=df['C_PP BM'].quantile(0.9),
-            tbse=df['C_et_F_TBSE P'].quantile(0.9),
+            ibt=ibt.quantile(0.9),
+            ibt_pp=ibt_pp.quantile(0.9),
+            tbse=tbse.quantile(0.9),
             actual_overconsumption=actual_overconsumption.quantile(0.9),
             overconsumption_per_capita=(consumption_per_capita).quantile(0.9)
         ),
         percentile_rank=IncentiveConsumptionRow(
-            ibt=percentrank_inc(df['C_EP_BCP HM'], df['C_EP_BCP HM'].mean()),
-            ibt_pp=percentrank_inc(df['C_PP BM'], df['C_PP BM'].mean()),
-            tbse=percentrank_inc(df['C_et_F_TBSE P'], df['C_et_F_TBSE P'].mean()),
+            ibt=percentrank_inc(ibt, ibt.mean()),
+            ibt_pp=percentrank_inc(ibt_pp, ibt_pp.mean()),
+            tbse=percentrank_inc(tbse, tbse.mean()),
             actual_overconsumption=percentrank_inc(actual_overconsumption, actual_overconsumption.mean()),
             overconsumption_per_capita=percentrank_inc(consumption_per_capita,
                                                        consumption_per_capita.mean())
         ),
         variance=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].var(),
-            ibt_pp=df['C_PP BM'].var(),
-            tbse=df['C_et_F_TBSE P'].var(),
+            ibt=ibt.var(),
+            ibt_pp=ibt_pp.var(),
+            tbse=tbse.var(),
             actual_overconsumption=actual_overconsumption.var(),
             overconsumption_per_capita=(consumption_per_capita).var()
         ),
         ecart_type=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].std(),
-            ibt_pp=df['C_PP BM'].std(),
-            tbse=df['C_et_F_TBSE P'].std(),
+            ibt=ibt.std(),
+            ibt_pp=ibt_pp.std(),
+            tbse=tbse.std(),
             actual_overconsumption=actual_overconsumption.std(),
             overconsumption_per_capita=(consumption_per_capita).std()
         ),
         mape=mape_row,
         variation_coeff=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].std() / df['C_EP_BCP HM'].mean(),
-            ibt_pp=df['C_PP BM'].std() / df['C_PP BM'].mean(),
-            tbse=df['C_et_F_TBSE P'].std() / df['C_et_F_TBSE P'].mean(),
-            actual_overconsumption=df['C_EP_BCP HM'].std() / df['C_EP_BCP HM'].mean(),
-            overconsumption_per_capita=df['C_EP_BCP HM'].std() / df['C_EP_BCP HM'].mean(),
+            ibt=ibt.std() / ibt.mean(),
+            ibt_pp=ibt_pp.std() / ibt_pp.mean(),
+            tbse=tbse.std() / tbse.mean(),
+            actual_overconsumption=ibt.std() / ibt.mean(),
+            overconsumption_per_capita=ibt.std() / ibt.mean(),
         ),
         iqr=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].quantile(0.75) - df['C_EP_BCP HM'].quantile(0.25),
-            ibt_pp=df['C_PP BM'].quantile(0.75) - df['C_PP BM'].quantile(0.25),
-            tbse=df['C_et_F_TBSE P'].quantile(0.75) - df['C_et_F_TBSE P'].quantile(0.25),
-            actual_overconsumption=df['C_EP_BCP HM'].quantile(0.75) - df['C_EP_BCP HM'].quantile(0.25),
-            overconsumption_per_capita=df['C_EP_BCP HM'].quantile(0.75) - df['C_EP_BCP HM'].quantile(0.25),
+            ibt=ibt.quantile(0.75) - ibt.quantile(0.25),
+            ibt_pp=ibt_pp.quantile(0.75) - ibt_pp.quantile(0.25),
+            tbse=tbse.quantile(0.75) - tbse.quantile(0.25),
+            actual_overconsumption=ibt.quantile(0.75) - ibt.quantile(0.25),
+            overconsumption_per_capita=ibt.quantile(0.75) - ibt.quantile(0.25),
         ),
         idr=IncentiveConsumptionRow(
-            ibt=df['C_EP_BCP HM'].quantile(0.9) / df['C_EP_BCP HM'].quantile(0.1),
-            ibt_pp=df['C_PP BM'].quantile(0.9) / df['C_PP BM'].quantile(0.1),
-            tbse=df['C_et_F_TBSE P'].quantile(0.9) / df['C_et_F_TBSE P'].quantile(0.1),
-            actual_overconsumption=df['C_EP_BCP HM'].quantile(0.9) / df['C_EP_BCP HM'].quantile(0.1),
-            overconsumption_per_capita=df['C_EP_BCP HM'].quantile(0.9) / df['C_EP_BCP HM'].quantile(0.1),
+            ibt=ibt.quantile(0.9) / ibt.quantile(0.1),
+            ibt_pp=ibt_pp.quantile(0.9) / ibt_pp.quantile(0.1),
+            tbse=tbse.quantile(0.9) / tbse.quantile(0.1),
+            actual_overconsumption=ibt.quantile(0.9) / ibt.quantile(0.1),
+            overconsumption_per_capita=ibt.quantile(0.9) / ibt.quantile(0.1),
         ),
         yule_coeff=IncentiveConsumptionRow(
             ibt=((q3_row.ibt - median_row.ibt) - (median_row.ibt - q1_row.ibt)) / (q3_row.ibt - q1_row.ibt),
@@ -370,27 +406,34 @@ def overconsumption_decomposition_variance(all_groups: OverconsumptionDecomposit
     )
 
 
-def overconsumption_decomposition(simulation_calculator: AbstractSimulation) -> OverconsumptionDecomposition:
+def overconsumption_decomposition(simulation_calculator: NewSimulation) -> OverconsumptionDecomposition:
     df = simulation_calculator.df
-    households_percentage_delta_c_moyen = (df['C_EP_BCP HM'] - df['C_PP BM']).replace(0, pd.NA).mean()
-    g1_frequency = df.loc[(df['Donnees K'] > 0) & (df[simulation_calculator.is_sanitation] == 0), 'Donnees K'].sum() / \
-                   df.loc[
-                       df['Donnees K'] > 0, 'Donnees K'].sum() * 100
-    g1_delta_c_moyen = df.loc[
-        (df['Donnees J'] > 0) & (df[simulation_calculator.is_sanitation] == 0), 'C_EP_BCP J'].mean()
-    g2_frequency = df.loc[(df['Donnees K'] > 0) & (df[simulation_calculator.is_sanitation] == 1), 'Donnees K'].sum() / \
-                   df.loc[
-                       (df['Donnees K'] > 0), 'Donnees K'].sum()
-    g2_delta_c_moyen = df.loc[
-        (df['Donnees J'] > 0) & (df[simulation_calculator.is_sanitation] == 1), 'C_EP_BCP J'].mean()
+    bcp_consumption = simulation_calculator.bcp_consumptions[simulation_calculator.simulation.launch.periods]
+    ibt_pp_consumption = simulation_calculator.ibt_pp_consumption
+    overconsumption = bcp_consumption - ibt_pp_consumption
+    is_overconsumption = (overconsumption > 0)
 
-    g1_var = df.loc[(df['Donnees J'] != 0) & df[simulation_calculator.is_sanitation] == 0, 'Donnees J'].var(ddof=1)
-    g2_var = df.loc[(df['Donnees J'] != 0) & df[simulation_calculator.is_sanitation] == 1, 'Donnees J'].var(ddof=1)
-    households_var = (df['C_EP_BCP HM'] - df['C_PP BM']).replace(0, pd.NA).var()
+    captive_ln = np.log(simulation_calculator.captive_consumption_per_day)
+    g1_delta_c_moyen = captive_ln[is_overconsumption & (
+            simulation_calculator.is_sanitation() == False)].mean()
+    g1_frequency = overconsumption[is_overconsumption & (simulation_calculator.is_sanitation() == False)].sum() / \
+                   overconsumption[is_overconsumption].sum()
+
+    g2_frequency = overconsumption[is_overconsumption & (simulation_calculator.is_sanitation() == True)].sum() / \
+                   overconsumption[is_overconsumption].sum()
+    g2_delta_c_moyen = captive_ln[is_overconsumption & (
+            simulation_calculator.is_sanitation() == True)].mean()
+
+    g1_var = overconsumption[(overconsumption != 0) & (
+            simulation_calculator.is_sanitation() == False)].var(ddof=1)
+    g2_var = overconsumption[(overconsumption != 0) & (
+            simulation_calculator.is_sanitation() == True)].var(ddof=1)
+    households_var = (overconsumption).replace(0, pd.NA).var()
+
     return OverconsumptionDecomposition(
         households_percentage=OverconsumptionDecompositionRow(
-            frequency=(df['Donnees K']).astype(float).sum() / len(df) * 100,
-            delta_c_moyen=households_percentage_delta_c_moyen,
+            frequency=(is_overconsumption).astype(float).sum() / len(df) * 100,
+            delta_c_moyen=overconsumption.mean(),
             variance=households_var,
         ),
         g1=OverconsumptionDecompositionRow(
@@ -404,37 +447,41 @@ def overconsumption_decomposition(simulation_calculator: AbstractSimulation) -> 
             variance=g2_var,
         ),
         poor=OverconsumptionDecompositionRow(
-            frequency=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 1), 'Donnees K'].sum() / df.loc[
-                (df['Donnees K'] > 0), 'Donnees K'].sum() * 100,
-            delta_c_moyen=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 1), 'C_EP_BCP J'].mean(),
-            variance=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 1), 'Donnees J'].var(ddof=1),
-            # percentage=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 1), 'Donnees J'].mean() / df.loc[   (df['Donnees K'] > 0) & (df['poor'] == 1), 'Donnees J'].var(ddof=1)
+            frequency=is_overconsumption[
+                          is_overconsumption & simulation_calculator.is_poor].sum() / is_overconsumption.sum() * 100,
+            delta_c_moyen=captive_ln[is_overconsumption & simulation_calculator.is_poor].mean(),
+            variance=overconsumption[is_overconsumption & simulation_calculator.is_poor].var(ddof=1),
         ),
         nonpoor=OverconsumptionDecompositionRow(
-            frequency=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 0), 'Donnees K'].sum() / df.loc[
-                (df['Donnees K'] > 0), 'Donnees K'].sum() * 100,
-            delta_c_moyen=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 0), 'C_EP_BCP J'].mean(),
-            variance=df.loc[(df['Donnees K'] > 0) & (df['poor'] == 0), 'Donnees J'].var(ddof=1),
+            frequency=is_overconsumption[is_overconsumption & (
+                ~simulation_calculator.is_poor)].sum() / is_overconsumption.sum() * 100,
+            delta_c_moyen=captive_ln[is_overconsumption & (~simulation_calculator.is_poor)].mean(),
+            variance=overconsumption[is_overconsumption & (~simulation_calculator.is_poor)].var(ddof=1),
         )
     )
 
 
-def composition_of_households_that_overconsume(simulation_calculator: AbstractSimulation):
-    df = simulation_calculator.df
+def composition_of_households_that_overconsume(simulation_calculator: NewSimulation):
+    bcp_consumption = simulation_calculator.bcp_consumptions[simulation_calculator.simulation.launch.periods]
+    ibt_pp_consumption = simulation_calculator.ibt_pp_consumption
+    overconsumption = bcp_consumption - ibt_pp_consumption
+    is_overconsumption = (overconsumption > 0)
 
-    den = df['Donnees K'].sum()
+    den = is_overconsumption.sum()
 
     g1_row = SquareRow(
-        poor=df.loc[(df[simulation_calculator.is_sanitation] == 0) & (df['poor'] == 1), 'Donnees K'].sum() / den * 100,
-        nonpoor=df.loc[
-                    (df[simulation_calculator.is_sanitation] == 0) & (df['poor'] == 0), 'Donnees K'].sum() / den * 100,
-        ensemble=df.loc[(df[simulation_calculator.is_sanitation] == 0), 'Donnees K'].sum() / den * 100,
+        poor=is_overconsumption[
+                 (simulation_calculator.is_sanitation() == 0) & (simulation_calculator.is_poor)].sum() / den * 100,
+        nonpoor=is_overconsumption[(simulation_calculator.is_sanitation() == 0) & (
+            ~ simulation_calculator.is_poor)].sum() / den * 100,
+        ensemble=is_overconsumption[simulation_calculator.is_sanitation() == 0].sum() / den * 100,
     )
     g2_row = SquareRow(
-        poor=df.loc[(df[simulation_calculator.is_sanitation] == 1) & (df['poor'] == 1), 'Donnees K'].sum() / den * 100,
-        nonpoor=df.loc[
-                    (df[simulation_calculator.is_sanitation] == 1) & (df['poor'] == 0), 'Donnees K'].sum() / den * 100,
-        ensemble=df.loc[(df[simulation_calculator.is_sanitation] == 1), 'Donnees K'].sum() / den * 100,
+        poor=is_overconsumption[
+                 (simulation_calculator.is_sanitation() == 1) & (simulation_calculator.is_poor)].sum() / den * 100,
+        nonpoor=is_overconsumption[(simulation_calculator.is_sanitation() == 1) & (
+            ~ simulation_calculator.is_poor)].sum() / den * 100,
+        ensemble=is_overconsumption[simulation_calculator.is_sanitation() == 1].sum() / den * 100,
     )
     return SquareTable(
         g1=g1_row,
@@ -447,25 +494,29 @@ def composition_of_households_that_overconsume(simulation_calculator: AbstractSi
     )
 
 
-def breakdown_of_overconsumption(simulation_calculator: AbstractSimulation):
-    df = simulation_calculator.df
-    den = df.loc[df['Donnees J'] > 0, 'Donnees J'].sum()
+def breakdown_of_overconsumption(simulation_calculator: NewSimulation):
+    bcp_consumption = simulation_calculator.bcp_consumptions[simulation_calculator.simulation.launch.periods]
+    ibt_pp_consumption = simulation_calculator.ibt_pp_consumption
+    overconsumption = bcp_consumption - ibt_pp_consumption
+    is_overconsumption = (overconsumption > 0)
+
+    den = overconsumption[is_overconsumption].sum()
     col = 'Donnees J'
     g1 = SquareRow(
-        poor=df.loc[(df[col] > 0) & (df[simulation_calculator.is_sanitation] == 0) & (
-                df['poor'] == 1), col].sum() / den * 100,
-        nonpoor=df.loc[(df[col] > 0) & (df[simulation_calculator.is_sanitation] == 0) & (
-                df['poor'] == 0), col].sum() / den * 100,
-        ensemble=df.loc[(df[col] > 0) & (
-                df[simulation_calculator.is_sanitation] == 0), col].sum() / den * 100,
+        poor=overconsumption[is_overconsumption & (simulation_calculator.is_sanitation() == 0) & (
+            simulation_calculator.is_poor)].sum() / den * 100,
+        nonpoor=overconsumption[is_overconsumption & (simulation_calculator.is_sanitation() == 0) & (
+                simulation_calculator.is_poor == False
+        )].sum() / den * 100,
+        ensemble=overconsumption[is_overconsumption & simulation_calculator.is_sanitation() == 0].sum() / den * 100,
     )
     g2 = SquareRow(
-        poor=df.loc[(df[col] > 0) & (df[simulation_calculator.is_sanitation] == 1) & (
-                df['poor'] == 1), col].sum() / den * 100,
-        nonpoor=df.loc[(df[col] > 0) & (df[simulation_calculator.is_sanitation] == 1) & (
-                df['poor'] == 0), col].sum() / den * 100,
-        ensemble=df.loc[(df[col] > 0) & (
-                df[simulation_calculator.is_sanitation] == 1), col].sum() / den * 100,
+        poor=overconsumption[is_overconsumption & (simulation_calculator.is_sanitation() == 1) & (
+            simulation_calculator.is_poor)].sum() / den * 100,
+        nonpoor=overconsumption[is_overconsumption & (simulation_calculator.is_sanitation() == 1) & (
+                simulation_calculator.is_poor == False
+        )].sum() / den * 100,
+        ensemble=overconsumption[is_overconsumption & simulation_calculator.is_sanitation() == 1].sum() / den * 100,
     )
     return SquareTable(
         g1=g1,
@@ -478,24 +529,27 @@ def breakdown_of_overconsumption(simulation_calculator: AbstractSimulation):
     )
 
 
-def decomposition_table(simulation_calculator: AbstractSimulation) -> GroupDecomposition:
+def decomposition_table(simulation_calculator: NewSimulation) -> GroupDecomposition:
     df = simulation_calculator.df
-    col = 'Donnees U'
-    delta_ibt_plus = df.loc[df[col] >= 0, col]
-    delta_ibt_minus = df.loc[df[col] < 0, col]
-    g1_delta_ibt_plus = df.loc[(df[col] >= 0) & (df[simulation_calculator.is_sanitation] == 0), col]
-    g1_delta_ibt_minus = df.loc[(df[col] < 0) & (df[simulation_calculator.is_sanitation] == 0), col]
-    g2_delta_ibt_plus = df.loc[(df[col] >= 0) & (df[simulation_calculator.is_sanitation] == 1), col]
-    g2_delta_ibt_minus = df.loc[(df[col] < 0) & (df[simulation_calculator.is_sanitation] == 1), col]
-    poor_delta_ibt_plus = df.loc[(df[col] >= 0) & (df['poor'] == 1), col]
-    poor_delta_ibt_minus = df.loc[(df[col] < 0) & (df['poor'] == 1), col]
-    nonpoor_delta_ibt_plus = df.loc[(df[col] >= 0) & (df['poor'] == 0), col]
-    nonpoor_delta_ibt_minus = df.loc[(df[col] < 0) & (df['poor'] == 0), col]
+
+    diff_consumption = simulation_calculator.bcp_consumptions[
+                           simulation_calculator.simulation.launch.periods] - simulation_calculator.tbse_consumption_per_trim
+    delta_ibt_plus = diff_consumption[diff_consumption >= 0]
+    delta_ibt_minus = diff_consumption[diff_consumption < 0]
+    g1_delta_ibt_plus = diff_consumption[(diff_consumption >= 0) & (simulation_calculator.is_sanitation() == 0)]
+    g1_delta_ibt_minus = diff_consumption[(diff_consumption < 0) & (simulation_calculator.is_sanitation() == 0)]
+    g2_delta_ibt_plus = diff_consumption[(diff_consumption >= 0) & (simulation_calculator.is_sanitation() == 1)]
+    g2_delta_ibt_minus = diff_consumption[(diff_consumption < 0) & (simulation_calculator.is_sanitation() == 1)]
+    poor_delta_ibt_plus = diff_consumption[(diff_consumption >= 0) & (simulation_calculator.is_poor == True)]
+    poor_delta_ibt_minus = diff_consumption[(diff_consumption < 0) & (simulation_calculator.is_poor == True)]
+    nonpoor_delta_ibt_plus = diff_consumption[(diff_consumption >= 0) & (simulation_calculator.is_poor == False)]
+    nonpoor_delta_ibt_minus = diff_consumption[(diff_consumption < 0) & (simulation_calculator.is_poor == False)]
+
     return GroupDecomposition(
         ensemble=OverconsumptionDecompositionRow(
             frequency=100,
-            delta_c_moyen=df['Donnees U'].mean(),
-            variance=df['Donnees U'].var(ddof=1),
+            delta_c_moyen=diff_consumption.mean(),
+            variance=diff_consumption.var(ddof=1),
         ),
         delta_plus=OverconsumptionDecompositionRow(
             frequency=len(delta_ibt_plus) / len(df) * 100,
@@ -514,96 +568,89 @@ def decomposition_table(simulation_calculator: AbstractSimulation) -> GroupDecom
         ),
         g1_delta_minus=OverconsumptionDecompositionRow(
             frequency=len(g1_delta_ibt_minus) / len(df) * 100,
-            delta_c_moyen=str(g1_delta_ibt_minus.mean()),
-            variance=str(g1_delta_ibt_minus.var(ddof=1)),
+            delta_c_moyen=g1_delta_ibt_minus.mean(),
+            variance=g1_delta_ibt_minus.var(ddof=1),
         ),
         g2_delta_plus=OverconsumptionDecompositionRow(
             frequency=len(g2_delta_ibt_plus) / len(df) * 100,
-            delta_c_moyen=str(g2_delta_ibt_plus.mean()) ,
-            variance=str(g2_delta_ibt_plus.var(ddof=1)),
+            delta_c_moyen=(g2_delta_ibt_plus.mean()),
+            variance=(g2_delta_ibt_plus.var(ddof=1)),
         ),
         g2_delta_minus=OverconsumptionDecompositionRow(
             frequency=len(g2_delta_ibt_minus) / len(df) * 100,
-            delta_c_moyen=str(g2_delta_ibt_minus.mean()),
-            variance=str(g2_delta_ibt_minus.var(ddof=1)),
+            delta_c_moyen=(g2_delta_ibt_minus.mean()),
+            variance=(g2_delta_ibt_minus.var(ddof=1)),
         ),
         poor_delta_plus=OverconsumptionDecompositionRow(
             frequency=len(poor_delta_ibt_plus) / len(df) * 100,
-            delta_c_moyen=str(poor_delta_ibt_plus.mean()),
-            variance=str(poor_delta_ibt_plus.var(ddof=1)),
+            delta_c_moyen=(poor_delta_ibt_plus.mean()),
+            variance=(poor_delta_ibt_plus.var(ddof=1)),
         ),
         poor_delta_minus=OverconsumptionDecompositionRow(
             frequency=len(poor_delta_ibt_minus) / len(df) * 100,
-            delta_c_moyen=str(poor_delta_ibt_minus.mean()),
-            variance=str(poor_delta_ibt_minus.var(ddof=1)),
+            delta_c_moyen=(poor_delta_ibt_minus.mean()),
+            variance=(poor_delta_ibt_minus.var(ddof=1)),
         ),
         nonpoor_delta_plus=OverconsumptionDecompositionRow(
             frequency=len(nonpoor_delta_ibt_plus) / len(df) * 100,
-            delta_c_moyen=str(nonpoor_delta_ibt_plus.mean()),
-            variance=str(nonpoor_delta_ibt_plus.var(ddof=1)),
+            delta_c_moyen=(nonpoor_delta_ibt_plus.mean()),
+            variance=(nonpoor_delta_ibt_plus.var(ddof=1)),
         ),
         nonpoor_delta_minus=OverconsumptionDecompositionRow(
             frequency=len(nonpoor_delta_ibt_minus) / len(df) * 100,
-            delta_c_moyen=str(nonpoor_delta_ibt_minus.mean()),
-            variance=str(nonpoor_delta_ibt_minus.var(ddof=1)),
+            delta_c_moyen=(nonpoor_delta_ibt_minus.mean()),
+            variance=(nonpoor_delta_ibt_minus.var(ddof=1)),
         )
     )
 
 
-def increase_contingency_table_household_percentage(simulation_calculator: AbstractSimulation) -> SquareTable:
-    df = simulation_calculator.df
-    increase_df = df.loc[df['Donnees U'] >= 0]
-    variable = 'Donnees X'
-    return contingence_table(increase_df, df, simulation_calculator, variable)
+def increase_contingency_table_household_percentage(simulation_calculator: NewSimulation) -> SquareTable:
+    diff_consumption = simulation_calculator.bcp_consumptions[
+                           simulation_calculator.simulation.launch.periods] - simulation_calculator.tbse_consumption_per_trim
+    return contingence_table(simulation_calculator, diff_consumption >= 0, (diff_consumption >= 0).astype(float))
 
 
-def decrease_contingency_table_household_percentage(simulation_calculator: AbstractSimulation) -> SquareTable:
-    df = simulation_calculator.df
-    decrease_df = df.loc[df['Donnees U'] < 0]
-    variable = 'Donnees X'
-    return contingence_table(decrease_df, df, simulation_calculator, variable)
+def decrease_contingency_table_household_percentage(simulation_calculator: NewSimulation) -> SquareTable:
+    diff_consumption = simulation_calculator.bcp_consumptions[
+                           simulation_calculator.simulation.launch.periods] - simulation_calculator.tbse_consumption_per_trim
+    return contingence_table(simulation_calculator, diff_consumption < 0, (diff_consumption < 0).astype(float))
 
 
-def increase_contingency_table_consumption(simulation_calculator: AbstractSimulation) -> SquareTable:
-    df = simulation_calculator.df
-    increase_df = df.loc[df['Donnees U'] >= 0]
-    variable = 'Donnees U'
-    return contingence_table(increase_df, df, simulation_calculator, variable)
+def increase_contingency_table_consumption(simulation_calculator: NewSimulation) -> SquareTable:
+    diff_consumption = simulation_calculator.bcp_consumptions[
+                           simulation_calculator.simulation.launch.periods] - simulation_calculator.tbse_consumption_per_trim
+    return contingence_table(simulation_calculator, diff_consumption >= 0, diff_consumption)
 
 
-def decrease_contingency_table_consumption(simulation_calculator: AbstractSimulation) -> SquareTable:
-    df = simulation_calculator.df
-    decrease_df = df.loc[df['Donnees U'] < 0]
-    variable = 'Donnees U'
-    return contingence_table(decrease_df, df, simulation_calculator, variable)
+def decrease_contingency_table_consumption(simulation_calculator: NewSimulation) -> SquareTable:
+    diff_consumption = simulation_calculator.bcp_consumptions[
+                           simulation_calculator.simulation.launch.periods] - simulation_calculator.tbse_consumption_per_trim
+    return contingence_table(simulation_calculator, diff_consumption < 0, diff_consumption)
 
 
-def contingence_table(variable_df, df, simulation_calculator, column_feature):
+def contingence_table(simulation_calculator: NewSimulation, condition, column_feature):
+    total_length = len(simulation_calculator.df)
+
     return SquareTable(
         g1=SquareRow(
-            poor=variable_df.loc[(variable_df[simulation_calculator.is_sanitation] == 0) & (
-                    variable_df['poor'] == 1), column_feature].sum() / len(
-                df) * 100,
-            nonpoor=variable_df.loc[(variable_df[simulation_calculator.is_sanitation] == 0) & (
-                    variable_df['poor'] == 0), column_feature].sum() / len(
-                df) * 100,
-            ensemble=variable_df.loc[
-                         (variable_df[simulation_calculator.is_sanitation] == 0), column_feature].sum() / len(
-                df) * 100,
+            poor=column_feature[condition & (simulation_calculator.is_sanitation() == False) & (
+                    simulation_calculator.is_poor == True)].sum() / total_length * 100,
+            nonpoor=column_feature[condition & (simulation_calculator.is_sanitation() == False) & (
+                    simulation_calculator.is_poor == False)].sum() / total_length * 100,
+            ensemble=column_feature[
+                         condition & (simulation_calculator.is_sanitation() == False)].sum() / total_length * 100,
         ),
         g2=SquareRow(
-            poor=variable_df.loc[(variable_df[simulation_calculator.is_sanitation] == 1) & (
-                    variable_df['poor'] == 1), column_feature].sum() / len(
-                df) * 100,
-            nonpoor=variable_df.loc[(variable_df[simulation_calculator.is_sanitation] == 1) & (
-                    variable_df['poor'] == 0), column_feature].sum() / len(df) * 100,
-            ensemble=variable_df.loc[
-                         (variable_df[simulation_calculator.is_sanitation] == 1), column_feature].sum() / len(
-                df) * 100,
+            poor=column_feature[condition & (simulation_calculator.is_sanitation() == True) & (
+                    simulation_calculator.is_poor == True)].sum() / total_length * 100,
+            nonpoor=column_feature[condition & (simulation_calculator.is_sanitation() == True) & (
+                    simulation_calculator.is_poor == False)].sum() / total_length * 100,
+            ensemble=column_feature[
+                         condition & (simulation_calculator.is_sanitation() == True)].sum() / total_length * 100,
         ),
         total_population=SquareRow(
-            poor=variable_df.loc[variable_df['poor'] == 1, column_feature].sum() / len(df) * 100,
-            nonpoor=variable_df.loc[variable_df['poor'] == 0, column_feature].sum() / len(df) * 100,
-            ensemble=variable_df[column_feature].sum() / len(df) * 100,
+            poor=column_feature[condition & (simulation_calculator.is_poor == True)].sum() / total_length * 100,
+            nonpoor=column_feature[condition & (simulation_calculator.is_poor == False)].sum() / total_length * 100,
+            ensemble=column_feature[condition].sum() / total_length * 100,
         )
     )

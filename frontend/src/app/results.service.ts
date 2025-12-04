@@ -147,6 +147,18 @@ export class ResultsService {
         );
     }
 
+    downloadCSV(id: number): Observable<any> {
+        return this.http.get(
+            `${this.apiUrl}/api/v1/results/${id}/csv`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                responseType: 'blob'
+            }
+        );
+    }
+
     getIncentiveConsumption(id: number): Observable<IncentiveConsumptionTable> {
         return this.http.get<IncentiveConsumptionTable>(
             `${this.apiUrl}/api/v1/results/${id}/incentive/consumption`,

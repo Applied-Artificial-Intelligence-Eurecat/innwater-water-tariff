@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { ResultsService, EconomicEfficiencyTable } from '../../results.service';
 
 export interface EconomicEfficiencyData {
@@ -15,13 +15,13 @@ export interface EconomicEfficiencyData {
 export class EconomicEfficiencyTableComponent implements OnInit {
   displayedColumns: string[] = ['category', 'consumption', 'deltaW'];
   dataSource: EconomicEfficiencyData[] = [];
+    @Input() simulationId!: number | null;
 
   constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
-    const simulationId = 2; // Replace with dynamic source if needed
 
-    this.resultsService.getEconomicEfficiency(simulationId).subscribe({
+    this.resultsService.getEconomicEfficiency(this.simulationId!).subscribe({
       next: (data: EconomicEfficiencyTable) => {
         this.dataSource = [
           { category: 'Average', consumption: '-', deltaW: '-' },

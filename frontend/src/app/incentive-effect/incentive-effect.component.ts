@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {IncentiveEffectService, GeneralDescriptionResponse, DeltaGeneralDescriptionResponse, DecompositionTablesResponseRaw, ContingencyTableResponse, OverconsumptionDecompositionResponse, HouseholdsOverconsumeCompositionResponse, BreakdownOfOverconsumptionCompositionResponse} from '../incentive-effect.service';
 
 @Component({
@@ -39,6 +39,7 @@ export class IncentiveEffectComponent implements OnInit {
   overDecompBreakdownRows: Array<{ label: string; poor?: number; nonpoor?: number; ensemble?: number }> = [];
 
   constructor(private route: ActivatedRoute,
+              private router: Router,
               private incentiveService: IncentiveEffectService) {}
 
   ngOnInit(): void {
@@ -306,5 +307,14 @@ export class IncentiveEffectComponent implements OnInit {
       { label: 'G2 (service EPA)', poor: data.decrease.g2.poor, nonpoor: data.decrease.g2.nonpoor, ensemble: data.decrease.g2.ensemble },
       { label: 'Total', poor: data.decrease.total_population.poor, nonpoor: data.decrease.total_population.nonpoor, ensemble: data.decrease.total_population.ensemble },
     ];
+  }
+
+  /**
+   * Navigate to the simulation details page for the current simulation
+   */
+  goToSimulationDetails(): void {
+    if (this.simulationId) {
+      this.router.navigate(['/simulation/details', this.simulationId]);
+    }
   }
 }

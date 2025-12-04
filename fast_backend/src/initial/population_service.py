@@ -103,3 +103,4 @@ async def save_population_data_given_simulation_info(bd: str, total_subscribers:
         concat_df = generate_original_df(bd)
 
     concat_df.to_csv(f'data/simulation_data/{simulation_id}/sample.csv', index=False)
+    return concat_df

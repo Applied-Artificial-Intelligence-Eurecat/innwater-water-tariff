@@ -52,7 +52,6 @@ import {EtapesProcessusComponent} from './etapes-processus/etapes-processus.comp
 import {PenParadeChartComponent} from './pen-parade-chart/pen-parade-chart.component';
 import {ChatComponent} from './components/chat/chat.component'
 import {ChatButtonComponent} from './components/chat-button/chat-button.component';
-import {AffordabilityComponent} from './evaluation/affordability/affordability.component';
 import {IncentiveComponent} from './evaluation/incentive/incentive.component';
 import {EfficiencyComponent} from './evaluation/efficiency/efficiency.component'
 import {EquityComponent} from "./evaluation/equity/equity.component";
@@ -78,12 +77,13 @@ import {WaterAgencyTableComponent} from './aggregated-dashboard/water-agency-tab
 import {StateTableComponent} from './aggregated-dashboard/state-table/state-table.component';
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
 import {MatSnackBarModule} from "@angular/material/snack-bar";
-import {AffordabilityGeneralComponent} from "./affordability/affordability-general/affordability-general.component";
 import { IncentiveEffectComponent } from './incentive-effect/incentive-effect.component';
 import { RoundDetailComponent } from './round-detail/round-detail.component';
 import { LinkGameDialogComponent } from './simulation-details/link-game-dialog/link-game-dialog.component';
 import { CreateGameDialogComponent } from './simulation-details/create-game-dialog/create-game-dialog.component';
 import { GameDetailComponent } from './game-detail/game-detail.component';
+import { ImagePopupDialogComponent } from './simulation-details/image-popup-dialog/image-popup-dialog.component';
+import { AffordabilityDetailsComponent } from './affordability-details/affordability-details.component';
 
 @NgModule({
     declarations: [
@@ -111,7 +111,6 @@ import { GameDetailComponent } from './game-detail/game-detail.component';
         ScatterPlotComponent,
         EtapesProcessusComponent,
         PenParadeChartComponent,
-        AffordabilityComponent,
         IncentiveComponent,
         EfficiencyComponent,
         EquityComponent,
@@ -122,7 +121,6 @@ import { GameDetailComponent } from './game-detail/game-detail.component';
         UsageTarificationComponent,
         SimplifiedDashboardComponent,
         FirstRoundAssessmentComponent,
-        AffordabilityGeneralComponent,
         AggregatedDashboardComponent,
         AffordabilityTableComponent,
         IncentiveEffectTableComponent,
@@ -138,6 +136,8 @@ import { GameDetailComponent } from './game-detail/game-detail.component';
         LinkGameDialogComponent,
         CreateGameDialogComponent,
         GameDetailComponent,
+        ImagePopupDialogComponent,
+        AffordabilityDetailsComponent,
     ],
     imports: [
         CommonModule,

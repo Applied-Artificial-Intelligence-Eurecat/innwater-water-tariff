@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { ResultsService, EnvironmentalCostTable } from '../../results.service';
 
 export interface EnvironmentalCostsData {
@@ -14,11 +14,12 @@ export interface EnvironmentalCostsData {
 export class EnvironmentalCostsTableComponent implements OnInit {
   displayedColumns: string[] = ['category', 'value'];
   dataSource: EnvironmentalCostsData[] = [];
+  @Input() simulationId!: number | null;
 
   constructor(private resultsService: ResultsService) {}
 
   ngOnInit(): void {
-    const simulationId = 2; // Replace with dynamic value if needed
+    const simulationId = this.simulationId!; // Replace with dynamic value if needed
 
     this.resultsService.getEnvironmentalCost(simulationId).subscribe({
       next: (data: EnvironmentalCostTable) => {

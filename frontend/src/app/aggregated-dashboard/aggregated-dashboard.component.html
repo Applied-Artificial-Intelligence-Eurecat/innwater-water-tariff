@@ -4,7 +4,7 @@
         <!-- Column 1 -->
         <div class="dashboard-column">
             <app-affordability-table [simulationId]="this.simulationId"></app-affordability-table>
-            <app-equity-table></app-equity-table>
+            <app-equity-table [simulationId]="this.simulationId"></app-equity-table>
         </div>
 
         <!-- Column 2 -->
@@ -15,10 +15,10 @@
 
         <!-- Column 3 -->
         <div class="dashboard-column">
-            <app-economic-efficiency-table></app-economic-efficiency-table>
-            <app-environmental-costs-table></app-environmental-costs-table>
-            <app-water-agency-table></app-water-agency-table>
-            <app-state-table></app-state-table>
+            <app-economic-efficiency-table [simulationId]="this.simulationId"></app-economic-efficiency-table>
+            <app-environmental-costs-table [simulationId]="this.simulationId"></app-environmental-costs-table>
+            <app-water-agency-table [simulationId]="this.simulationId"></app-water-agency-table>
+            <app-state-table [simulationId]="this.simulationId"></app-state-table>
         </div>
     </div>
 </div> 

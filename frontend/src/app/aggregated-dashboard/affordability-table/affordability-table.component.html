@@ -1,6 +1,9 @@
 <mat-card class="table-card">
   <mat-card-header>
     <mat-card-title>Affordability (PAR H)</mat-card-title>
+             <button mat-raised-button color="primary" [routerLink]="['/affordability-details', simulationId]" class="button-right">
+            Details
+        </button>
   </mat-card-header>
   <mat-card-content>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">

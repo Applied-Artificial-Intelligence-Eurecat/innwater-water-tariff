@@ -36,7 +36,7 @@ class PopulationModel(BaseModel):
     )
     original_datasource: bool = Field(
         ...,
-        default_factory=lambda: False,
+        default_factory=lambda: True,
         description="Use the original datasource for the population",
         example=False
     )

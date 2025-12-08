@@ -88,6 +88,8 @@ def process_population_sample_df(df, total_subscribers, sanitation_subscribers, 
     g2_augmented = pd.concat([df[~is_g1]] * ceil(g2_card / len(df[~is_g1]))).sample(g2_card)
     g1_augmented['Revenu_Imputé_2'] = g1_augmented[('Revenu_Imputé_2')] * (1 + np.random.normal(0, std, g1_card))
     g2_augmented['Revenu_Imputé_2'] = g2_augmented[('Revenu_Imputé_2')] * (1 + np.random.normal(0, std, g2_card))
+    g1_augmented.reset_index(drop=True, inplace=True)
+    g2_augmented.reset_index(drop=True, inplace=True)
 
     return g1_augmented, g2_augmented
 

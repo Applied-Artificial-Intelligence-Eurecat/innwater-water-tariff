@@ -38,6 +38,7 @@ class DeltaIncentiveConsumptionRow(BaseModel):
 
 
 class IncentiveConsumption(BaseModel):
+    perc_households: IncentiveConsumptionRow | DeltaIncentiveConsumptionRow | None = None
     mean: IncentiveConsumptionRow | DeltaIncentiveConsumptionRow
     median: IncentiveConsumptionRow | DeltaIncentiveConsumptionRow
     min: IncentiveConsumptionRow | DeltaIncentiveConsumptionRow
@@ -166,6 +167,12 @@ def delta_incentive_effect_consumption(calculator: NewSimulation) -> IncentiveCo
                                               delta_ibt_pp_plus=delta_ibt_pp_plus.median(),
                                               delta_ibt_pp_minus=delta_ibt_pp_minus.median())
     return IncentiveConsumption(
+        perc_households=DeltaIncentiveConsumptionRow(
+            delta_ibt_plus=len(delta_ibt_plus) / len(delta) * 100,
+            delta_ibt_minus=len(delta_ibt_minus) / len(delta) * 100,
+            delta_ibt_pp_plus=len(delta_ibt_pp_plus) / len(delta_pp) * 100,
+            delta_ibt_pp_minus=len(delta_ibt_pp_minus) / len(delta_pp) * 100
+        ),
         mean=DeltaIncentiveConsumptionRow(
             delta_ibt_plus=delta_ibt_plus.mean(),
             delta_ibt_minus=delta_ibt_minus.mean(),
@@ -231,10 +238,10 @@ def delta_incentive_effect_consumption(calculator: NewSimulation) -> IncentiveCo
             delta_ibt_pp_minus=delta_ibt_pp_minus.quantile(0.75) - delta_ibt_pp_minus.quantile(0.25),
         ),
         idr=DeltaIncentiveConsumptionRow(
-            delta_ibt_plus=delta_ibt_plus.quantile(0.9) / delta_ibt_plus.quantile(0.1),
-            delta_ibt_minus=delta_ibt_minus.quantile(0.9) / delta_ibt_minus.quantile(0.1),
-            delta_ibt_pp_plus=delta_ibt_pp_plus.quantile(0.9) / delta_ibt_pp_plus.quantile(0.1),
-            delta_ibt_pp_minus=delta_ibt_pp_minus.quantile(0.9) / delta_ibt_pp_minus.quantile(0.1),
+            delta_ibt_plus=delta_ibt_plus.quantile(0.9) - delta_ibt_plus.quantile(0.1),
+            delta_ibt_minus=delta_ibt_minus.quantile(0.9) - delta_ibt_minus.quantile(0.1),
+            delta_ibt_pp_plus=delta_ibt_pp_plus.quantile(0.9) - delta_ibt_pp_plus.quantile(0.1),
+            delta_ibt_pp_minus=delta_ibt_pp_minus.quantile(0.9) - delta_ibt_pp_minus.quantile(0.1),
         ),
         yule_coeff=DeltaIncentiveConsumptionRow(
             delta_ibt_plus=check_zero_devision(lambda: ((q3_row.delta_ibt_plus - median_row.delta_ibt_plus) - (
@@ -252,10 +259,10 @@ def delta_incentive_effect_consumption(calculator: NewSimulation) -> IncentiveCo
                                        q3_row.delta_ibt_pp_minus - q1_row.delta_ibt_pp_minus),
         ),
         gini_schutz=DeltaIncentiveConsumptionRow(
-            delta_ibt_plus=1 - (mape_row.delta_ibt_plus / 100),
-            delta_ibt_minus=1 - (mape_row.delta_ibt_minus / 100),
-            delta_ibt_pp_plus=1 - (mape_row.delta_ibt_pp_plus / 100),
-            delta_ibt_pp_minus=1 - (mape_row.delta_ibt_pp_minus / 100),
+            delta_ibt_plus=(mape_row.delta_ibt_plus / (2 * delta_ibt_plus.mean())) * 100,
+            delta_ibt_minus=(mape_row.delta_ibt_minus / (2 * delta_ibt_minus.mean())) * 100,
+            delta_ibt_pp_plus=(mape_row.delta_ibt_pp_plus / (2 * delta_ibt_pp_plus.mean())) * 100,
+            delta_ibt_pp_minus=(mape_row.delta_ibt_pp_minus / (2 * delta_ibt_pp_minus.mean())) * 100,
         )
     )
 

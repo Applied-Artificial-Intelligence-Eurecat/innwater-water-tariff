@@ -1,14 +1,16 @@
 services:
   backend:
-    build: ./fast_backend
+    build:
+      context: ./fast_backend
+      dockerfile: Dockerfile
+      args:
+        base_href: /msm/
     image: water-tariff-api
     hostname: water-tariff-backend
     container_name: water-tariff-api
     volumes:
       - ./fast_backend:/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    ports:
-      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:password@database:5432/watertariff
       - PORT=8000
@@ -27,8 +29,6 @@ services:
       POSTGRES_PASSWORD: password
     networks:
       - proxy-network
-    ports:
-      - "15432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -46,6 +46,7 @@ services:
     restart: unless-stopped
     environment:
       - API_URL=http://water-tariff-backend:8000
+      - base_href=/msm/
     depends_on:
       - backend
     networks:

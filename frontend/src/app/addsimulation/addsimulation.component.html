@@ -348,32 +348,32 @@
                                             <div [formGroupName]="i" class="threshold-inputs">
                                                 <mat-form-field appearance="fill">
                                                     <input type="number" min="0" matInput formControlName="seuil"
-                                                           placeholder="seuil">
+                                                           placeholder="threshold">
                                                     <mat-hint *ngIf="i === 0">Start of the tier</mat-hint>
                                                 </mat-form-field>
                                                 <mat-form-field appearance="fill">
                                                     <input type="number" matInput formControlName="prix"
-                                                           placeholder="prix">
+                                                           placeholder="price">
                                                     <mat-hint>Block price</mat-hint>
                                                 </mat-form-field>
                                             </div>
-                                            <!--<div class="threshold-actions">
+                                            <div class="threshold-actions">
                                                 <button mat-icon-button color="warn" *ngIf="seuils_ep.length > 1"
                                                         (click)="removeInputControl(i)"
-                                                        aria-label="Add a price threshold">
+                                                        aria-label="Remove this tier">
                                                     <mat-icon>remove_circle</mat-icon>
                                                 </button>
-                                            </div>-->
+                                            </div>
                                         </div>
                                     </ng-container>
 
-                                    <!--<div class="add-threshold">
+                                    <div class="add-threshold">
                                         <button mat-button color="primary" (click)="addInputControl()"
                                                 class="add-button">
                                             <mat-icon>add_circle</mat-icon>
-                                            Ajouter un palier
+                                            Add a tier
                                         </button>
-                                    </div>-->
+                                    </div>
                                 </div>
                             </div>
 
@@ -403,37 +403,37 @@
                         </div>
                     </mat-tab>
 
-                    <mat-tab label="Assainissement">
+                    <mat-tab label="Sanitation">
                         <div class="tarification-section">
-                            <h3>Tarification Assainissement</h3>
+                            <h3>Sanitation Tarification</h3>
                             <p class="section-description">
-                                Définissez les tarifs pour les services d'assainissement, incluant l'abonnement et les
-                                différents paliers de consommation.
+                                Define the rates for sanitation services, including the subscription and the different
+                                consumption tiers.
                             </p>
 
                             <div class="form-section">
-                                <h4>Abonnement</h4>
+                                <h4>Fixed part</h4>
                                 <div class="form-field">
                                     <mat-form-field appearance="fill">
-                                        <mat-label>Montant de l'abonnement (en euros par trimestre, hors TVA)
+                                        <mat-label>Subscription fee (in euros per quarter, excluding VAT)
                                         </mat-label>
                                         <input type="number" min="0" matInput formControlName="montantAbo_a">
-                                        <mat-hint>Frais fixes facturés indépendamment de la consommation</mat-hint>
+                                        <mat-hint>Fixed charges billed regardless of consumption</mat-hint>
                                     </mat-form-field>
                                 </div>
                             </div>
 
                             <div class="form-section">
-                                <h4>Paliers de Consommation</h4>
+                                <h4>Price thresholds</h4>
                                 <p class="subsection-description">
-                                    Définissez les seuils de consommation (en m³) et les prix unitaires correspondants
-                                    (en euros par m³, hors TVA et redevances).
+                                    Enter the tariff thresholds (in cubic meters) and the corresponding unit prices
+                                    (in euros per cubic meter, excluding VAT and environmental excise duties).
                                 </p>
 
                                 <div class="thresholds-table">
                                     <div class="thresholds-header">
-                                        <div class="threshold-label">Seuil (m³)</div>
-                                        <div class="price-label">Prix (€/m³)</div>
+                                        <div class="threshold-label">Threshold (m³)</div>
+                                        <div class="price-label">Price (€/m³)</div>
                                         <div class="action-label"></div>
                                     </div>
 
@@ -443,32 +443,32 @@
                                             <div [formGroupName]="i" class="threshold-inputs">
                                                 <mat-form-field appearance="fill">
                                                     <input type="number" min="0" matInput formControlName="seuil"
-                                                           placeholder="seuil">
-                                                    <mat-hint *ngIf="i === 0">Début du palier</mat-hint>
+                                                           placeholder="threshold">
+                                                    <mat-hint *ngIf="i === 0">Start of the tier</mat-hint>
                                                 </mat-form-field>
                                                 <mat-form-field appearance="fill">
                                                     <input type="number" matInput formControlName="prix"
-                                                           placeholder="prix">
-                                                    <mat-hint>Prix pour ce palier</mat-hint>
+                                                           placeholder="price">
+                                                    <mat-hint>Block price</mat-hint>
                                                 </mat-form-field>
                                             </div>
-                                            <!--<div class="threshold-actions">
+                                            <div class="threshold-actions">
                                                 <button mat-icon-button color="warn" *ngIf="seuils_a.length > 1"
                                                         (click)="removeInputControl_a(i)"
-                                                        aria-label="Supprimer ce palier">
+                                                        aria-label="Remove this tier">
                                                     <mat-icon>remove_circle</mat-icon>
                                                 </button>
-                                            </div>-->
+                                            </div>
                                         </div>
                                     </ng-container>
 
-                                    <!--<div class="add-threshold">
+                                    <div class="add-threshold">
                                         <button mat-button color="primary" (click)="addInputControl_a()"
                                                 class="add-button">
                                             <mat-icon>add_circle</mat-icon>
-                                            Ajouter un palier
+                                            Add a tier
                                         </button>
-                                    </div>-->
+                                    </div>
                                 </div>
                             </div>
 

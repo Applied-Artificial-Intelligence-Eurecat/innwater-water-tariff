@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, Validators, FormGroup} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {InitialAPIService, SimulationPayload} from '../initial-api.service';
@@ -163,15 +163,36 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
     addInputControl() {
         console.log(this.seuils_ep.value.slice(-1).map((a: any) => a.prix)[0]);
+        // Calculate the new threshold value
+        const newThreshold = this.seuils_ep.value.slice(-1).map((a: any) => a.seuil)[0] + 1;
+
         const trancheForm = this.fb.group({
-            seuil: new FormControl(this.seuils_ep.value.slice(-1).map((a: any) => a.seuil)[0] + 1, {validators: [Validators.required]}),
+            seuil: new FormControl(newThreshold, {validators: [Validators.required]}),
             prix: new FormControl(this.seuils_ep.value.slice(-1).map((a: any) => a.prix)[0] + 0.0001, {validators: [Validators.required, Validators.minLength(4)]}),
         });
         this.seuils_ep.push(trancheForm);
+
+        // Add a matching tier to sanitation with the same threshold
+        const trancheForm_a = this.fb.group({
+            seuil: new FormControl(newThreshold, {validators: [Validators.required]}),
+            prix: new FormControl('', {validators: [Validators.required, Validators.minLength(4)]}),
+        });
+        this.seuils_a.push(trancheForm_a);
+
+        // Add value change subscription to synchronize thresholds
+        this.syncThresholdChanges(this.seuils_ep.length - 1);
     };
 
     removeInputControl(idx: number) {
-        this.seuils_ep.removeAt(idx);
+        // Only remove if there's more than one tier
+        if (this.seuils_ep.length > 1) {
+            this.seuils_ep.removeAt(idx);
+
+            // Remove the corresponding sanitation tier if it exists
+            if (idx < this.seuils_a.length) {
+                this.seuils_a.removeAt(idx);
+            }
+        }
     }
 
     addInputControl_r_ep() {
@@ -187,15 +208,37 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
     }
 
     addInputControl_a() {
+        console.log(this.seuils_a.value.slice(-1).map((a: any) => a.prix)[0]);
+        // Calculate the new threshold value
+        const newThreshold = this.seuils_a.value.slice(-1).map((a: any) => a.seuil)[0] + 1;
+
         const trancheForm = this.fb.group({
-            seuil: new FormControl(0, {validators: [Validators.required]}),
-            prix: new FormControl('', {validators: [Validators.required, Validators.minLength(4)]}),
+            seuil: new FormControl(newThreshold, {validators: [Validators.required]}),
+            prix: new FormControl(this.seuils_a.value.slice(-1).map((a: any) => a.prix)[0] + 0.0001, {validators: [Validators.required, Validators.minLength(4)]}),
         });
         this.seuils_a.push(trancheForm);
+
+        // Add a matching tier to drinking water with the same threshold
+        const trancheForm_ep = this.fb.group({
+            seuil: new FormControl(newThreshold, {validators: [Validators.required]}),
+            prix: new FormControl('', {validators: [Validators.required, Validators.minLength(4)]}),
+        });
+        this.seuils_ep.push(trancheForm_ep);
+
+        // Add value change subscription to synchronize thresholds
+        this.syncThresholdChanges(this.seuils_a.length - 1);
     };
 
     removeInputControl_a(idx: number) {
-        this.seuils_a.removeAt(idx);
+        // Only remove if there's more than one tier
+        if (this.seuils_a.length > 1) {
+            this.seuils_a.removeAt(idx);
+
+            // Remove the corresponding drinking water tier if it exists
+            if (idx < this.seuils_ep.length) {
+                this.seuils_ep.removeAt(idx);
+            }
+        }
     }
 
 
@@ -217,6 +260,8 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                 this.loadSimulationData(this.simulationId);
             } else {
                 this.initializeDefaultValues();
+                // Set up threshold synchronization for default values
+                this.setupAllThresholdSynchronization();
             }
         });
     }
@@ -336,6 +381,9 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
                 }
 
                 this.loading = false;
+
+                // Set up threshold synchronization for loaded data
+                this.setupAllThresholdSynchronization();
             },
             error: (err) => {
                 console.error('Error loading simulation:', err);
@@ -352,6 +400,8 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
                 // Initialize with default values if loading fails
                 this.initializeDefaultValues();
+                // Set up threshold synchronization for default values
+                this.setupAllThresholdSynchronization();
             }
         });
     }
@@ -614,4 +664,59 @@ export class AddsimulationComponent implements OnInit, AfterViewInit {
 
     }
 
+    /**
+     * Sets up threshold synchronization for all existing tiers
+     */
+    setupAllThresholdSynchronization() {
+        // Ensure both arrays have the same length
+        const minLength = Math.min(this.seuils_ep.length, this.seuils_a.length);
+
+        // Set up synchronization for each tier
+        for (let i = 0; i < minLength; i++) {
+            this.syncThresholdChanges(i);
+        }
+    }
+
+    /**
+     * Synchronizes threshold changes between drinking water and sanitation tiers
+     * @param index The index of the tier to synchronize
+     */
+    syncThresholdChanges(index: number) {
+        if (index < 0 || index >= this.seuils_ep.length || index >= this.seuils_a.length) {
+            console.warn(`Cannot sync thresholds at index ${index}: out of range`);
+            return;
+        }
+
+        // Get the form groups at the specified index
+        const epFormGroup = this.seuils_ep.at(index) as FormGroup;
+        const aFormGroup = this.seuils_a.at(index) as FormGroup;
+
+        // Get the threshold controls
+        const epThresholdControl = epFormGroup.get('seuil');
+        const aThresholdControl = aFormGroup.get('seuil');
+
+        if (!epThresholdControl || !aThresholdControl) {
+            console.warn(`Cannot sync thresholds at index ${index}: controls not found`);
+            return;
+        }
+
+        // Ensure the thresholds are initially the same
+        // Use the drinking water threshold as the reference
+        const epValue = epThresholdControl.value;
+        if (aThresholdControl.value !== epValue) {
+            aThresholdControl.setValue(epValue, { emitEvent: false });
+        }
+
+        // Subscribe to changes in the drinking water threshold
+        epThresholdControl.valueChanges.subscribe(value => {
+            // Update the sanitation threshold without triggering its valueChanges event
+            aThresholdControl.setValue(value, { emitEvent: false });
+        });
+
+        // Subscribe to changes in the sanitation threshold
+        aThresholdControl.valueChanges.subscribe(value => {
+            // Update the drinking water threshold without triggering its valueChanges event
+            epThresholdControl.setValue(value, { emitEvent: false });
+        });
+    }
 }

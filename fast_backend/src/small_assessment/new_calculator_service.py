@@ -103,6 +103,7 @@ class NewSimulation:
                                     self.simulation.demand.coefficients.a2 * self.df['SNWA'] +
                                     self.simulation.demand.coefficients.a3 * self.df['Piscine (1 = oui)'] +
                                     self.simulation.demand.coefficients.a4 * self.df['Garden * Wheather'])
+        print("LEN, DF", len(self.df))
         self.captive_consumption_per_day = self.captive_consumption.apply(np.exp)
         self.captive_consumption_per_trim = self.captive_consumption_per_day * 90
 
@@ -137,14 +138,21 @@ class NewSimulation:
             daily_income = row['Revenu_Imputé_2'] / 30
             daily_subscription = (self.simulation.epa_prix_base_ttc if row[
                 SANITATION_COLUMN] else self.simulation.potable_water_prix_base_ttc) / 90
+            print("daily_subscription", daily_subscription)
             daily_subscription_tier = (
                                           epa_nordin_tier_ttc if row[SANITATION_COLUMN] else ep_nordin_tier_ttc
                                       ) / 90
+            print("daily_subscription_tier", daily_subscription_tier)
             daily_virtual_income = np.log(
                 daily_income - daily_subscription + daily_subscription_tier) * self.simulation.demand.coefficients.a6
+            print("daily_virtual_income", daily_virtual_income)
             prix_ttc = np.log(
                 epa_prix_ttc if row[SANITATION_COLUMN] else ep_prix_ttc) * self.simulation.demand.coefficients.a5
-            return daily_subscription_tier, 90 * np.exp(prix_ttc + daily_virtual_income + captive_consumption)
+            print("prix_ttc", prix_ttc)
+            print("Daily consumption", daily_subscription_tier)
+            consumption_ = 90 * np.exp(prix_ttc + daily_virtual_income + captive_consumption)
+            print("consumption", consumption_)
+            return daily_subscription_tier, consumption_
 
         return apply
 
@@ -373,6 +381,11 @@ class NewSimulation:
         self.ibt_par_excess_rank = get_rank(self.ibt_par_excess)
         self.tbse_par_excess_rank = get_rank(self.tbse_par_excess)
 
+        self.ibt_ginis = get_gini(self.ibt_par_excess, 1 / len(self.df) * 100)
+        self.tbse_ginis = get_gini(self.tbse_par_excess, 1 / len(self.df) * 100)
+        self.ibt_unafford_ginis = get_gini(self.ibt_par_excess, 1 / (self.ibt_par_excess > 0).sum() * 100)
+        self.tbse_unafford_ginis = get_gini(self.tbse_par_excess, 1 / (self.tbse_par_excess > 0).sum() * 100)
+
     def get_df(self):
         self.df['par_ibt'] = self.par_ibt
         self.df['par_tbse'] = self.par_tbse
@@ -384,6 +397,17 @@ class NewSimulation:
         self.df['ibt_bcp_receipt'] = self.ibt_bcp_receipt
         self.df['ibt_base_receipt'] = self.ibt_base_receipt
         return self.df
+
+
+def get_gini(excess, constant):
+    df_ = pd.DataFrame(
+        {"ibt_par_excess": excess, }
+    )
+    df_.sort_values(by="ibt_par_excess", inplace=True)
+    df_['rank'] = df_['ibt_par_excess'] / excess.sum() * 100
+    df_['addition']  = df_['rank'].cumsum()
+    res = constant * (df_['addition'] + df_['addition'].shift(1).fillna(0))
+    return res
 
 
 def get_rank(excess):

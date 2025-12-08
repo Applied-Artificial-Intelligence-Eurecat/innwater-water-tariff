@@ -153,7 +153,7 @@ export class IncentiveEffectComponent implements OnInit {
     });
 
     this.deltaTopRows = [
-      D('% de Ménage', 'percentile_rank'), // treat as header percentage row when provided
+      D('% de Ménage', 'perc_households'), // treat as header percentage row when provided
       D('Moyenne', 'mean'),
       D('Médiane', 'median'),
       D('Min', 'min'),

@@ -39,6 +39,7 @@ export interface DeltaGeneralMetrics {
 }
 
 export interface DeltaGeneralDescriptionResponse {
+    perc_households: DeltaGeneralMetrics;
     mean: DeltaGeneralMetrics;
     median: DeltaGeneralMetrics;
     min: DeltaGeneralMetrics;

@@ -421,7 +421,8 @@ async def get_simulation_payload_from_db(current_user, db, simulation_id, get_si
                                                                      periods=simulation.number_of_periods, ),
                                                   population=PopulationModel(bd=simulation.population.database_path,
                                                                              eps=simulation.population.eps,
-                                                                             std=simulation.population.std, ),
+                                                                             std=simulation.population.std,
+                                                                             original_datasource=simulation.population.original_datasource,),
                                                   primitives=PrimitivesModel(ep=WaterServiceCostModel(
                                                       couts_fixes=simulation.primitives.cost_potable_water.fixed_costs,
                                                       couts_variables=simulation.primitives.cost_potable_water.variable_costs,

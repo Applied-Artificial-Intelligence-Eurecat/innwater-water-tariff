@@ -633,3 +633,68 @@ async def delete_simulation(simulation_id: int, current_user: User = Depends(get
         "status": "success",
         "message": f"Simulation {simulation_id} deleted successfully",
     }
+
+
+@initial_router.post("/simulations/reevaluate", response_model=Dict[str, Any])
+async def reevaluate_all_simulations(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    """
+    Re-evaluates all simulations for the current user one by one.
+
+    Args:
+        current_user: Current authenticated user
+        db: Database session
+
+    Returns:
+        dict: Contains the status of each simulation re-evaluation
+    """
+    # Query all simulations associated with the user's projects
+    simulations = db.query(Simulation).join(Project).filter(Project.user_id == current_user.id).all()
+
+    if not simulations:
+        return {
+            "status": "success",
+            "message": "No simulations found to re-evaluate",
+            "data": []
+        }
+
+    results = []
+
+    for simulation in simulations:
+        try:
+            # Get simulation payload
+            simulation_payload, sim_obj = await get_simulation_payload_from_db(
+                current_user, db, simulation.id, get_simulation_db=True
+            )
+
+            # Get population data
+            df = await save_population_data_given_simulation_info(
+                total_subscribers=simulation.primitives.cost_potable_water.subscribers_number,
+                sanitation_subscribers=simulation.primitives.cost_sanitation.subscribers_number,
+                bd=simulation.population.database_path,
+                eps=simulation.population.eps,
+                std=simulation.population.std,
+                use_original_datasource=simulation.population.original_datasource,
+                simulation_id=simulation.id,
+            )
+
+            # Start processing and calculating simulation
+            await start_processing_and_calculating_simulation(simulation.id, simulation_payload, df, db)
+
+            results.append({
+                "simulation_id": simulation.id,
+                "name": simulation.name,
+                "status": "success"
+            })
+        except Exception as e:
+            results.append({
+                "simulation_id": simulation.id,
+                "name": simulation.name,
+                "status": "error",
+                "error": str(e)
+            })
+
+    return {
+        "status": "success",
+        "message": f"Re-evaluated {len(simulations)} simulations",
+        "data": results
+    }

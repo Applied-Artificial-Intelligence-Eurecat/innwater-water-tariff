@@ -102,8 +102,8 @@ async def get_general_descriptive_affordability(
             par_tbse=par_tbse.quantile(0.9),
         ),
         f=GeneralRow(
-            par_ibt=percentrank_inc(par_ibt, par_ibt.mean()),
-            par_tbse=percentrank_inc(par_tbse, par_tbse.mean()),
+            par_ibt=percentrank_inc(par_ibt, par_ibt.mean()) * 100,
+            par_tbse=percentrank_inc(par_tbse, par_tbse.mean()) * 100,
         ),
         variance=GeneralRow(
             par_ibt=par_ibt.var(),
@@ -142,23 +142,24 @@ async def get_general_incidence_affordability(
                                       delta_par=simulation_calculator.ibt_par_headcount.mean() - simulation_calculator.tbse_par_headcount.mean() * 100),
         people=AugmentedGeneralRow(
             par_ibt=(simulation_calculator.ibt_par_headcount * simulation_calculator.df['nbpers']).sum() /
-                    simulation_calculator.df['nbpers'].sum(),
+                    simulation_calculator.df['nbpers'].sum() * 100,
             par_tbse=(simulation_calculator.tbse_par_headcount * simulation_calculator.df['nbpers']).sum() /
-                     simulation_calculator.df['nbpers'].sum(),
+                     simulation_calculator.df['nbpers'].sum() * 100,
             delta_par=(simulation_calculator.ibt_par_headcount * simulation_calculator.df['nbpers']).sum() /
                       simulation_calculator.df['nbpers'].sum() - (
                               simulation_calculator.tbse_par_headcount * simulation_calculator.df['nbpers']).sum() /
-                      simulation_calculator.df['nbpers'].sum()
+                      simulation_calculator.df['nbpers'].sum() * 100
         ),
         children=AugmentedGeneralRow(
-            par_ibt=(simulation_calculator.ibt_par_headcount * simulation_calculator.df['nenf']).sum() /
-                    simulation_calculator.df['nenf'].sum(),
-            par_tbse=(simulation_calculator.tbse_par_headcount * simulation_calculator.df['nenf']).sum() /
-                     simulation_calculator.df['nenf'].sum(),
-            delta_par=(simulation_calculator.ibt_par_headcount * simulation_calculator.df['nenf']).sum() /
-                      simulation_calculator.df['nenf'].sum() - (
-                              simulation_calculator.tbse_par_headcount * simulation_calculator.df['nenf']).sum() /
-                      simulation_calculator.df['nenf'].sum()),
+                par_ibt=(simulation_calculator.ibt_par_headcount * simulation_calculator.df['nenf']).sum() /
+                        simulation_calculator.df['nenf'].sum() * 100,
+                par_tbse=(simulation_calculator.tbse_par_headcount * simulation_calculator.df['nenf']).sum() /
+                         simulation_calculator.df['nenf'].sum() * 100,
+                delta_par=(simulation_calculator.ibt_par_headcount * simulation_calculator.df['nenf']).sum() /
+                          simulation_calculator.df['nenf'].sum() - (
+                                  simulation_calculator.tbse_par_headcount * simulation_calculator.df['nenf']).sum() /
+                          simulation_calculator.df['nenf'].sum() * 100,
+        )
     )
 
 
@@ -253,18 +254,24 @@ def create_deficit_table(ibt_excess, tbse_excess):
     )
 
 
-@affordability_router.get("/{simulation_id}/g1_g2_par_description")
-async def general_par_description(simulation_id: int, current_user: User = Depends(get_current_active_user),
-                                  db: Session = Depends(get_db)) -> GeneralStatistic:
+async def get_group_par_description(
+    simulation_id: int, 
+    current_user: User,
+    db: Session,
+    filter_func
+) -> GeneralStatistic:
     simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
                                                                           get_simulation_db=True)
     simulation_calculator = await get_or_create_simulation_from_payload(simulation_id, simulation, simulation_payload)
 
+    filter_value = filter_func(simulation_calculator)
+    not_filter_value = ~filter_value
+
     # Get PAR data for each group
-    par_ibt_g1 = simulation_calculator.par_ibt[~simulation_calculator.is_sanitation()]
-    par_ibt_g2 = simulation_calculator.par_ibt[simulation_calculator.is_sanitation()]
-    par_tbse_g1 = simulation_calculator.par_tbse[~simulation_calculator.is_sanitation()]
-    par_tbse_g2 = simulation_calculator.par_tbse[simulation_calculator.is_sanitation()]
+    par_ibt_g1 = simulation_calculator.par_ibt[not_filter_value]
+    par_ibt_g2 = simulation_calculator.par_ibt[filter_value]
+    par_tbse_g1 = simulation_calculator.par_tbse[not_filter_value]
+    par_tbse_g2 = simulation_calculator.par_tbse[filter_value]
 
     # Calculate delta values
     delta_par_g1 = par_ibt_g1 - par_tbse_g1
@@ -324,10 +331,10 @@ async def general_par_description(simulation_id: int, current_user: User = Depen
             par_tbse_g2=par_tbse_g2.quantile(0.9),
         ),
         f=GroupRow(
-            par_ibt_g1=percentrank_inc(par_ibt_g1, par_ibt_g1.mean()),
-            par_ibt_g2=percentrank_inc(par_ibt_g2, par_ibt_g2.mean()),
-            par_tbse_g1=percentrank_inc(par_tbse_g1, par_tbse_g1.mean()),
-            par_tbse_g2=percentrank_inc(par_tbse_g2, par_tbse_g2.mean()),
+            par_ibt_g1=percentrank_inc(par_ibt_g1, par_ibt_g1.mean()) * 100,
+            par_ibt_g2=percentrank_inc(par_ibt_g2, par_ibt_g2.mean()) * 100,
+            par_tbse_g1=percentrank_inc(par_tbse_g1, par_tbse_g1.mean()) * 100,
+            par_tbse_g2=percentrank_inc(par_tbse_g2, par_tbse_g2.mean()) * 100,
         ),
         variance=GroupRow(
             par_ibt_g1=par_ibt_g1.var(),
@@ -355,71 +362,103 @@ async def general_par_description(simulation_id: int, current_user: User = Depen
         ),
     )
 
+@affordability_router.get("/{simulation_id}/g1_g2_par_description")
+async def general_par_description(
+    simulation_id: int, 
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+) -> GeneralStatistic:
+    return await get_group_par_description(simulation_id, current_user, db, lambda calculator: calculator.is_sanitation())
 
-@affordability_router.get("/{simulation_id}/g1_g2/incidence")
-async def general_par_incidence(simulation_id: int, current_user: User = Depends(get_current_active_user),
-                                db: Session = Depends(get_db)):
+@affordability_router.get("/{simulation_id}/poor/par_description")
+async def poor_par_description(
+    simulation_id: int, 
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+) -> GeneralStatistic:
+    return await get_group_par_description(simulation_id, current_user, db, lambda calculator: calculator.is_poor)
+
+
+async def get_group_par_incidence(
+    simulation_id: int, 
+    current_user: User,
+    db: Session,
+    filter_func
+):
     simulation_payload, simulation = await get_simulation_payload_from_db(
         current_user, db, simulation_id, get_simulation_db=True
     )
     calculator = await get_or_create_simulation_from_payload(simulation_id, simulation, simulation_payload)
+
+    filter_value = filter_func(calculator)
+    not_filter_value = ~filter_value
+
+    # For sanitation filter, we use specific logic for perc_household in g1 and g2
+    if filter_func.__code__.co_consts and 'is_sanitation' in str(filter_func.__code__.co_consts):
+        g1_perc_household = ((calculator.simulation.primitives.drinking_water.number_of_subscribers -
+                             calculator.simulation.primitives.sanitation.number_of_subscribers) /
+                            calculator.simulation.primitives.drinking_water.number_of_subscribers) * 100
+        g2_perc_household = ((calculator.simulation.primitives.sanitation.number_of_subscribers) /
+                            calculator.simulation.primitives.drinking_water.number_of_subscribers) * 100
+    else:
+        # For other filters, calculate percentage based on the filter
+        g1_perc_household = not_filter_value.mean() * 100
+        g2_perc_household = filter_value.mean() * 100
+
     return GroupIncidenceTable(
         g1=GroupIncidenceRow(
-            perc_household=((calculator.simulation.primitives.drinking_water.number_of_subscribers -
-                             calculator.simulation.primitives.sanitation.number_of_subscribers) /
-                            calculator.simulation.primitives.drinking_water.number_of_subscribers) * 100,
-            ibt_household=calculator.ibt_par_headcount[calculator.is_sanitation() == False].sum() / (
-                    calculator.is_sanitation() == False).sum() * 100,
-            perc_people=calculator.df["nbpers"][calculator.is_sanitation() == False].sum() / (
+            perc_household=g1_perc_household,
+            ibt_household=calculator.ibt_par_headcount[not_filter_value].sum() / (
+                    not_filter_value).sum() * 100,
+            perc_people=calculator.df["nbpers"][not_filter_value].sum() / (
                 calculator.df["nbpers"].sum()
             ) * 100,
             ibt_people=(100 * (calculator.ibt_par_headcount * calculator.df["nbpers"])[
-                calculator.is_sanitation() == False].sum() /
-                        calculator.df["nbpers"][calculator.is_sanitation() == False].sum()
+                not_filter_value].sum() /
+                        calculator.df["nbpers"][not_filter_value].sum()
                         ),
-            perc_children=(100 * calculator.df.loc[calculator.is_sanitation() == False, "nenf"].sum()
+            perc_children=(100 * calculator.df.loc[not_filter_value, "nenf"].sum()
                            / calculator.df["nenf"].sum()
                            ),
             ibt_children=(100 *
                           (calculator.ibt_par_headcount * calculator.df["nenf"])[
-                              calculator.is_sanitation() == False
-                              ].sum() / calculator.df.loc[calculator.is_sanitation() == False, "nenf"].sum()),
-            tbse_household=calculator.tbse_par_headcount[calculator.is_sanitation() == False].sum() / (
-                    calculator.is_sanitation() == False
+                              not_filter_value
+                              ].sum() / calculator.df.loc[not_filter_value, "nenf"].sum()),
+            tbse_household=calculator.tbse_par_headcount[not_filter_value].sum() / (
+                    not_filter_value
             ).sum() * 100,
             tbse_people=(100 * (calculator.tbse_par_headcount * calculator.df["nbpers"])[
-                calculator.is_sanitation() == False].sum() / calculator.df["nbpers"][
-                             calculator.is_sanitation() == False].sum()),
-            tbse_children=(100 * calculator.df.loc[calculator.is_sanitation() == False, "nenf"].sum()
+                not_filter_value].sum() / calculator.df["nbpers"][
+                             not_filter_value].sum()),
+            tbse_children=(100 * calculator.df.loc[not_filter_value, "nenf"].sum()
                            / calculator.df["nenf"].sum()
                            ),
         ),
         g2=GroupIncidenceRow(
-            perc_household=((calculator.simulation.primitives.sanitation.number_of_subscribers) /
-                            calculator.simulation.primitives.drinking_water.number_of_subscribers) * 100,
-            ibt_household=calculator.ibt_par_headcount[calculator.is_sanitation() == True].sum() / (
-                    calculator.is_sanitation() == True).sum() * 100,
-            perc_people=calculator.df["nbpers"][calculator.is_sanitation() == True].sum() / (
+            perc_household=g2_perc_household,
+            ibt_household=calculator.ibt_par_headcount[filter_value].sum() / (
+                    filter_value).sum() * 100,
+            perc_people=calculator.df["nbpers"][filter_value].sum() / (
                 calculator.df["nbpers"].sum()
             ) * 100,
             ibt_people=(100 * (calculator.ibt_par_headcount * calculator.df["nbpers"])[
-                calculator.is_sanitation() == True].sum() /
-                        calculator.df["nbpers"][calculator.is_sanitation() == True].sum()
+                filter_value].sum() /
+                        calculator.df["nbpers"][filter_value].sum()
                         ),
-            perc_children=(100 * calculator.df.loc[calculator.is_sanitation() == True, "nenf"].sum()
+            perc_children=(100 * calculator.df.loc[filter_value, "nenf"].sum()
                            / calculator.df["nenf"].sum()
                            ),
             ibt_children=(100 *
                           (calculator.ibt_par_headcount * calculator.df["nenf"])[
-                              calculator.is_sanitation() == True
-                              ].sum() / calculator.df.loc[calculator.is_sanitation() == True, "nenf"].sum()),
-            tbse_household=calculator.tbse_par_headcount[calculator.is_sanitation() == True].sum() / (
-                    calculator.is_sanitation() == True
+                              filter_value
+                              ].sum() / calculator.df.loc[filter_value, "nenf"].sum()),
+            tbse_household=calculator.tbse_par_headcount[filter_value].sum() / (
+                    filter_value
             ).sum() * 100,
             tbse_people=(100 * (calculator.tbse_par_headcount * calculator.df["nbpers"])[
-                calculator.is_sanitation() == True].sum() / calculator.df["nbpers"][
-                             calculator.is_sanitation() == True].sum()),
-            tbse_children=(100 * calculator.df.loc[calculator.is_sanitation() == True, "nenf"].sum()
+                filter_value].sum() / calculator.df["nbpers"][
+                             filter_value].sum()),
+            tbse_children=(100 * calculator.df.loc[filter_value, "nenf"].sum()
                            / calculator.df["nenf"].sum()
                            ),
         ),
@@ -440,35 +479,54 @@ async def general_par_incidence(simulation_id: int, current_user: User = Depends
         )
     )
 
+@affordability_router.get("/{simulation_id}/g1_g2/incidence")
+async def general_par_incidence(
+    simulation_id: int, 
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    return await get_group_par_incidence(simulation_id, current_user, db, lambda calculator: calculator.is_sanitation())
 
-@affordability_router.get("/{simulation_id}/g1_g2/intensity")
-async def get_group_g1_g2_intensity(
+@affordability_router.get("/{simulation_id}/poor/incidence")
+async def poor_par_incidence(
+    simulation_id: int, 
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    return await get_group_par_incidence(simulation_id, current_user, db, lambda calculator: calculator.is_poor)
+
+
+async def get_group_intensity(
         simulation_id: int,
-        current_user: User = Depends(get_current_active_user),
-        db: Session = Depends(get_db)
+        current_user: User,
+        db: Session,
+        filter_func
 ):
     simulation_payload, simulation = await get_simulation_payload_from_db(
         current_user, db, simulation_id, get_simulation_db=True
     )
     calculator = await get_or_create_simulation_from_payload(simulation_id, simulation, simulation_payload)
 
+    filter_value = filter_func(calculator)
+    not_filter_value = ~filter_value
+
     ibt_apparent_group = GroupDeficit(
         g1=RowDeficit(
-            perc=(~calculator.is_sanitation()).mean() * 100,
+            perc=not_filter_value.mean() * 100,
             mean=calculator.ibt_par_excess[
-                calculator.is_sanitation() == False
+                filter_value == False
                 ].mean(),
             var=calculator.ibt_par_excess[
-                calculator.is_sanitation() == False
+                filter_value == False
                 ].var()
         ),
         g2=RowDeficit(
-            perc=calculator.is_sanitation().mean() * 100,
+            perc=filter_value.mean() * 100,
             mean=calculator.ibt_par_excess[
-                calculator.is_sanitation() == True
+                filter_value == True
                 ].mean(),
             var=calculator.ibt_par_excess[
-                calculator.is_sanitation() == True
+                filter_value == True
                 ].var(), ),
         ensemble=RowDeficit(
             perc=100,
@@ -479,21 +537,21 @@ async def get_group_g1_g2_intensity(
     ibt_apparent_group = from_group_deficit_to_augmented(ibt_apparent_group)
     tbse_apparent_group = GroupDeficit(
         g1=RowDeficit(
-            perc=(~calculator.is_sanitation()).mean() * 100,
+            perc=not_filter_value.mean() * 100,
             mean=calculator.tbse_par_excess[
-                calculator.is_sanitation() == False
+                filter_value == False
                 ].mean(),
             var=calculator.tbse_par_excess[
-                calculator.is_sanitation() == False
+                filter_value == False
                 ].var()
         ),
         g2=RowDeficit(
-            perc=calculator.is_sanitation().mean() * 100,
+            perc=filter_value.mean() * 100,
             mean=calculator.tbse_par_excess[
-                calculator.is_sanitation() == True
+                filter_value == True
                 ].mean(),
             var=calculator.tbse_par_excess[
-                calculator.is_sanitation() == True
+                filter_value == True
                 ].var(), ),
         ensemble=RowDeficit(
             perc=100,
@@ -505,21 +563,21 @@ async def get_group_g1_g2_intensity(
 
     ibt_effective_group = GroupDeficit(
         g1=RowDeficit(
-            perc=(np.array((calculator.is_sanitation() == False))[(calculator.ibt_par_excess > 0)]).mean() * 100,
+            perc=(np.array((filter_value == False))[(calculator.ibt_par_excess > 0)]).mean() * 100,
             mean=calculator.ibt_par_excess[
-                (calculator.is_sanitation() == False) & (calculator.ibt_par_excess > 0)
+                (filter_value == False) & (calculator.ibt_par_excess > 0)
                 ].mean(),
             var=calculator.ibt_par_excess[
-                (calculator.is_sanitation() == False) & (calculator.ibt_par_excess > 0)
+                (filter_value == False) & (calculator.ibt_par_excess > 0)
                 ].var()
         ),
         g2=RowDeficit(
-            perc=(np.array((calculator.is_sanitation()))[(calculator.ibt_par_excess > 0)]).mean() * 100,
+            perc=(np.array((filter_value))[(calculator.ibt_par_excess > 0)]).mean() * 100,
             mean=calculator.ibt_par_excess[
-                (calculator.is_sanitation() == True) & (calculator.ibt_par_excess > 0)
+                (filter_value == True) & (calculator.ibt_par_excess > 0)
                 ].mean(),
             var=calculator.ibt_par_excess[
-                (calculator.is_sanitation() == True) & (calculator.ibt_par_excess > 0)
+                (filter_value == True) & (calculator.ibt_par_excess > 0)
                 ].var(),
         ), ensemble=RowDeficit(
             perc=100,
@@ -530,21 +588,21 @@ async def get_group_g1_g2_intensity(
     ibt_effective_group = from_group_deficit_to_augmented(ibt_effective_group)
     tbse_effective_group = GroupDeficit(
         g1=RowDeficit(
-            perc=(np.array((calculator.is_sanitation() == False))[(calculator.tbse_par_excess > 0)]).mean() * 100,
+            perc=(np.array((filter_value == False))[(calculator.tbse_par_excess > 0)]).mean() * 100,
             mean=calculator.tbse_par_excess[
-                (calculator.is_sanitation() == False) & (calculator.tbse_par_excess > 0)
+                (filter_value == False) & (calculator.tbse_par_excess > 0)
                 ].mean(),
             var=calculator.tbse_par_excess[
-                (calculator.is_sanitation() == False) & (calculator.tbse_par_excess > 0)
+                (filter_value == False) & (calculator.tbse_par_excess > 0)
                 ].var()
         ),
         g2=RowDeficit(
-            perc=(np.array((calculator.is_sanitation() == True))[(calculator.tbse_par_excess > 0)]).mean() * 100,
+            perc=(np.array((filter_value == True))[(calculator.tbse_par_excess > 0)]).mean() * 100,
             mean=calculator.tbse_par_excess[
-                (calculator.is_sanitation() == True) & (calculator.tbse_par_excess > 0)
+                (filter_value == True) & (calculator.tbse_par_excess > 0)
                 ].mean(),
             var=calculator.tbse_par_excess[
-                (calculator.is_sanitation() == True) & (calculator.tbse_par_excess > 0)
+                (filter_value == True) & (calculator.tbse_par_excess > 0)
                 ].var()
         ),
         ensemble=RowDeficit(
@@ -565,39 +623,55 @@ async def get_group_g1_g2_intensity(
         )
     }
 
-
-@affordability_router.get("/{simulation_id}/g1_g2_par_inequality")
-async def gini_index_comparison(
+@affordability_router.get("/{simulation_id}/g1_g2/intensity")
+async def get_group_g1_g2_intensity(
         simulation_id: int,
         current_user: User = Depends(get_current_active_user),
         db: Session = Depends(get_db)
+):
+    return await get_group_intensity(simulation_id, current_user, db, lambda calculator: calculator.is_sanitation())
+
+@affordability_router.get("/{simulation_id}/poor/intensity")
+async def get_group_poor_intensity(
+        simulation_id: int,
+        current_user: User = Depends(get_current_active_user),
+        db: Session = Depends(get_db)
+):
+    return await get_group_intensity(simulation_id, current_user, db, lambda calculator: calculator.is_poor)
+
+
+async def get_group_par_inequality(
+        simulation_id: int,
+        current_user: User,
+        db: Session,
+        filter_func
 ) -> OutputGiniDecomp:
     simulation_payload, simulation = await get_simulation_payload_from_db(
         current_user, db, simulation_id, get_simulation_db=True
     )
     calculator = await get_or_create_simulation_from_payload(simulation_id, simulation, simulation_payload)
 
-    is_sanitation = calculator.is_sanitation()
+    filter_value = filter_func(calculator)
 
     # Process PAR IBT values
-    par_ibt_gini_data = gini_decomp(calculator.par_ibt, is_sanitation)['gini_decomp']
+    par_ibt_gini_data = gini_decomp(calculator.par_ibt, filter_value)['gini_decomp']
     par_ibt_table = _create_gini_decomp_table(par_ibt_gini_data)
 
     # Process PAR TBSE values
-    par_tbse_gini_data = gini_decomp(calculator.par_tbse, is_sanitation)['gini_decomp']
+    par_tbse_gini_data = gini_decomp(calculator.par_tbse, filter_value)['gini_decomp']
     par_tbse_table = _create_gini_decomp_table(par_tbse_gini_data)
 
     # Process excess PAR IBT values
     excess_par_ibt_gini_data = gini_decomp(
         calculator.par_ibt[calculator.ibt_par_excess > 0],
-        is_sanitation[calculator.ibt_par_excess > 0]
+        filter_value[calculator.ibt_par_excess > 0]
     )['gini_decomp']
     excess_par_ibt_table = _create_gini_decomp_table(excess_par_ibt_gini_data)
 
-    # Process excess PAR TBSE values (assuming this exists based on OutputGiniDecomp structure)
+    # Process excess PAR TBSE values
     excess_par_tbse_gini_data = gini_decomp(
         calculator.par_tbse[calculator.tbse_par_excess > 0],
-        is_sanitation[calculator.tbse_par_excess > 0]
+        filter_value[calculator.tbse_par_excess > 0]
     )['gini_decomp']
     excess_par_tbse_table = _create_gini_decomp_table(excess_par_tbse_gini_data)
 
@@ -607,3 +681,19 @@ async def gini_index_comparison(
         excess_par_ibt=excess_par_ibt_table,
         excess_par_tbse=excess_par_tbse_table
     )
+
+@affordability_router.get("/{simulation_id}/g1_g2_par_inequality")
+async def gini_index_comparison(
+        simulation_id: int,
+        current_user: User = Depends(get_current_active_user),
+        db: Session = Depends(get_db)
+) -> OutputGiniDecomp:
+    return await get_group_par_inequality(simulation_id, current_user, db, lambda calculator: calculator.is_sanitation())
+
+@affordability_router.get("/{simulation_id}/poor/par_inequality")
+async def poor_gini_index_comparison(
+        simulation_id: int,
+        current_user: User = Depends(get_current_active_user),
+        db: Session = Depends(get_db)
+) -> OutputGiniDecomp:
+    return await get_group_par_inequality(simulation_id, current_user, db, lambda calculator: calculator.is_poor)

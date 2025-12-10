@@ -138,20 +138,14 @@ class NewSimulation:
             daily_income = row['Revenu_Imputé_2'] / 30
             daily_subscription = (self.simulation.epa_prix_base_ttc if row[
                 SANITATION_COLUMN] else self.simulation.potable_water_prix_base_ttc) / 90
-            print("daily_subscription", daily_subscription)
             daily_subscription_tier = (
                                           epa_nordin_tier_ttc if row[SANITATION_COLUMN] else ep_nordin_tier_ttc
                                       ) / 90
-            print("daily_subscription_tier", daily_subscription_tier)
             daily_virtual_income = np.log(
                 daily_income - daily_subscription + daily_subscription_tier) * self.simulation.demand.coefficients.a6
-            print("daily_virtual_income", daily_virtual_income)
             prix_ttc = np.log(
                 epa_prix_ttc if row[SANITATION_COLUMN] else ep_prix_ttc) * self.simulation.demand.coefficients.a5
-            print("prix_ttc", prix_ttc)
-            print("Daily consumption", daily_subscription_tier)
             consumption_ = 90 * np.exp(prix_ttc + daily_virtual_income + captive_consumption)
-            print("consumption", consumption_)
             return daily_subscription_tier, consumption_
 
         return apply

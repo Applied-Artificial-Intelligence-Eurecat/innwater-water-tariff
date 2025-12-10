@@ -271,124 +271,124 @@
         <mat-tab-group>
             <mat-tab label="Descriptive Statistics">
                 <div class="grid-3cols delta-wrapper">
-            <!-- PAR Table -->
-            <div class="col">
-                <mat-card class="table-card">
-                    <mat-card-header>
-                        <mat-card-title></mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <table mat-table [dataSource]="parTableRows" class="mat-elevation-z1">
-                            <ng-container matColumnDef="label">
-                                <th mat-header-cell *matHeaderCellDef></th>
-                                <td mat-cell *matCellDef="let r">{{ r.label }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_ibt">
-                                <th mat-header-cell *matHeaderCellDef>G1 (EP)</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_ibt">
-                                <th mat-header-cell *matHeaderCellDef>G2 (EPA)</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_tbse">
-                                <th mat-header-cell *matHeaderCellDef>G1 (EP)</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_tbse">
-                                <th mat-header-cell *matHeaderCellDef>G2 (EPA)</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_delta">
-                                <th mat-header-cell *matHeaderCellDef>G1</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_delta | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_delta">
-                                <th mat-header-cell *matHeaderCellDef>G2</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_delta | number:'1.1-1' }}</td>
-                            </ng-container>
+                    <!-- PAR Table -->
+                    <div class="col">
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title></mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="parTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>G1 (EP)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>G2 (EPA)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>G1 (EP)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>G2 (EPA)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_delta">
+                                        <th mat-header-cell *matHeaderCellDef>G1</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_delta | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_delta">
+                                        <th mat-header-cell *matHeaderCellDef>G2</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_delta | number:'1.1-1' }}</td>
+                                    </ng-container>
 
-                            <tr mat-header-row
-                                *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse', 'g1_delta', 'g2_delta']"></tr>
-                            <tr mat-row
-                                *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse', 'g1_delta', 'g2_delta'];"></tr>
-                        </table>
-                    </mat-card-content>
-                </mat-card>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse', 'g1_delta', 'g2_delta']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse', 'g1_delta', 'g2_delta'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
 
-                <!-- Statistics Table -->
-                <mat-card class="table-card">
-                    <mat-card-header>
-                        <mat-card-title></mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <table mat-table [dataSource]="statsTableRows" class="mat-elevation-z1">
-                            <ng-container matColumnDef="label">
-                                <th mat-header-cell *matHeaderCellDef>Statistic</th>
-                                <td mat-cell *matCellDef="let r">{{ r.label }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_ibt">
-                                <th mat-header-cell *matHeaderCellDef>G1 IBT</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_ibt">
-                                <th mat-header-cell *matHeaderCellDef>G2 IBT</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_tbse">
-                                <th mat-header-cell *matHeaderCellDef>G1 TBSE</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.1-1' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_tbse">
-                                <th mat-header-cell *matHeaderCellDef>G2 TBSE</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.1-1' }}</td>
-                            </ng-container>
+                        <!-- Statistics Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title></mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="statsTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef>Statistic</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>G1 IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>G2 IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>G1 TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>G2 TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
 
-                            <tr mat-header-row
-                                *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse']"></tr>
-                            <tr mat-row
-                                *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse'];"></tr>
-                        </table>
-                    </mat-card-content>
-                </mat-card>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
 
-                <!-- Dispersion Table -->
-                <mat-card class="table-card">
-                    <mat-card-header>
-                        <mat-card-title></mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <table mat-table [dataSource]="dispersionTableRows" class="mat-elevation-z1">
-                            <ng-container matColumnDef="label">
-                                <th mat-header-cell *matHeaderCellDef>Statistic</th>
-                                <td mat-cell *matCellDef="let r">{{ r.label }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_ibt">
-                                <th mat-header-cell *matHeaderCellDef>G1 IBT</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.3-3' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_ibt">
-                                <th mat-header-cell *matHeaderCellDef>G2 IBT</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.3-3' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g1_tbse">
-                                <th mat-header-cell *matHeaderCellDef>G1 TBSE</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.3-3' }}</td>
-                            </ng-container>
-                            <ng-container matColumnDef="g2_tbse">
-                                <th mat-header-cell *matHeaderCellDef>G2 TBSE</th>
-                                <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.3-3' }}</td>
-                            </ng-container>
+                        <!-- Dispersion Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title></mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="dispersionTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef>Statistic</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>G1 IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.3-3' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>G2 IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.3-3' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>G1 TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.3-3' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>G2 TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.3-3' }}</td>
+                                    </ng-container>
 
-                            <tr mat-header-row
-                                *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse']"></tr>
-                            <tr mat-row
-                                *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse'];"></tr>
-                        </table>
-                    </mat-card-content>
-                </mat-card>
-            </div>
-        </div>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
 
             </mat-tab>
             <mat-tab label="Incidence">
@@ -441,8 +441,10 @@
                                         <td mat-cell *matCellDef="let r">{{ r.tbseChildren | number:'1.2-2' }}</td>
                                     </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="['group', 'percHouseholdsIbt', 'ibtHouseholds', 'percPeopleIbt', 'ibtPeople', 'percChildrenIbt', 'ibtChildren', 'tbseHouseholds', 'tbsePeople', 'tbseChildren']"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percHouseholdsIbt', 'ibtHouseholds', 'percPeopleIbt', 'ibtPeople', 'percChildrenIbt', 'ibtChildren', 'tbseHouseholds', 'tbsePeople', 'tbseChildren'];"></tr>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['group', 'percHouseholdsIbt', 'ibtHouseholds', 'percPeopleIbt', 'ibtPeople', 'percChildrenIbt', 'ibtChildren', 'tbseHouseholds', 'tbsePeople', 'tbseChildren']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['group', 'percHouseholdsIbt', 'ibtHouseholds', 'percPeopleIbt', 'ibtPeople', 'percChildrenIbt', 'ibtChildren', 'tbseHouseholds', 'tbsePeople', 'tbseChildren'];"></tr>
                                 </table>
                             </mat-card-content>
                         </mat-card>
@@ -477,11 +479,21 @@
                                     </ng-container>
                                     <ng-container matColumnDef="decomposition">
                                         <th mat-header-cell *matHeaderCellDef>Decomposition</th>
-                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                        <td mat-cell *matCellDef="let r"
+                                            [style.font-weight]="!r.group ? 'bold' : 'normal'">
+                                            <span *ngIf="r.group"> {{ r.decomposition }}</span>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.decompositionValue | number:'1.2-2' }}
+                                        </td>
                                     </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition']"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition'];"></tr>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
                                 </table>
                             </mat-card-content>
                         </mat-card>
@@ -511,11 +523,21 @@
                                     </ng-container>
                                     <ng-container matColumnDef="decomposition">
                                         <th mat-header-cell *matHeaderCellDef>Decomposition</th>
-                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                        <td mat-cell *matCellDef="let r"
+                                            [style.font-weight]="!r.group ? 'bold' : 'normal'">
+                                            <span *ngIf="r.group"> {{ r.decomposition }}</span>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.decompositionValue | number:'1.2-2' }}
+                                        </td>
                                     </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition']"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition'];"></tr>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
                                 </table>
                             </mat-card-content>
                         </mat-card>
@@ -545,11 +567,21 @@
                                     </ng-container>
                                     <ng-container matColumnDef="decomposition">
                                         <th mat-header-cell *matHeaderCellDef>Decomposition</th>
-                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                        <td mat-cell *matCellDef="let r"
+                                            [style.font-weight]="!r.group ? 'bold' : 'normal'">
+                                            <span *ngIf="r.group"> {{ r.decomposition }}</span>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.decompositionValue | number:'1.2-2' }}
+                                        </td>
                                     </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition']"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition'];"></tr>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
                                 </table>
                             </mat-card-content>
                         </mat-card>
@@ -579,11 +611,21 @@
                                     </ng-container>
                                     <ng-container matColumnDef="decomposition">
                                         <th mat-header-cell *matHeaderCellDef>Decomposition</th>
-                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                        <td mat-cell *matCellDef="let r"
+                                            [style.font-weight]="!r.group ? 'bold' : 'normal'">
+                                            <span *ngIf="r.group"> {{ r.decomposition }}</span>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.decompositionValue | number:'1.2-2' }}
+                                        </td>
                                     </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition']"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition'];"></tr>
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
                                 </table>
                             </mat-card-content>
                         </mat-card>
@@ -707,11 +749,471 @@
     </mat-tab>
     <mat-tab label="Focus: Decomposition of Poor vs Non-poor">
         <mat-tab-group>
-            <mat-tab label="Descriptive Statistics"></mat-tab>
-            <mat-tab label="Incidence"></mat-tab>
-            <mat-tab label="Intensity"></mat-tab>
-            <mat-tab label="Inequality"></mat-tab>
-        </mat-tab-group>
+            <mat-tab label="Descriptive Statistics">
+                <div class="grid-3cols delta-wrapper">
+                    <!-- PAR Table -->
+                    <div class="col">
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title></mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorParTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>Poor (IBT)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor (IBT)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>Poor (TBSE)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor (TBSE)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_delta">
+                                        <th mat-header-cell *matHeaderCellDef>Poor</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_delta | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_delta">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_delta | number:'1.1-1' }}</td>
+                                    </ng-container>
 
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse', 'g1_delta', 'g2_delta']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse', 'g1_delta', 'g2_delta'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- Statistics Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title></mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorStatsTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef>Statistic</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>Poor IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>Poor TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.1-1' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- Dispersion Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title></mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorDispersionTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef>Statistic</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>Poor IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_ibt | number:'1.3-3' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_ibt">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor IBT</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_ibt | number:'1.3-3' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g1_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>Poor TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g1_tbse | number:'1.3-3' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="g2_tbse">
+                                        <th mat-header-cell *matHeaderCellDef>Non-poor TBSE</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.g2_tbse | number:'1.3-3' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row
+                                        *matHeaderRowDef="['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse']"></tr>
+                                    <tr mat-row
+                                        *matRowDef="let row; columns: ['label', 'g1_ibt', 'g2_ibt', 'g1_tbse', 'g2_tbse'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="Incidence">
+                <div class="grid-3cols delta-wrapper">
+                    <div class="col">
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>Poor vs Non-poor Incidence</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorIncidenceTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="group">
+                                        <th mat-header-cell *matHeaderCellDef>Group</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.group }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percHouseholdsIbt">
+                                        <th mat-header-cell *matHeaderCellDef>% Households (IBT)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percHouseholdsIbt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="ibtHouseholds">
+                                        <th mat-header-cell *matHeaderCellDef>IBT Households</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.ibtHouseholds | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percPeopleIbt">
+                                        <th mat-header-cell *matHeaderCellDef>% People (IBT)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percPeopleIbt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="ibtPeople">
+                                        <th mat-header-cell *matHeaderCellDef>IBT People</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.ibtPeople | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percChildrenIbt">
+                                        <th mat-header-cell *matHeaderCellDef>% Children (IBT)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percChildrenIbt | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="ibtChildren">
+                                        <th mat-header-cell *matHeaderCellDef>IBT Children</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.ibtChildren | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="tbseHouseholds">
+                                        <th mat-header-cell *matHeaderCellDef>TBSE Households</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.tbseHouseholds | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="tbsePeople">
+                                        <th mat-header-cell *matHeaderCellDef>TBSE People</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.tbsePeople | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="tbseChildren">
+                                        <th mat-header-cell *matHeaderCellDef>TBSE Children</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.tbseChildren | number:'1.2-2' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['group', 'percHouseholdsIbt', 'ibtHouseholds', 'percPeopleIbt', 'ibtPeople', 'percChildrenIbt', 'ibtChildren', 'tbseHouseholds', 'tbsePeople', 'tbseChildren']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percHouseholdsIbt', 'ibtHouseholds', 'percPeopleIbt', 'ibtPeople', 'percChildrenIbt', 'ibtChildren', 'tbseHouseholds', 'tbsePeople', 'tbseChildren'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="Intensity">
+                <div class="grid-3cols delta-wrapper">
+                    <div class="col">
+                        <!-- PAR IBT Deficit Apparent Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>PAR IBT Deficit Apparent</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorIbtApparentDeficitTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="group">
+                                        <th mat-header-cell *matHeaderCellDef>Group</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.group }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percentage">
+                                        <th mat-header-cell *matHeaderCellDef>gⱼ (%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percentage | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="mean">
+                                        <th mat-header-cell *matHeaderCellDef>Moyenne</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.mean | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="variance">
+                                        <th mat-header-cell *matHeaderCellDef>Variance</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.variance | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decomposition">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition</th>
+                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.decompositionValue | number:'1.2-2' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- PAR TBSE Deficit Apparent Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>PAR TBSE Deficit Apparent</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorTbseApparentDeficitTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="group">
+                                        <th mat-header-cell *matHeaderCellDef>Group</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.group }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percentage">
+                                        <th mat-header-cell *matHeaderCellDef>gⱼ (%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percentage | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="mean">
+                                        <th mat-header-cell *matHeaderCellDef>Moyenne</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.mean | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="variance">
+                                        <th mat-header-cell *matHeaderCellDef>Variance</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.variance | number:'1.2-2' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decomposition">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition</th>
+                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.decompositionValue | number:'1.2-2' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- PAR IBT Deficit Effective Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>PAR IBT Deficit Effective</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorIbtEffectiveDeficitTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="group">
+                                        <th mat-header-cell *matHeaderCellDef>Group</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.group }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percentage">
+                                        <th mat-header-cell *matHeaderCellDef>gⱼ (%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percentage | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="mean">
+                                        <th mat-header-cell *matHeaderCellDef>Moyenne</th>
+                                        <td mat-cell *matCellDef="let r">
+                                            <ng-container *ngIf="r.mean !== null; else dash">{{ r.mean | number:'1.2-2' }}</ng-container>
+                                            <ng-template #dash>-</ng-template>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="variance">
+                                        <th mat-header-cell *matHeaderCellDef>Variance</th>
+                                        <td mat-cell *matCellDef="let r">
+                                            <ng-container *ngIf="r.variance !== null; else dash">{{ r.variance | number:'1.2-2' }}</ng-container>
+                                            <ng-template #dash>-</ng-template>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decomposition">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition</th>
+                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">
+                                            <ng-container *ngIf="r.decompositionValue !== null; else dash">{{ r.decompositionValue | number:'1.2-2' }}</ng-container>
+                                            <ng-template #dash>-</ng-template>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- PAR TBSE Deficit Effective Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>PAR TBSE Deficit Effective</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorTbseEffectiveDeficitTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="group">
+                                        <th mat-header-cell *matHeaderCellDef>Group</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.group }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percentage">
+                                        <th mat-header-cell *matHeaderCellDef>gⱼ (%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percentage | number:'1.1-1' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="mean">
+                                        <th mat-header-cell *matHeaderCellDef>Moyenne</th>
+                                        <td mat-cell *matCellDef="let r">
+                                            <ng-container *ngIf="r.mean !== null; else dash">{{ r.mean | number:'1.2-2' }}</ng-container>
+                                            <ng-template #dash>-</ng-template>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="variance">
+                                        <th mat-header-cell *matHeaderCellDef>Variance</th>
+                                        <td mat-cell *matCellDef="let r">
+                                            <ng-container *ngIf="r.variance !== null; else dash">{{ r.variance | number:'1.2-2' }}</ng-container>
+                                            <ng-template #dash>-</ng-template>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decomposition">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition</th>
+                                        <td mat-cell *matCellDef="let r" [style.font-weight]="!r.group ? 'bold' : 'normal'">{{ r.decomposition }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="decompositionValue">
+                                        <th mat-header-cell *matHeaderCellDef>Decomposition Value</th>
+                                        <td mat-cell *matCellDef="let r">
+                                            <ng-container *ngIf="r.decompositionValue !== null; else dash">{{ r.decompositionValue | number:'1.2-2' }}</ng-container>
+                                            <ng-template #dash>-</ng-template>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['group', 'percentage', 'mean', 'variance', 'decomposition', 'decompositionValue'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="Inequality">
+                <div class="delta-wrapper">
+                    <div class="gini-grid">
+                        <!-- Gini PAR IBT Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>Gini PAR IBT</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorParIbtTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="value">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.value | number:'1.4-4' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percent">
+                                        <th mat-header-cell *matHeaderCellDef>(%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percent | number:'1.4-4' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['label', 'value', 'percent']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['label', 'value', 'percent'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- Gini PAR TBSE Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>Gini PAR TBSE</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorParTbseTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="value">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.value | number:'1.4-4' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percent">
+                                        <th mat-header-cell *matHeaderCellDef>(%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percent | number:'1.4-4' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['label', 'value', 'percent']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['label', 'value', 'percent'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- Excess Gini PAR IBT Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>Excess Gini PAR IBT</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorExcessParIbtTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="value">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.value | number:'1.4-4' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percent">
+                                        <th mat-header-cell *matHeaderCellDef>(%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percent | number:'1.4-4' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['label', 'value', 'percent']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['label', 'value', 'percent'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- Excess Gini PAR TBSE Table -->
+                        <mat-card class="table-card">
+                            <mat-card-header>
+                                <mat-card-title>Excess Gini PAR TBSE</mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table mat-table [dataSource]="poorExcessParTbseTableRows" class="mat-elevation-z1">
+                                    <ng-container matColumnDef="label">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.label }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="value">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let r">{{ r.value | number:'1.4-4' }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="percent">
+                                        <th mat-header-cell *matHeaderCellDef>(%)</th>
+                                        <td mat-cell *matCellDef="let r">{{ r.percent | number:'1.4-4' }}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['label', 'value', 'percent']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['label', 'value', 'percent'];"></tr>
+                                </table>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+        <div *ngIf="loading">Loading…</div>
+        <div *ngIf="error" class="error">{{ error }}</div>
     </mat-tab>
 </mat-tab-group>

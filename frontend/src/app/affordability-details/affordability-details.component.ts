@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {AffordabilityParApiService, GeneralParDescriptionResponse, StatParItem, GiniSymMatrixResponse, GiniIndexComparisonResponse, GeneralDescriptiveResponse, GeneralIncidenceResponse, GeneralDeficitsResponse, GeneralInequalityResponse, G1G2IncidenceResponse, G1G2IntensityResponse} from "../affordability-par-api.service";
+import {AffordabilityParApiService, GeneralParDescriptionResponse, StatParItem, GiniSymMatrixResponse, GiniIndexComparisonResponse, GeneralDescriptiveResponse, GeneralIncidenceResponse, GeneralDeficitsResponse, GeneralInequalityResponse, G1G2IncidenceResponse, G1G2IntensityResponse, PoorDescriptiveResponse, PoorIncidenceResponse, PoorIntensityResponse, PoorInequalityResponse} from "../affordability-par-api.service";
 
 @Component({
     selector: 'app-affordability-details',
@@ -37,10 +37,30 @@ export class AffordabilityDetailsComponent implements OnInit {
     g1g2IncidenceTableRows: Array<{ group: string; percHouseholdsIbt?: number; ibtHouseholds?: number; percPeopleIbt?: number; ibtPeople?: number; percChildrenIbt?: number; ibtChildren?: number; tbseHouseholds?: number; tbsePeople?: number; tbseChildren?: number }> = [];
 
     // Focus G1 vs G2 > Intensity tab data
-    ibtApparentDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string }> = [];
-    tbseApparentDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string }> = [];
-    ibtEffectiveDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string }> = [];
-    tbseEffectiveDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string }> = [];
+    ibtApparentDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+    tbseApparentDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+    ibtEffectiveDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+    tbseEffectiveDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+
+    // Focus Poor vs Non-poor > Descriptive Statistics tab data
+    poorParTableRows: Array<{ label: string; g1_ibt?: number; g2_ibt?: number; g1_tbse?: number; g2_tbse?: number; g1_delta?: number; g2_delta?: number }> = [];
+    poorStatsTableRows: Array<{ label: string; g1_ibt?: number; g2_ibt?: number; g1_tbse?: number; g2_tbse?: number }> = [];
+    poorDispersionTableRows: Array<{ label: string; g1_ibt?: number; g2_ibt?: number; g1_tbse?: number; g2_tbse?: number }> = [];
+
+    // Focus Poor vs Non-poor > Incidence tab data
+    poorIncidenceTableRows: Array<{ group: string; percHouseholdsIbt?: number; ibtHouseholds?: number; percPeopleIbt?: number; ibtPeople?: number; percChildrenIbt?: number; ibtChildren?: number; tbseHouseholds?: number; tbsePeople?: number; tbseChildren?: number }> = [];
+
+    // Focus Poor vs Non-poor > Intensity tab data
+    poorIbtApparentDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+    poorTbseApparentDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+    poorIbtEffectiveDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+    poorTbseEffectiveDeficitTableRows: Array<{ group: string; percentage?: number; mean?: number; variance?: number; decomposition?: string; decompositionValue?: number }> = [];
+
+    // Focus Poor vs Non-poor > Inequality tab data
+    poorParIbtTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
+    poorParTbseTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
+    poorExcessParIbtTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
+    poorExcessParTbseTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
 
     // Gini Index Comparison tab data
     giniIbtTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
@@ -67,6 +87,10 @@ export class AffordabilityDetailsComponent implements OnInit {
                 this.fetchGiniData(this.simulationId);
                 this.fetchG1G2Incidence(this.simulationId);
                 this.fetchG1G2Intensity(this.simulationId);
+                this.fetchPoorDescriptive(this.simulationId);
+                this.fetchPoorIncidence(this.simulationId);
+                this.fetchPoorIntensity(this.simulationId);
+                this.fetchPoorInequality(this.simulationId);
             }
         });
     }
@@ -591,21 +615,24 @@ export class AffordabilityDetailsComponent implements OnInit {
                 percentage: data.apparent.par_ibt.g1.perc,
                 mean: data.apparent.par_ibt.g1.mean,
                 variance: data.apparent.par_ibt.g1.var,
-                decomposition: 'Var Inter'
+                decomposition: 'Var Inter',
+                decompositionValue: data.apparent.par_ibt.var_inter
             },
             {
                 group: 'G2',
                 percentage: data.apparent.par_ibt.g2.perc,
                 mean: data.apparent.par_ibt.g2.mean,
                 variance: data.apparent.par_ibt.g2.var,
-                decomposition: 'Var intra'
+                decomposition: 'Var intra',
+                decompositionValue: data.apparent.par_ibt.var_intra
             },
             {
                 group: 'Ensemble',
                 percentage: data.apparent.par_ibt.ensemble.perc,
                 mean: data.apparent.par_ibt.ensemble.mean,
                 variance: data.apparent.par_ibt.ensemble.var,
-                decomposition: 'Rap. Corr.'
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.apparent.par_ibt.rap_corr
             },
             {
                 group: '',
@@ -620,21 +647,24 @@ export class AffordabilityDetailsComponent implements OnInit {
                 percentage: data.apparent.par_tbse.g1.perc,
                 mean: data.apparent.par_tbse.g1.mean,
                 variance: data.apparent.par_tbse.g1.var,
-                decomposition: 'Var Inter'
+                decomposition: 'Var Inter',
+                decompositionValue: data.apparent.par_tbse.var_inter
             },
             {
                 group: 'G2',
                 percentage: data.apparent.par_tbse.g2.perc,
                 mean: data.apparent.par_tbse.g2.mean,
                 variance: data.apparent.par_tbse.g2.var,
-                decomposition: 'Var intra'
+                decomposition: 'Var intra',
+                decompositionValue: data.apparent.par_tbse.var_intra
             },
             {
                 group: 'Ensemble',
                 percentage: data.apparent.par_tbse.ensemble.perc,
                 mean: data.apparent.par_tbse.ensemble.mean,
                 variance: data.apparent.par_tbse.ensemble.var,
-                decomposition: 'Rap. Corr.'
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.apparent.par_tbse.rap_corr
             },
             {
                 group: '',
@@ -649,21 +679,24 @@ export class AffordabilityDetailsComponent implements OnInit {
                 percentage: data.effective.par_ibt.g1.perc,
                 mean: data.effective.par_ibt.g1.mean,
                 variance: data.effective.par_ibt.g1.var,
-                decomposition: 'Var Inter'
+                decomposition: 'Var Inter',
+                decompositionValue: data.effective.par_ibt.var_inter
             },
             {
                 group: 'G2',
                 percentage: data.effective.par_ibt.g2.perc,
                 mean: data.effective.par_ibt.g2.mean,
                 variance: data.effective.par_ibt.g2.var,
-                decomposition: 'Var intra'
+                decomposition: 'Var intra',
+                decompositionValue: data.effective.par_ibt.var_intra
             },
             {
                 group: 'Ensemble',
                 percentage: data.effective.par_ibt.ensemble.perc,
                 mean: data.effective.par_ibt.ensemble.mean,
                 variance: data.effective.par_ibt.ensemble.var,
-                decomposition: 'Rap. Corr.'
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.effective.par_ibt.rap_corr
             },
             {
                 group: '',
@@ -678,21 +711,24 @@ export class AffordabilityDetailsComponent implements OnInit {
                 percentage: data.effective.par_tbse.g1.perc,
                 mean: data.effective.par_tbse.g1.mean,
                 variance: data.effective.par_tbse.g1.var,
-                decomposition: 'Var Inter'
+                decomposition: 'Var Inter',
+                decompositionValue: data.effective.par_tbse.var_inter
             },
             {
                 group: 'G2',
                 percentage: data.effective.par_tbse.g2.perc,
                 mean: data.effective.par_tbse.g2.mean,
                 variance: data.effective.par_tbse.g2.var,
-                decomposition: 'Var intra'
+                decomposition: 'Var intra',
+                decompositionValue: data.effective.par_tbse.var_intra
             },
             {
                 group: 'Ensemble',
                 percentage: data.effective.par_tbse.ensemble.perc,
                 mean: data.effective.par_tbse.ensemble.mean,
                 variance: data.effective.par_tbse.ensemble.var,
-                decomposition: 'Rap. Corr.'
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.effective.par_tbse.rap_corr
             },
             {
                 group: '',
@@ -836,5 +872,448 @@ export class AffordabilityDetailsComponent implements OnInit {
         if (this.simulationId) {
             this.router.navigate(['/simulation/details', this.simulationId]);
         }
+    }
+
+    private fetchPoorDescriptive(id: number): void {
+        this.loading = true;
+        this.error = null;
+        this.affordabilityParService.getPoorDescriptive(id).subscribe({
+            next: (data: PoorDescriptiveResponse) => {
+                this.preparePoorDescriptiveTables(data);
+                this.loading = false;
+            },
+            error: err => {
+                this.error = 'Failed to load poor vs non-poor descriptive statistics data';
+                console.error(err);
+                this.loading = false;
+            }
+        });
+    }
+
+    private preparePoorDescriptiveTables(data: PoorDescriptiveResponse): void {
+        // Process data for PAR table
+        this.poorParTableRows = [
+            {
+                label: 'Mean',
+                g1_ibt: data.mean.par_ibt_g1,
+                g2_ibt: data.mean.par_ibt_g2,
+                g1_tbse: data.mean.par_tbse_g1,
+                g2_tbse: data.mean.par_tbse_g2,
+                g1_delta: data.mean.delta_par_g1,
+                g2_delta: data.mean.delta_par_g2
+            },
+            {
+                label: 'Median',
+                g1_ibt: data.median.par_ibt_g1,
+                g2_ibt: data.median.par_ibt_g2,
+                g1_tbse: data.median.par_tbse_g1,
+                g2_tbse: data.median.par_tbse_g2,
+                g1_delta: data.median.delta_par_g1,
+                g2_delta: data.median.delta_par_g2
+            }
+        ];
+
+        // Process data for Statistics table
+        this.poorStatsTableRows = [
+            {
+                label: 'Min',
+                g1_ibt: data.min.par_ibt_g1,
+                g2_ibt: data.min.par_ibt_g2,
+                g1_tbse: data.min.par_tbse_g1,
+                g2_tbse: data.min.par_tbse_g2
+            },
+            {
+                label: 'Max',
+                g1_ibt: data.max.par_ibt_g1,
+                g2_ibt: data.max.par_ibt_g2,
+                g1_tbse: data.max.par_tbse_g1,
+                g2_tbse: data.max.par_tbse_g2
+            },
+            {
+                label: 'Q1',
+                g1_ibt: data.q1.par_ibt_g1,
+                g2_ibt: data.q1.par_ibt_g2,
+                g1_tbse: data.q1.par_tbse_g1,
+                g2_tbse: data.q1.par_tbse_g2
+            },
+            {
+                label: 'Q3',
+                g1_ibt: data.q3.par_ibt_g1,
+                g2_ibt: data.q3.par_ibt_g2,
+                g1_tbse: data.q3.par_tbse_g1,
+                g2_tbse: data.q3.par_tbse_g2
+            },
+            {
+                label: 'D1',
+                g1_ibt: data.d1.par_ibt_g1,
+                g2_ibt: data.d1.par_ibt_g2,
+                g1_tbse: data.d1.par_tbse_g1,
+                g2_tbse: data.d1.par_tbse_g2
+            },
+            {
+                label: 'D9',
+                g1_ibt: data.d9.par_ibt_g1,
+                g2_ibt: data.d9.par_ibt_g2,
+                g1_tbse: data.d9.par_tbse_g1,
+                g2_tbse: data.d9.par_tbse_g2
+            },
+            {
+                label: 'F (Mean)',
+                g1_ibt: data.f.par_ibt_g1,
+                g2_ibt: data.f.par_ibt_g2,
+                g1_tbse: data.f.par_tbse_g1,
+                g2_tbse: data.f.par_tbse_g2
+            }
+        ];
+
+        // Process data for Dispersion table
+        this.poorDispersionTableRows = [
+            {
+                label: 'Variance',
+                g1_ibt: data.variance.par_ibt_g1,
+                g2_ibt: data.variance.par_ibt_g2,
+                g1_tbse: data.variance.par_tbse_g1,
+                g2_tbse: data.variance.par_tbse_g2
+            },
+            {
+                label: 'Écart-type',
+                g1_ibt: data.ecart_type.par_ibt_g1,
+                g2_ibt: data.ecart_type.par_ibt_g2,
+                g1_tbse: data.ecart_type.par_tbse_g1,
+                g2_tbse: data.ecart_type.par_tbse_g2
+            },
+            {
+                label: 'MAPE',
+                g1_ibt: data.MAPE.par_ibt_g1,
+                g2_ibt: data.MAPE.par_ibt_g2,
+                g1_tbse: data.MAPE.par_tbse_g1,
+                g2_tbse: data.MAPE.par_tbse_g2
+            },
+            {
+                label: 'Coefficient variation',
+                g1_ibt: data.coeff_variation.par_ibt_g1,
+                g2_ibt: data.coeff_variation.par_ibt_g2,
+                g1_tbse: data.coeff_variation.par_tbse_g1,
+                g2_tbse: data.coeff_variation.par_tbse_g2
+            }
+        ];
+    }
+
+    private fetchPoorIncidence(id: number): void {
+        this.loading = true;
+        this.error = null;
+        this.affordabilityParService.getPoorIncidence(id).subscribe({
+            next: (data: PoorIncidenceResponse) => {
+                this.preparePoorIncidenceTable(data);
+                this.loading = false;
+            },
+            error: err => {
+                this.error = 'Failed to load poor vs non-poor incidence data';
+                console.error(err);
+                this.loading = false;
+            }
+        });
+    }
+
+    private preparePoorIncidenceTable(data: PoorIncidenceResponse): void {
+        // Process data for Poor vs Non-poor Incidence table
+        this.poorIncidenceTableRows = [
+            {
+                group: 'G1',
+                percHouseholdsIbt: data.g1.perc_household * 100,
+                ibtHouseholds: data.g1.ibt_household,
+                percPeopleIbt: data.g1.perc_people,
+                ibtPeople: data.g1.ibt_people,
+                percChildrenIbt: data.g1.perc_children,
+                ibtChildren: data.g1.ibt_children,
+                tbseHouseholds: data.g1.tbse_household,
+                tbsePeople: data.g1.tbse_people,
+                tbseChildren: data.g1.tbse_children
+            },
+            {
+                group: 'G2',
+                percHouseholdsIbt: data.g2.perc_household * 100,
+                ibtHouseholds: data.g2.ibt_household,
+                percPeopleIbt: data.g2.perc_people,
+                ibtPeople: data.g2.ibt_people,
+                percChildrenIbt: data.g2.perc_children,
+                ibtChildren: data.g2.ibt_children,
+                tbseHouseholds: data.g2.tbse_household,
+                tbsePeople: data.g2.tbse_people,
+                tbseChildren: data.g2.tbse_children
+            },
+            {
+                group: 'Total',
+                percHouseholdsIbt: data.total.perc_household,
+                ibtHouseholds: data.total.ibt_household,
+                percPeopleIbt: data.total.perc_people,
+                ibtPeople: data.total.ibt_people,
+                percChildrenIbt: data.total.perc_children,
+                ibtChildren: data.total.ibt_children,
+                tbseHouseholds: data.total.tbse_household,
+                tbsePeople: data.total.tbse_people,
+                tbseChildren: data.total.tbse_children
+            }
+        ];
+    }
+
+    private fetchPoorIntensity(id: number): void {
+        this.loading = true;
+        this.error = null;
+        this.affordabilityParService.getPoorIntensity(id).subscribe({
+            next: (data: PoorIntensityResponse) => {
+                this.preparePoorIntensityTables(data);
+                this.loading = false;
+            },
+            error: err => {
+                this.error = 'Failed to load poor vs non-poor intensity data';
+                console.error(err);
+                this.loading = false;
+            }
+        });
+    }
+
+    private preparePoorIntensityTables(data: PoorIntensityResponse): void {
+        // Process data for PAR IBT Deficit Apparent table
+        this.poorIbtApparentDeficitTableRows = [
+            {
+                group: 'G1',
+                percentage: data.apparent.par_ibt.g1.perc,
+                mean: data.apparent.par_ibt.g1.mean,
+                variance: data.apparent.par_ibt.g1.var,
+                decomposition: 'Var Inter',
+                decompositionValue: data.apparent.par_ibt.var_inter
+            },
+            {
+                group: 'G2',
+                percentage: data.apparent.par_ibt.g2.perc,
+                mean: data.apparent.par_ibt.g2.mean,
+                variance: data.apparent.par_ibt.g2.var,
+                decomposition: 'Var intra',
+                decompositionValue: data.apparent.par_ibt.var_intra
+            },
+            {
+                group: 'Ensemble',
+                percentage: data.apparent.par_ibt.ensemble.perc,
+                mean: data.apparent.par_ibt.ensemble.mean,
+                variance: data.apparent.par_ibt.ensemble.var,
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.apparent.par_ibt.rap_corr
+            },
+            {
+                group: '',
+                decomposition: data.apparent.par_ibt.rap_corr !== null ? data.apparent.par_ibt.rap_corr.toFixed(2) : '-'
+            }
+        ];
+
+        // Process data for PAR TBSE Deficit Apparent table
+        this.poorTbseApparentDeficitTableRows = [
+            {
+                group: 'G1',
+                percentage: data.apparent.par_tbse.g1.perc,
+                mean: data.apparent.par_tbse.g1.mean,
+                variance: data.apparent.par_tbse.g1.var,
+                decomposition: 'Var Inter',
+                decompositionValue: data.apparent.par_tbse.var_inter
+            },
+            {
+                group: 'G2',
+                percentage: data.apparent.par_tbse.g2.perc,
+                mean: data.apparent.par_tbse.g2.mean,
+                variance: data.apparent.par_tbse.g2.var,
+                decomposition: 'Var intra',
+                decompositionValue: data.apparent.par_tbse.var_intra
+            },
+            {
+                group: 'Ensemble',
+                percentage: data.apparent.par_tbse.ensemble.perc,
+                mean: data.apparent.par_tbse.ensemble.mean,
+                variance: data.apparent.par_tbse.ensemble.var,
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.apparent.par_tbse.rap_corr
+            },
+            {
+                group: '',
+                decomposition: data.apparent.par_tbse.rap_corr !== null ? data.apparent.par_tbse.rap_corr.toFixed(2) : '-'
+            }
+        ];
+
+        // Process data for PAR IBT Deficit Effective table
+        this.poorIbtEffectiveDeficitTableRows = [
+            {
+                group: 'G1',
+                percentage: data.effective.par_ibt.g1.perc,
+                mean: data.effective.par_ibt.g1.mean !== null ? data.effective.par_ibt.g1.mean : undefined,
+                variance: data.effective.par_ibt.g1.var !== null ? data.effective.par_ibt.g1.var : undefined,
+                decomposition: 'Var Inter',
+                decompositionValue: data.effective.par_ibt.var_inter
+            },
+            {
+                group: 'G2',
+                percentage: data.effective.par_ibt.g2.perc,
+                mean: data.effective.par_ibt.g2.mean !== null ? data.effective.par_ibt.g2.mean : undefined,
+                variance: data.effective.par_ibt.g2.var !== null ? data.effective.par_ibt.g2.var : undefined,
+                decomposition: 'Var intra',
+                decompositionValue: data.effective.par_ibt.var_intra
+            },
+            {
+                group: 'Ensemble',
+                percentage: data.effective.par_ibt.ensemble.perc,
+                mean: data.effective.par_ibt.ensemble.mean !== null ? data.effective.par_ibt.ensemble.mean : undefined,
+                variance: data.effective.par_ibt.ensemble.var !== null ? data.effective.par_ibt.ensemble.var : undefined,
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.effective.par_ibt.rap_corr
+            },
+            {
+                group: '',
+                decomposition: data.effective.par_ibt.rap_corr !== null ? data.effective.par_ibt.rap_corr.toFixed(2) : '-'
+            }
+        ];
+
+        // Process data for PAR TBSE Deficit Effective table
+        this.poorTbseEffectiveDeficitTableRows = [
+            {
+                group: 'G1',
+                percentage: data.effective.par_tbse.g1.perc,
+                mean: data.effective.par_tbse.g1.mean !== null ? data.effective.par_tbse.g1.mean : undefined,
+                variance: data.effective.par_tbse.g1.var !== null ? data.effective.par_tbse.g1.var : undefined,
+                decomposition: 'Var Inter',
+                decompositionValue: data.effective.par_tbse.var_inter
+            },
+            {
+                group: 'G2',
+                percentage: data.effective.par_tbse.g2.perc,
+                mean: data.effective.par_tbse.g2.mean !== null ? data.effective.par_tbse.g2.mean : undefined,
+                variance: data.effective.par_tbse.g2.var !== null ? data.effective.par_tbse.g2.var : undefined,
+                decomposition: 'Var intra',
+                decompositionValue: data.effective.par_tbse.var_intra
+            },
+            {
+                group: 'Ensemble',
+                percentage: data.effective.par_tbse.ensemble.perc,
+                mean: data.effective.par_tbse.ensemble.mean !== null ? data.effective.par_tbse.ensemble.mean : undefined,
+                variance: data.effective.par_tbse.ensemble.var !== null ? data.effective.par_tbse.ensemble.var : undefined,
+                decomposition: 'Rap. Corr.',
+                decompositionValue: data.effective.par_tbse.rap_corr
+            },
+            {
+                group: '',
+                decomposition: data.effective.par_tbse.rap_corr !== null ? data.effective.par_tbse.rap_corr.toFixed(2) : '-'
+            }
+        ];
+    }
+
+    private fetchPoorInequality(id: number): void {
+        this.loading = true;
+        this.error = null;
+        this.affordabilityParService.getPoorInequality(id).subscribe({
+            next: (data: PoorInequalityResponse) => {
+                this.preparePoorInequalityTables(data);
+                this.loading = false;
+            },
+            error: err => {
+                this.error = 'Failed to load poor vs non-poor inequality data';
+                console.error(err);
+                this.loading = false;
+            }
+        });
+    }
+
+    private preparePoorInequalityTables(data: PoorInequalityResponse): void {
+        // Prepare PAR IBT table
+        this.poorParIbtTableRows = [
+            {
+                label: 'Between',
+                value: data.par_ibt.between.value,
+                percent: data.par_ibt.between.perc
+            },
+            {
+                label: 'Within',
+                value: data.par_ibt.within.value,
+                percent: data.par_ibt.within.perc
+            },
+            {
+                label: 'Transvariation',
+                value: data.par_ibt.transvariation.value,
+                percent: data.par_ibt.transvariation.perc
+            },
+            {
+                label: 'Ensemble',
+                value: data.par_ibt.ensemble.value,
+                percent: data.par_ibt.ensemble.perc
+            }
+        ];
+
+        // Prepare PAR TBSE table
+        this.poorParTbseTableRows = [
+            {
+                label: 'Between',
+                value: data.par_tbse.between.value,
+                percent: data.par_tbse.between.perc
+            },
+            {
+                label: 'Within',
+                value: data.par_tbse.within.value,
+                percent: data.par_tbse.within.perc
+            },
+            {
+                label: 'Transvariation',
+                value: data.par_tbse.transvariation.value,
+                percent: data.par_tbse.transvariation.perc
+            },
+            {
+                label: 'Ensemble',
+                value: data.par_tbse.ensemble.value,
+                percent: data.par_tbse.ensemble.perc
+            }
+        ];
+
+        // Prepare Excess PAR IBT table
+        this.poorExcessParIbtTableRows = [
+            {
+                label: 'Between',
+                value: data.excess_par_ibt.between.value,
+                percent: data.excess_par_ibt.between.perc
+            },
+            {
+                label: 'Within',
+                value: data.excess_par_ibt.within.value,
+                percent: data.excess_par_ibt.within.perc
+            },
+            {
+                label: 'Transvariation',
+                value: data.excess_par_ibt.transvariation.value,
+                percent: data.excess_par_ibt.transvariation.perc
+            },
+            {
+                label: 'Ensemble',
+                value: data.excess_par_ibt.ensemble.value,
+                percent: data.excess_par_ibt.ensemble.perc
+            }
+        ];
+
+        // Prepare Excess PAR TBSE table
+        this.poorExcessParTbseTableRows = [
+            {
+                label: 'Between',
+                value: data.excess_par_tbse.between.value,
+                percent: data.excess_par_tbse.between.perc
+            },
+            {
+                label: 'Within',
+                value: data.excess_par_tbse.within.value,
+                percent: data.excess_par_tbse.within.perc
+            },
+            {
+                label: 'Transvariation',
+                value: data.excess_par_tbse.transvariation.value,
+                percent: data.excess_par_tbse.transvariation.perc
+            },
+            {
+                label: 'Ensemble',
+                value: data.excess_par_tbse.ensemble.value,
+                percent: data.excess_par_tbse.ensemble.perc
+            }
+        ];
     }
 }

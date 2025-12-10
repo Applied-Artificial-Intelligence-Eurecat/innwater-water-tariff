@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+import numpy as np
+from pydantic import BaseModel, field_validator
 
 
 class GroupRow(BaseModel):
@@ -6,6 +7,7 @@ class GroupRow(BaseModel):
     par_ibt_g2: float | None
     par_tbse_g1: float | None
     par_tbse_g2: float | None
+
 
 
 class AugmentedGroupRow(GroupRow):
@@ -83,6 +85,13 @@ class RowDeficit(BaseModel):
     mean: float
     var: float
 
+    @field_validator('perc', 'mean', 'var')
+    @classmethod
+    def convert_nan_to_none(cls, v):
+        if v is not None and np.isnan(v).any():
+            return None
+        return v
+
 
 class GroupDeficit(BaseModel):
     g1: RowDeficit
@@ -91,20 +100,33 @@ class GroupDeficit(BaseModel):
 
 
 class AugmentedGroupDeficit(GroupDeficit):
-    var_inter: float
-    var_intra: float
-    rap_corr: float
+    var_inter: float | None
+    var_intra: float | None
+    rap_corr: float | None
+
+    @field_validator('var_inter', 'var_intra', 'rap_corr')
+    @classmethod
+    def convert_nan_to_none(cls, v):
+        if v is not None and np.isnan(v).any():
+            return None
+        return v
+
 
 
 def from_group_deficit_to_augmented(group_deficit: GroupDeficit) -> AugmentedGroupDeficit:
-    var_inter = (group_deficit.g1.perc * (
-            group_deficit.g1.mean - group_deficit.ensemble.mean) ** 2 + group_deficit.g2.perc * (
-                        group_deficit.g2.mean - group_deficit.ensemble.mean) ** 2) / 100
-    return AugmentedGroupDeficit(g1=group_deficit.g1, g2=group_deficit.g2, ensemble=group_deficit.ensemble,
-                                 var_inter=var_inter,
-                                 var_intra=(
-                                                       group_deficit.g1.perc * group_deficit.g1.var + group_deficit.g2.perc * group_deficit.g2.var) / 100,
-                                 rap_corr=var_inter / group_deficit.ensemble.var * 100)
+    try:
+        var_inter = (group_deficit.g1.perc * (
+                group_deficit.g1.mean - group_deficit.ensemble.mean) ** 2 + group_deficit.g2.perc * (
+                            group_deficit.g2.mean - group_deficit.ensemble.mean) ** 2) / 100
+        return AugmentedGroupDeficit(g1=group_deficit.g1, g2=group_deficit.g2, ensemble=group_deficit.ensemble,
+                                     var_inter=var_inter,
+                                     var_intra=(
+                                                           group_deficit.g1.perc * group_deficit.g1.var + group_deficit.g2.perc * group_deficit.g2.var) / 100,
+                                     rap_corr=var_inter / group_deficit.ensemble.var * 100)
+    except:
+        return AugmentedGroupDeficit(g1=group_deficit.g1, g2=group_deficit.g2, ensemble=group_deficit.ensemble,
+                                     var_inter=None,
+                                     var_intra=None, rap_corr=None)
 
 
 class DeficitAffordabilityTable(BaseModel):

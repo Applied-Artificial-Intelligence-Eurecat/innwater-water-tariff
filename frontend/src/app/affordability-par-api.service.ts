@@ -29,8 +29,71 @@ export interface G1G2IntensityResponse {
   effective: G1G2IntensityDeficitTable;
 }
 
+// Interface for the poor/intensity endpoint response
+export interface PoorIntensityRowDeficit {
+  perc: number;
+  mean: number;
+  var: number;
+}
+
+export interface PoorIntensityGroupDeficit {
+  g1: PoorIntensityRowDeficit;
+  g2: PoorIntensityRowDeficit;
+  ensemble: PoorIntensityRowDeficit;
+  var_inter: number;
+  var_intra: number;
+  rap_corr: number;
+}
+
+export interface PoorIntensityDeficitTable {
+  par_ibt: PoorIntensityGroupDeficit;
+  par_tbse: PoorIntensityGroupDeficit;
+}
+
+export interface PoorIntensityResponse {
+  apparent: PoorIntensityDeficitTable;
+  effective: PoorIntensityDeficitTable;
+}
+
 // Interface for the g1_g2/incidence endpoint response
 export interface G1G2IncidenceResponse {
+  g1: {
+    perc_household: number;
+    ibt_household: number;
+    perc_people: number;
+    ibt_people: number;
+    perc_children: number;
+    ibt_children: number;
+    tbse_household: number;
+    tbse_people: number;
+    tbse_children: number;
+  };
+  g2: {
+    perc_household: number;
+    ibt_household: number;
+    perc_people: number;
+    ibt_people: number;
+    perc_children: number;
+    ibt_children: number;
+    tbse_household: number;
+    tbse_people: number;
+    tbse_children: number;
+  };
+  total: {
+    perc_household: number;
+    ibt_household: number;
+    perc_people: number;
+    ibt_people: number;
+    perc_children: number;
+    ibt_children: number;
+    tbse_household: number;
+    tbse_people: number;
+    tbse_children: number;
+  };
+}
+
+// Interface for the poor/incidence endpoint response
+export interface PoorIncidenceResponse {
   g1: {
     perc_household: number;
     ibt_household: number;
@@ -86,6 +149,82 @@ export interface GeneralInequalityResponse {
     schutz: {
       par_ibt: number;
       par_tbse: number;
+    };
+  };
+}
+
+// Interface for the poor/par_inequality endpoint response
+export interface PoorInequalityResponse {
+  par_ibt: {
+    between: {
+      value: number;
+      perc: number;
+    };
+    within: {
+      value: number;
+      perc: number;
+    };
+    transvariation: {
+      value: number;
+      perc: number;
+    };
+    ensemble: {
+      value: number;
+      perc: number;
+    };
+  };
+  par_tbse: {
+    between: {
+      value: number;
+      perc: number;
+    };
+    within: {
+      value: number;
+      perc: number;
+    };
+    transvariation: {
+      value: number;
+      perc: number;
+    };
+    ensemble: {
+      value: number;
+      perc: number;
+    };
+  };
+  excess_par_ibt: {
+    between: {
+      value: number;
+      perc: number;
+    };
+    within: {
+      value: number;
+      perc: number;
+    };
+    transvariation: {
+      value: number;
+      perc: number;
+    };
+    ensemble: {
+      value: number;
+      perc: number;
+    };
+  };
+  excess_par_tbse: {
+    between: {
+      value: number;
+      perc: number;
+    };
+    within: {
+      value: number;
+      perc: number;
+    };
+    transvariation: {
+      value: number;
+      perc: number;
+    };
+    ensemble: {
+      value: number;
+      perc: number;
     };
   };
 }
@@ -243,6 +382,92 @@ export interface GeneralDescriptiveResponse {
 
 // Interface for the general_par_description endpoint response
 export interface GeneralParDescriptionResponse {
+  mean: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+    delta_par_g1: number;
+    delta_par_g2: number;
+  };
+  median: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+    delta_par_g1: number;
+    delta_par_g2: number;
+  };
+  min: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  max: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  q1: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  q3: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  d1: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  d9: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  f: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  variance: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  ecart_type: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  MAPE: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+  coeff_variation: {
+    par_ibt_g1: number;
+    par_ibt_g2: number;
+    par_tbse_g1: number;
+    par_tbse_g2: number;
+  };
+}
+
+// Interface for the poor/par_description endpoint response
+export interface PoorDescriptiveResponse {
   mean: {
     par_ibt_g1: number;
     par_ibt_g2: number;
@@ -601,6 +826,70 @@ export class AffordabilityParApiService {
   getG1G2Intensity(id: number): Observable<G1G2IntensityResponse> {
     return this.http.get<G1G2IntensityResponse>(
       `${this.apiUrl}/api/v1/results/affordability/${id}/g1_g2/intensity`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+  }
+
+  /**
+   * Gets the Poor vs Non-poor descriptive statistics for a specific simulation
+   * @param id The simulation ID
+   * @returns Observable with Poor vs Non-poor descriptive statistics
+   */
+  getPoorDescriptive(id: number): Observable<PoorDescriptiveResponse> {
+    return this.http.get<PoorDescriptiveResponse>(
+      `${this.apiUrl}/api/v1/results/affordability/${id}/poor/par_description`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+  }
+
+  /**
+   * Gets the Poor vs Non-poor incidence data for a specific simulation
+   * @param id The simulation ID
+   * @returns Observable with Poor vs Non-poor incidence data
+   */
+  getPoorIncidence(id: number): Observable<PoorIncidenceResponse> {
+    return this.http.get<PoorIncidenceResponse>(
+      `${this.apiUrl}/api/v1/results/affordability/${id}/poor/incidence`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+  }
+
+  /**
+   * Gets the Poor vs Non-poor intensity data for a specific simulation
+   * @param id The simulation ID
+   * @returns Observable with Poor vs Non-poor intensity data
+   */
+  getPoorIntensity(id: number): Observable<PoorIntensityResponse> {
+    return this.http.get<PoorIntensityResponse>(
+      `${this.apiUrl}/api/v1/results/affordability/${id}/poor/intensity`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+  }
+
+  /**
+   * Gets the Poor vs Non-poor inequality data for a specific simulation
+   * @param id The simulation ID
+   * @returns Observable with Poor vs Non-poor inequality data
+   */
+  getPoorInequality(id: number): Observable<PoorInequalityResponse> {
+    return this.http.get<PoorInequalityResponse>(
+      `${this.apiUrl}/api/v1/results/affordability/${id}/poor/par_inequality`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`

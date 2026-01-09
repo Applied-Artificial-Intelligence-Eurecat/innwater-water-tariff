@@ -88,6 +88,7 @@ class NewSimulation:
         self.calculate_receipts()
         self.calculate_par()
         self.calculate_first_tier_consumption()
+        self.calculate_aproximate_demand_consumptions()
 
     def calculate_poor(self):
         uc_oecd = 1 + (self.df['nbpers'] - self.df['nenf'] - 1) * 0.5 + self.df['nenf'] * 0.3
@@ -290,12 +291,18 @@ class NewSimulation:
         return self.overconsumption
 
     def calculate_first_tier_consumption(self):
-        a_i = ((self.df['Revenu_Imputé_2'] / 30) ** self.simulation.demand.coefficients.a5) * self.captive_consumption
+        self.first_tier_a_i = ((self.df[
+                                    'Revenu_Imputé_2'] / 30) ** self.simulation.demand.coefficients.a5) * self.captive_consumption
         self.first_tier_consumption_per_day = (
                 ((self.simulation.primitives.drinking_water.variable_costs +
                   self.simulation.primitives.environment.average_variable_cost)
-                 ** self.simulation.demand.coefficients.a6) * a_i)
+                 ** self.simulation.demand.coefficients.a6) * self.first_tier_a_i)
         self.first_tier_consumption_per_trim = self.first_tier_consumption_per_day * 90
+
+    def calculate_aproximate_demand_consumptions(self):
+        is_sanitation = self.is_sanitation().astype(float)
+        op = self.simulation.primitives.drinking_water.variable_costs + is_sanitation * self.simulation.primitives.sanitation.variable_costs
+
 
     def __calculate_generic_tbse_receipt(self, consumption):
         potable_receipt = self.simulation.tbse_potable_water_base_prix + consumption * self.simulation.tbse_potable_water_variable_prix
@@ -399,7 +406,7 @@ def get_gini(excess, constant):
     )
     df_.sort_values(by="ibt_par_excess", inplace=True)
     df_['rank'] = df_['ibt_par_excess'] / excess.sum() * 100
-    df_['addition']  = df_['rank'].cumsum()
+    df_['addition'] = df_['rank'].cumsum()
     res = constant * (df_['addition'] + df_['addition'].shift(1).fillna(0))
     return res
 

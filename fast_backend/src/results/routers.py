@@ -11,6 +11,7 @@ from src.results.affordability.routers import affordability_router
 from src.results.incentive.routers import incentive_effect_router
 from src.results.schemas import *
 from src.small_assessment.affordability_service import affordability_general
+from src.small_assessment.economic_efficiency import economic_efficiency_dashboard
 from src.small_assessment.incentive_service import incentive_effect_consumption
 from src.small_assessment.new_calculator_service import get_or_create_simulation_from_payload, NewSimulation
 from src.small_assessment.rex_service import calculate_net_cost_service
@@ -89,14 +90,12 @@ async def get_incentive_efficiency(simulation_id, current_user: User = Depends(g
 @results_router.get("/{simulation_id}/economic_efficiency", response_model=EconomicEfficiencyTable)
 async def get_economic_efficiency(simulation_id, current_user: User = Depends(get_current_active_user),
                                   db: Session = Depends(get_db)):
-    efficiency_table = EconomicEfficiencyTable(
-        first_best=EconomicEfficiencyRow(conso=None, delta_w=None),  # '***' → None
-        delta_ibt_pp=EconomicEfficiencyRow(conso=None, delta_w=None),
-        impact_sur_co=EconomicEfficiencyRow(conso=None, delta_w=None),
-        delta_tbse=EconomicEfficiencyRow(conso=None, delta_w=None),
-        delta_surplus_m=EconomicEfficiencyRow(conso=None, delta_w=None)
-    )
-    return efficiency_table
+
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                          get_simulation_db=True)
+    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    return economic_efficiency_dashboard(simulation_finished)
 
 
 @results_router.get("/{simulation_id}/equity/gini", response_model=EquityGiniIndexTable)
@@ -178,13 +177,13 @@ def calculate_rex(simulation_calculator: NewSimulation):
 async def get_other_funding(simulation_id: int, current_user: User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return FundingTable(
-        net_contributors_percent=None,
-        net_beneficiaries_percent=None,
-        subsidized_basic_c_percent=None,
-        subsidized_non_basic_c_percent=None,
-        margined_c_percent=None,
-        bad_sub_percent=None,
-        bad_tax_percent=None
+        net_contributors_percent=42.1,
+        net_beneficiaries_percent=57.9,
+        subsidized_basic_c_percent=47.3,
+        subsidized_non_basic_c_percent=4.2,
+        margined_c_percent=77.6,
+        bad_sub_percent=FundingMetricRow(dae=10.7, dai=0.0),
+        bad_tax_percent=FundingMetricRow(dae=17.9, dai=17.9)
     )
 
 
@@ -192,10 +191,10 @@ async def get_other_funding(simulation_id: int, current_user: User = Depends(get
 async def get_environmental_cost(simulation_id: int, current_user: User = Depends(get_current_active_user),
                                  db: Session = Depends(get_db)):
     return EnvironmentalCostTable(
-        tbse_conso_rang_1=None,
-        effective_tbse=None,
-        ibt=None,
-        ibt_pp=None
+        tbse_conso_rang_1=39.08,
+        effective_tbse=47.16,
+        ibt=36.27,
+        ibt_pp=33.83
     )
 
 
@@ -203,7 +202,7 @@ async def get_environmental_cost(simulation_id: int, current_user: User = Depend
 async def get_water_agency(simulation_id: int, current_user: User = Depends(get_current_active_user),
                            db: Session = Depends(get_db)):
     return WaterAgencyTable(
-        exercise_duty=None,
+        exercise_duty=904314,
     )
 
 
@@ -211,7 +210,7 @@ async def get_water_agency(simulation_id: int, current_user: User = Depends(get_
 async def get_state_table(simulation_id: int, current_user: User = Depends(get_current_active_user),
                           db: Session = Depends(get_db)):
     return StateTable(
-        vat=None
+        vat=1031371
     )
 
 

@@ -46,10 +46,10 @@ class EconomicEfficiencyRow(BaseModel):
 
 class EconomicEfficiencyTable(BaseModel):
     first_best: EconomicEfficiencyRow
-    delta_ibt_pp: EconomicEfficiencyRow
-    impact_sur_co: EconomicEfficiencyRow
-    delta_tbse: EconomicEfficiencyRow
-    delta_surplus_m: EconomicEfficiencyRow
+    delta_tbse_a: EconomicEfficiencyRow
+    delta_ibt_a: EconomicEfficiencyRow
+    delta_ibt_pp_a: EconomicEfficiencyRow
+    impact_overconsumption: EconomicEfficiencyRow
 
 
 class EquityGiniIndexTable(BaseModel):
@@ -84,14 +84,19 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+class FundingMetricRow(BaseModel):
+    dae: Optional[float] = None
+    dai: Optional[float] = None
+
+
 class FundingTable(BaseModel):
     net_contributors_percent: Optional[float] = Field(None, description="% Households that are net contributors")
     net_beneficiaries_percent: Optional[float] = Field(None, description="% Households that are net beneficiaries")
     subsidized_basic_c_percent: Optional[float] = Field(None, description="Subsidized basic consumption (%)")
     subsidized_non_basic_c_percent: Optional[float] = Field(None, description="Subsidized non-basic consumption (%)")
     margined_c_percent: Optional[float] = Field(None, description="Margined consumption (%)")
-    bad_sub_percent: Optional[float] = Field(None, description='"Bad" Subsidy (%)')
-    bad_tax_percent: Optional[float] = Field(None, description='"Bad" Taxation (%)')
+    bad_sub_percent: FundingMetricRow = Field(FundingMetricRow(), description='"Bad" Subsidy (%)')
+    bad_tax_percent: FundingMetricRow = Field(FundingMetricRow(), description='"Bad" Taxation (%)')
 
 
 class EnvironmentalCostTable(BaseModel):

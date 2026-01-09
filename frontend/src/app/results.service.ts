@@ -47,10 +47,10 @@ export interface EconomicEfficiencyRow {
 
 export interface EconomicEfficiencyTable {
     first_best: EconomicEfficiencyRow;
-    delta_ibt_pp: EconomicEfficiencyRow;
-    impact_sur_co: EconomicEfficiencyRow;
-    delta_tbse: EconomicEfficiencyRow;
-    delta_surplus_m: EconomicEfficiencyRow;
+    delta_tbse_a: EconomicEfficiencyRow;
+    delta_ibt_a: EconomicEfficiencyRow;
+    delta_ibt_pp_a: EconomicEfficiencyRow;
+    impact_overconsumption: EconomicEfficiencyRow;
 }
 
 // Gini Index
@@ -92,6 +92,12 @@ export interface FundingRexOp {
     total_cost: number;
 }
 
+// Funding metric row for DAE/DAI values
+export interface FundingMetricRow {
+    dae: number | null;
+    dai: number | null;
+}
+
 // /funding/other
 export interface FundingOther {
     net_contributors_percent: number | null;
@@ -99,8 +105,8 @@ export interface FundingOther {
     subsidized_basic_c_percent: number | null;
     subsidized_non_basic_c_percent: number | null;
     margined_c_percent: number | null;
-    bad_sub_percent: number | null;
-    bad_tax_percent: number | null;
+    bad_sub_percent: FundingMetricRow;
+    bad_tax_percent: FundingMetricRow;
 }
 
 // /environmental_cost

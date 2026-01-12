@@ -1,5 +1,6 @@
 from io import StringIO
 
+import numpy as np
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -8,6 +9,7 @@ from src.core.database import get_db
 from src.core.models import User
 from src.initial.routers import get_simulation_payload_from_db
 from src.results.affordability.routers import affordability_router
+from src.results.economic_efficiency.routers import economic_efficiency_router
 from src.results.incentive.routers import incentive_effect_router
 from src.results.schemas import *
 from src.small_assessment.affordability_service import affordability_general
@@ -16,6 +18,8 @@ from src.small_assessment.incentive_service import incentive_effect_consumption
 from src.small_assessment.new_calculator_service import get_or_create_simulation_from_payload, NewSimulation
 from src.small_assessment.rex_service import calculate_net_cost_service
 
+from src.results.schemas import EconomicEfficiencyTable
+
 results_router = APIRouter(
     prefix="/results",
     tags=["results"],
@@ -23,6 +27,7 @@ results_router = APIRouter(
 )
 
 results_router.include_router(incentive_effect_router, tags=["incentive_effect"])
+results_router.include_router(economic_efficiency_router, tags=["economic_efficiency"])
 
 
 @results_router.get("/{simulation_id}/affordability", response_model=AffordabilityTable)
@@ -87,15 +92,6 @@ async def get_incentive_efficiency(simulation_id, current_user: User = Depends(g
     return efficiency_table
 
 
-@results_router.get("/{simulation_id}/economic_efficiency", response_model=EconomicEfficiencyTable)
-async def get_economic_efficiency(simulation_id, current_user: User = Depends(get_current_active_user),
-                                  db: Session = Depends(get_db)):
-
-    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
-                                                                          get_simulation_db=True)
-    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
-
-    return economic_efficiency_dashboard(simulation_finished)
 
 
 @results_router.get("/{simulation_id}/equity/gini", response_model=EquityGiniIndexTable)
@@ -190,27 +186,39 @@ async def get_other_funding(simulation_id: int, current_user: User = Depends(get
 @results_router.get("/{simulation_id}/environmental_cost")
 async def get_environmental_cost(simulation_id: int, current_user: User = Depends(get_current_active_user),
                                  db: Session = Depends(get_db)):
+
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                          get_simulation_db=True)
+    simulation_calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
     return EnvironmentalCostTable(
-        tbse_conso_rang_1=39.08,
-        effective_tbse=47.16,
-        ibt=36.27,
-        ibt_pp=33.83
+        tbse_conso_rang_1=np.mean(simulation_calculator.first_tier_env_cost),
+        effective_tbse=np.mean(simulation_calculator.tbse_env_cost),
+        ibt=np.mean(simulation_calculator.ibt_env_cost),
+        ibt_pp=np.mean(simulation_calculator.ibt_pp_env_cost),
     )
 
 
 @results_router.get("/{simulation_id}/water_agency")
 async def get_water_agency(simulation_id: int, current_user: User = Depends(get_current_active_user),
                            db: Session = Depends(get_db)):
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                          get_simulation_db=True)
+    simulation_calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
     return WaterAgencyTable(
-        exercise_duty=904314,
+        exercise_duty=simulation_calculator.water_agency_exercise_duty,
     )
 
 
 @results_router.get("/{simulation_id}/state")
 async def get_state_table(simulation_id: int, current_user: User = Depends(get_current_active_user),
                           db: Session = Depends(get_db)):
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                          get_simulation_db=True)
+    simulation_calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
     return StateTable(
-        vat=1031371
+        vat=simulation_calculator.state_avt_total
     )
 
 
@@ -236,5 +244,14 @@ async def get_csv_results(simulation_id: int, current_user: User = Depends(get_c
         headers={"Content-Disposition": f"attachment; filename=simulation_{simulation_id}_results.csv"}
     )
 
+
+@results_router.get("/{simulation_id}/economic_efficiency", response_model=EconomicEfficiencyTable)
+async def get_economic_efficiency(simulation_id: int, current_user: User = Depends(get_current_active_user),
+                              db: Session = Depends(get_db)):
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                      get_simulation_db=True)
+    simulation_finished = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    return economic_efficiency_dashboard(simulation_finished)
 
 results_router.include_router(affordability_router)

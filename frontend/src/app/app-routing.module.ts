@@ -19,6 +19,7 @@ import {IncentiveEffectComponent} from "./incentive-effect/incentive-effect.comp
 import {RoundDetailComponent} from "./round-detail/round-detail.component";
 import {GameDetailComponent} from "./game-detail/game-detail.component";
 import {AffordabilityDetailsComponent} from "./affordability-details/affordability-details.component";
+import {EconomicEfficiencyDetailsComponent} from "./economic-efficiency-details/economic-efficiency-details.component";
 
 const routes: Routes = [
     {
@@ -91,6 +92,10 @@ const routes: Routes = [
     {
         path: 'affordability-details/:id',
         component: AffordabilityDetailsComponent,
+    },
+    {
+        path: 'economic-efficiency-details/:id',
+        component: EconomicEfficiencyDetailsComponent,
     },
     {
         path: 'round-detail/:id',

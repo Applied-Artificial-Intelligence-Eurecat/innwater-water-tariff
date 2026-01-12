@@ -89,6 +89,10 @@ class NewSimulation:
         self.calculate_par()
         self.calculate_first_tier_consumption()
         self.calculate_aproximate_demand_consumptions()
+        self.calculate_delta_economic_efficiency()
+        self.calculate_overconsumption_approximate()
+        self.calculate_environmental_costs()
+        self.calculate_rex()
 
     def calculate_poor(self):
         uc_oecd = 1 + (self.df['nbpers'] - self.df['nenf'] - 1) * 0.5 + self.df['nenf'] * 0.3
@@ -287,22 +291,173 @@ class NewSimulation:
         return self.bcp_consumptions
 
     def calculate_overconsumption(self):
-        self.overconsumption = self.ibt_pp_consumption - self.bcp_consumptions[self.simulation.launch.periods]
+        self.overconsumption = self.bcp_consumptions[self.simulation.launch.periods] - self.ibt_pp_consumption
         return self.overconsumption
 
     def calculate_first_tier_consumption(self):
         self.first_tier_a_i = ((self.df[
-                                    'Revenu_Imputé_2'] / 30) ** self.simulation.demand.coefficients.a5) * self.captive_consumption
+                                    'Revenu_Imputé_2'] / 30) ** self.simulation.demand.coefficients.a6) * self.captive_consumption_per_day
         self.first_tier_consumption_per_day = (
                 ((self.simulation.primitives.drinking_water.variable_costs +
                   self.simulation.primitives.environment.average_variable_cost)
-                 ** self.simulation.demand.coefficients.a6) * self.first_tier_a_i)
+                 ** self.simulation.demand.coefficients.a5) * self.first_tier_a_i)
         self.first_tier_consumption_per_trim = self.first_tier_consumption_per_day * 90
 
     def calculate_aproximate_demand_consumptions(self):
-        is_sanitation = self.is_sanitation().astype(float)
-        op = self.simulation.primitives.drinking_water.variable_costs + is_sanitation * self.simulation.primitives.sanitation.variable_costs
+        self.tbse_a_consumption_per_trim = self._aproximate_demand_consumption_calculation(
+            self.simulation.tbse_potable_water_variable_prix, self.simulation.tbse_sanitation_variable_prix)
 
+        # IBT PP A
+        possible_ibt_consumptions = []
+        for potable_water_ttc, sanitation_ttc in zip(self.simulation.potable_water_prix_tiers_ttc,
+                                                     self.simulation.sanitation_prix_tiers_ttc):
+            possible_ibt_consumptions.append(self._aproximate_demand_consumption_calculation(potable_water_ttc,
+                                                                                             sanitation_ttc))
+        ibt_pp_a_consumption_per_trim = []
+        for i in range(len(possible_ibt_consumptions[0])):
+            found = False
+            for ithreshold, (usage_tiers, next_usage_tier) in enumerate(
+                    zip(self.simulation.tariff.drinking_water.usage_tiers,
+                        self.simulation.tariff.drinking_water.usage_tiers[1:])):
+                if usage_tiers.threshold <= possible_ibt_consumptions[ithreshold][i] < next_usage_tier.threshold:
+                    ibt_pp_a_consumption_per_trim.append(possible_ibt_consumptions[ithreshold][i])
+                    found = True
+                    break
+                elif ithreshold + 1 < len(self.simulation.tariff.drinking_water.usage_tiers) and (
+                        usage_tiers.threshold <= possible_ibt_consumptions[ithreshold + 1][
+                    i] < next_usage_tier.threshold):
+                    ibt_pp_a_consumption_per_trim.append(possible_ibt_consumptions[ithreshold + 1][i])
+                    found = True
+                    break
+            if not found:
+                ibt_pp_a_consumption_per_trim.append(possible_ibt_consumptions[-1][i])
+        self.ibt_pp_a_consumption_per_trim = pd.Series(ibt_pp_a_consumption_per_trim)
+        self.ibt_a_consumption_per_trim = self.ibt_pp_a_consumption_per_trim + self.overconsumption
+
+    def calculate_delta_economic_efficiency(self):
+        self.delta_tbse_a = self.tbse_a_consumption_per_trim - self.first_tier_consumption_per_trim
+        self.delta_ibt_pp_a = self.ibt_pp_a_consumption_per_trim - self.first_tier_consumption_per_trim
+        self.delta_ibt_a = self.ibt_a_consumption_per_trim - self.first_tier_consumption_per_trim
+
+    def _aproximate_demand_consumption_calculation(self, potable_water_ttc_price, sanitation_ttc_price):
+        is_sanitation = self.is_sanitation().astype(float)
+        tbse_ttc_price = potable_water_ttc_price + is_sanitation * sanitation_ttc_price
+        daily_consumption_ttc = self.first_tier_a_i * (tbse_ttc_price ** self.simulation.demand.coefficients.a5)
+        return daily_consumption_ttc * 90
+
+    def calculate_overconsumption_approximate(self):
+        self.tbse_a_surplus_contr_var = self._calculation_variation_contribution_overconsumption(
+            self.tbse_a_consumption_per_trim)
+        self.ibt_pp_a_surplus_contr_var = self._calculation_variation_contribution_overconsumption(
+            self.ibt_pp_a_consumption_per_trim
+        )
+        self.ibt_a_surplus_contr_var = self._calculation_variation_contribution_overconsumption(
+            self.ibt_a_consumption_per_trim
+        )
+
+        self.tbse_a_receipt = self.__calculate_generic_tbse_receipt(self.tbse_a_consumption_per_trim)
+        self.ibt_pp_a_receipt = self.__calculate_generic_ibt_receipt(self.ibt_pp_a_consumption_per_trim)
+        self.ibt_a_receipt = self.__calculate_generic_ibt_receipt(self.ibt_a_consumption_per_trim)
+
+        self.ibt_pp_surplus_consumption = self._calculate_surplus_consumption_receipt(
+            self.ibt_pp_a_consumption_per_trim, self.ibt_pp_a_receipt)
+        self.ibt_surplus_consumption = self._calculate_surplus_consumption_receipt(self.ibt_a_consumption_per_trim,
+                                                                                   self.ibt_a_receipt)
+        self.delta_ibt_surplus_consumption = self._calculate_surplus_consumption_receipt(
+            self.ibt_a_consumption_per_trim,
+            self.ibt_a_receipt,
+            self.ibt_pp_a_consumption_per_trim,
+            self.ibt_pp_a_receipt
+        )
+
+    def _calculate_surplus_consumption_receipt(self, consumption, receipt, other_consumption=None, other_receipt=None):
+        consumption_per_day = consumption / 90
+        if other_consumption is None:
+            other_consumption = self.tbse_a_consumption_per_trim
+        if other_receipt is None:
+            other_receipt = self.tbse_a_receipt
+        tbse_consumption_per_day = other_consumption / 90
+        elastic_price = abs(self.simulation.demand.coefficients.a5)
+        coef = (1 - elastic_price) / elastic_price
+        coef_beta = elastic_price / (1 - elastic_price)
+        variation_surplus = coef_beta * self.first_tier_b_i * (
+                tbse_consumption_per_day ** (-coef) - consumption_per_day ** (-coef)) * 90
+        delta_fact_ttc = receipt - other_receipt
+        variation_surplus_consumption = variation_surplus - delta_fact_ttc
+        return variation_surplus_consumption
+
+    def _calculation_variation_contribution_overconsumption(self, consumption_trim):
+        elastic_price = abs(self.simulation.demand.coefficients.a5)
+        coef = (1 - elastic_price) / elastic_price
+        coef_beta = elastic_price / (1 - elastic_price)
+        self.first_tier_b_i = self.first_tier_a_i ** (1 / elastic_price)
+        variation_i1 = coef_beta * self.first_tier_b_i * (
+                self.first_tier_consumption_per_day ** (-coef) - (consumption_trim / 90) ** (-coef)
+        )
+        variation_i2 = (consumption_trim / 90 - self.first_tier_consumption_per_day) * (
+                self.simulation.primitives.environment.average_variable_cost + self.simulation.primitives.drinking_water.variable_costs
+        )
+        agg_surplus_contribution_variation_eur_per_quarter = (variation_i1 - variation_i2) * 90
+        return agg_surplus_contribution_variation_eur_per_quarter
+
+    def calculate_environmental_costs(self):
+        is_g1 = ~self.is_sanitation()
+        cost_env_no_recuperable = (is_g1 *
+                                   max(self.simulation.primitives.environment.average_variable_cost
+                                       - self.simulation.primitives.taxation.drinking_water.fees, 0)) + (
+                                          self.is_sanitation() * max(
+                                      self.simulation.primitives.environment.average_variable_cost
+                                      - self.simulation.primitives.taxation.drinking_water.fees
+                                      - self.simulation.primitives.taxation.sanitation.fees
+                                      - self.simulation.primitives.sanitation.variable_costs,
+                                      0)
+                                  )
+        self.first_tier_env_cost = cost_env_no_recuperable * self.first_tier_consumption_per_trim
+        self.tbse_env_cost = cost_env_no_recuperable * self.tbse_consumption_per_trim
+        self.ibt_env_cost = cost_env_no_recuperable * self.bcp_consumptions[self.simulation.launch.periods]
+        self.ibt_pp_env_cost = cost_env_no_recuperable * self.ibt_pp_consumption
+        self.overconsumption_env_cost = cost_env_no_recuperable * self.overconsumption
+
+    def calculate_rex(self):
+        drinking_water_agence = self._calculate_agence_rex(self.bcp_consumptions[self.simulation.launch.periods],
+                                                           self.simulation.primitives.taxation.drinking_water.fees,
+                                                           self.simulation.primitives.drinking_water.number_of_subscribers)
+        sanitation_agence = self._calculate_agence_rex(
+            self.bcp_consumptions[self.simulation.launch.periods][self.is_sanitation()],
+            self.simulation.primitives.taxation.sanitation.fees,
+            self.simulation.primitives.sanitation.number_of_subscribers)
+
+        self.water_agency_exercise_duty = drinking_water_agence + sanitation_agence
+
+        drinking_water_mean_state_fee = self.__calculate_state_variable_rex(
+            self.bcp_consumptions[self.simulation.launch.periods],
+            self.simulation.primitives.drinking_water.number_of_subscribers,
+            self.simulation.potable_water_base_tva_per_unit_of_service,
+            self.simulation.potable_water_fees_tva_per_unit_of_service,
+            self.simulation.tariff.drinking_water.usage_tiers)
+
+        sanitation_mean_state_fee = self.__calculate_state_variable_rex(
+            self.bcp_consumptions[self.simulation.launch.periods][self.is_sanitation()],
+            self.simulation.primitives.sanitation.number_of_subscribers,
+            self.simulation.sanitation_base_tva_per_unit_of_service,
+            self.simulation.sanitation_fees_tva_per_unit_of_service,
+            self.simulation.tariff.sanitation.usage_tiers
+        )
+
+        self.state_avt_total = drinking_water_mean_state_fee + sanitation_mean_state_fee
+
+    def _calculate_agence_rex(self, consumption, fees, number_of_subscribers):
+        level_service = number_of_subscribers * (4 * np.mean(consumption))
+        total = fees * level_service
+        return total
+
+    def __calculate_state_variable_rex(self, consumption, num_subscribers, tva_base, tva_tiers, usage_tiers):
+        drinking_water_constant_state = tva_base * 4
+        drinking_water_variable_state = np.mean(self.__calculate_state_variable_ibt_receipt(consumption,
+                                                                                            usage_tiers,
+                                                                                            tva_tiers))
+        mean_state_fee = (drinking_water_variable_state + drinking_water_constant_state) * num_subscribers
+        return mean_state_fee
 
     def __calculate_generic_tbse_receipt(self, consumption):
         potable_receipt = self.simulation.tbse_potable_water_base_prix + consumption * self.simulation.tbse_potable_water_variable_prix
@@ -310,6 +465,19 @@ class NewSimulation:
                 self.simulation.tbse_sanitation_base_prix + consumption *
                 self.simulation.tbse_sanitation_variable_prix)
         return potable_receipt + sanitation_receipt
+
+    def __calculate_state_variable_ibt_receipt(self, consumption, tariff_tiers, tva_fees):
+        thresholds = list(map(lambda x: x.threshold, tariff_tiers))
+
+        res = []
+
+        for j, consumption_value in enumerate(consumption):
+            val = 0
+            for usage_tier, tva_fee, consumption_tier in zip(tariff_tiers, tva_fees,
+                                                             decompose_value(consumption_value, thresholds)):
+                val += (consumption_tier * tva_fee)
+            res.append(val)
+        return pd.Series(res)
 
     def __calculate_generic_ibt_receipt(self, consumption, add_splitted_receipt=False):
         thresholds = list(map(lambda x: x.threshold, self.simulation.tariff.drinking_water.usage_tiers))
@@ -469,10 +637,10 @@ def main():
     gini_result = gini_decomp(simulation.ibt_par_excess, simulation.is_sanitation())
 
     print(time.time() - start)
-    save_simulation(2, simulation)
-    import pickle
-    with open("simulation.pickle", "rb") as f:
-        obj = pickle.load(f)
+    # save_simulation(2, simulation)
+    # import pickle
+    # with open("simulation.pickle", "rb") as f:
+    #    obj = pickle.load(f)
 
 
 if __name__ == '__main__':

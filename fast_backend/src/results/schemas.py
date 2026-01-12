@@ -52,6 +52,26 @@ class EconomicEfficiencyTable(BaseModel):
     impact_overconsumption: EconomicEfficiencyRow
 
 
+class SurplusDeltaRow(BaseModel):
+    total_percent: Optional[float] = Field(None, description="Total percentage")
+    g_percent: Optional[float] = Field(None, description="G percentage")
+    p_percent: Optional[float] = Field(None, description="P percentage")
+    total_value: Optional[float] = Field(None, description="Total value in euros")
+    g_value: Optional[float] = Field(None, description="G value in euros")
+    p_value: Optional[float] = Field(None, description="P value in euros")
+
+
+class SurplusImpactRow(BaseModel):
+    total: Optional[float] = Field(None, description="Total impact")
+    overconsumers: Optional[float] = Field(None, description="Impact on overconsumers (H)")
+
+
+class EconomicEfficiencyDetailsTable(BaseModel):
+    ibt_a_delta: SurplusDeltaRow = Field(..., description="IBT A Delta")
+    ibt_a_pp_delta: SurplusDeltaRow = Field(..., description="IBT A PP Delta")
+    impact_on_sur_co: SurplusImpactRow = Field(..., description="Impact on Sur_Co")
+
+
 class EquityGiniIndexTable(BaseModel):
     ibt: Optional[float] = Field(None, description="Net Income Gini Index for IBT")
     ibt_ae: Optional[float] = Field(None, description="Net Income Gini Index for IBT-AE")

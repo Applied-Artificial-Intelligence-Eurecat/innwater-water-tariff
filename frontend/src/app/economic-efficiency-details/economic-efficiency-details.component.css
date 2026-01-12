@@ -1,0 +1,18 @@
+@import '../aggregated-dashboard/shared-table-styles.css';
+
+.content-container {
+  margin-top: 20px;
+}
+
+.table-card {
+  margin-bottom: 20px;
+}
+
+.bold-text {
+  font-weight: bold;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}

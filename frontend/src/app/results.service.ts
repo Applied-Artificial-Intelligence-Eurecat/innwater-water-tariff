@@ -53,6 +53,26 @@ export interface EconomicEfficiencyTable {
     impact_overconsumption: EconomicEfficiencyRow;
 }
 
+export interface SurplusDeltaRow {
+    total_percent: number | null;
+    g_percent: number | null;
+    p_percent: number | null;
+    total_value: number | null;
+    g_value: number | null;
+    p_value: number | null;
+}
+
+export interface SurplusImpactRow {
+    total: number | null;
+    overconsumers: number | null;
+}
+
+export interface EconomicEfficiencyDetailsTable {
+    ibt_a_delta: SurplusDeltaRow;
+    ibt_a_pp_delta: SurplusDeltaRow;
+    impact_on_sur_co: SurplusImpactRow;
+}
+
 // Gini Index
 export interface EquityGiniTable {
     ibt: number | null;
@@ -190,6 +210,17 @@ export class ResultsService {
     getEconomicEfficiency(id: number): Observable<EconomicEfficiencyTable> {
         return this.http.get<EconomicEfficiencyTable>(
             `${this.apiUrl}/api/v1/results/${id}/economic_efficiency`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+    }
+
+    getEconomicEfficiencyDetails(id: number): Observable<EconomicEfficiencyDetailsTable> {
+        return this.http.get<EconomicEfficiencyDetailsTable>(
+            `${this.apiUrl}/api/v1/results/${id}/economic_efficiency/details`,
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`

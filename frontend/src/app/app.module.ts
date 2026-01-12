@@ -84,6 +84,7 @@ import { CreateGameDialogComponent } from './simulation-details/create-game-dial
 import { GameDetailComponent } from './game-detail/game-detail.component';
 import { ImagePopupDialogComponent } from './simulation-details/image-popup-dialog/image-popup-dialog.component';
 import { AffordabilityDetailsComponent } from './affordability-details/affordability-details.component';
+import { EconomicEfficiencyDetailsComponent } from './economic-efficiency-details/economic-efficiency-details.component';
 
 @NgModule({
     declarations: [
@@ -138,6 +139,7 @@ import { AffordabilityDetailsComponent } from './affordability-details/affordabi
         GameDetailComponent,
         ImagePopupDialogComponent,
         AffordabilityDetailsComponent,
+        EconomicEfficiencyDetailsComponent,
     ],
     imports: [
         CommonModule,

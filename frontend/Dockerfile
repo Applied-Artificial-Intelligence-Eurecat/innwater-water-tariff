@@ -4,7 +4,7 @@ FROM node:16 as build
 WORKDIR /app
 
 ARG configuration=production
-ARG base_href=/
+ARG base_href=/msm/
 
 
 # Copy package.json and package-lock.json

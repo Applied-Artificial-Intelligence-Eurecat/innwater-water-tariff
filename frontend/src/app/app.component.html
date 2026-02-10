@@ -1,4 +1,4 @@
-<mat-toolbar class="mat-elevation-z8">
+    <mat-toolbar class="mat-elevation-z8" *ngIf="showHeader">
     <span class="toolbar-title">InnWater NEWTS</span>
     <span class="toolbar-spacer"></span>
     <button mat-button routerLink="/home">
@@ -21,8 +21,17 @@
     </button>
 </mat-toolbar>
 
-<div class="main-content">
+<div class="main-content" [class.no-footer]="!showFooter">
     <app-chat-button></app-chat-button>
     <app-chat></app-chat>
     <router-outlet></router-outlet>
 </div>
+
+<footer class="footer" *ngIf="showFooter">
+    <div class="footer-content">
+        <img src="assets/funded_by.png" alt="Funded by European Union and UK Research and Innovation" class="footer-image">
+        <p class="footer-text">
+            This project has received funding from the European Union's Horizon Europe programme (Grant Agreement No. 101086512) and from UK Research and Innovation (UKRI) under the UK government's Horizon Europe funding guarantee (Grant No. 10066637).
+        </p>
+    </div>
+</footer>

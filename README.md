@@ -108,7 +108,7 @@ docker-compose up --build
 ## Contact
 
 - **Water Tariff Dashboard design and development**: Michel Paul & Jimmy Lauret (University of La Réunion)
-- **Software Development**: Oriol Alàs (Eurecat)
+- **Software Development and AI Assistant**: Oriol Alàs (Eurecat)
 
 ---
 

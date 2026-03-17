@@ -1,0 +1,1 @@
+"""Equity indicators calculation package."""

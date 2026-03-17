@@ -17,6 +17,7 @@ from src.small_assessment.economic_efficiency import economic_efficiency_dashboa
 from src.small_assessment.incentive_service import incentive_effect_consumption
 from src.small_assessment.new_calculator_service import get_or_create_simulation_from_payload, NewSimulation
 from src.small_assessment.rex_service import calculate_net_cost_service
+from src.results.equity.equity_indicators import calculate_full_equity_indicators
 
 from src.results.schemas import EconomicEfficiencyTable
 
@@ -107,22 +108,64 @@ async def get_equity_gini_index(simulation_id: int, current_user: User = Depends
 @results_router.get("/{simulation_id}/equity/basic_consumption", response_model=BasicConsumptionEquityTable)
 async def get_basic_consumption_equity(simulation_id: int, current_user: User = Depends(get_current_active_user),
                                        db: Session = Depends(get_db)):
+    from src.results.equity.calculation_service import calculate_equity_from_simulation
+
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                          get_simulation_db=True)
+    simulation_calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    equity_indicators = calculate_equity_from_simulation(simulation_calculator)
+    basic_indicators = equity_indicators['basic']
+
     return BasicConsumptionEquityTable(
-        net_sub_basic_c=BasicConsumptionEquityRow(dae=None, dai=None),
-        omega_ratio_1=BasicConsumptionEquityRow(dae=None, dai=None),
-        net_taxes_basic_c=BasicConsumptionEquityRow(dae=None, dai=None),
-        omega_ratio_2=BasicConsumptionEquityRow(dae=None, dai=None),
+        net_sub_basic_c=BasicConsumptionEquityRow(
+            dae=round(basic_indicators['net_subsidy_consumption_mean'], 2),
+            dai=round(basic_indicators['net_subsidy_service_mean'], 2)
+        ),
+        omega_ratio_1=BasicConsumptionEquityRow(
+            dae=round(basic_indicators['omega_net_subsidy_consumption'], 2),
+            dai=round(basic_indicators['omega_net_subsidy_service'], 2)
+        ),
+        net_taxes_basic_c=BasicConsumptionEquityRow(
+            dae=round(basic_indicators['net_margin_consumption_mean'], 2),
+            dai=round(basic_indicators['net_margin_service_mean'], 2)
+        ),
+        omega_ratio_2=BasicConsumptionEquityRow(
+            dae=round(basic_indicators['omega_net_margin_consumption'], 2),
+            dai=round(basic_indicators['omega_net_margin_service'], 2)
+        ),
     )
 
 
 @results_router.get("/{simulation_id}/equity/full_consumption", response_model=FullConsumptionEquityTable)
 async def get_full_consumption_equity(simulation_id: int, current_user: User = Depends(get_current_active_user),
                                       db: Session = Depends(get_db)):
+    from src.results.equity.calculation_service import calculate_equity_from_simulation
+
+    simulation_payload, simulation = await get_simulation_payload_from_db(current_user, db, simulation_id,
+                                                                          get_simulation_db=True)
+    simulation_calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
+
+    equity_indicators = calculate_equity_from_simulation(simulation_calculator)
+    general_indicators = equity_indicators['general']
+
     return FullConsumptionEquityTable(
-        net_sub_c=FullConsumptionEquityRow(afe=None, afi=None),
-        omega_ratio_1=FullConsumptionEquityRow(afe=None, afi=None),
-        net_taxation=FullConsumptionEquityRow(afe=None, afi=None),
-        omega_ratio_2=FullConsumptionEquityRow(afe=None, afi=None),
+        net_sub_c=FullConsumptionEquityRow(
+            afe=round(general_indicators['net_subsidy_consumption_mean'], 2),
+            afi=round(general_indicators['net_subsidy_service_mean'], 2)
+        ),
+        omega_ratio_1=FullConsumptionEquityRow(
+            afe=round(general_indicators['omega_net_subsidy_consumption'], 2),
+            afi=round(general_indicators['omega_net_subsidy_service'], 2)
+        ),
+        net_taxation=FullConsumptionEquityRow(
+            afe=round(general_indicators['net_margin_consumption_mean'], 2),
+            afi=round(general_indicators['net_margin_service_mean'], 2)
+        ),
+        omega_ratio_2=FullConsumptionEquityRow(
+            afe=round(general_indicators['omega_net_margin_consumption'], 2),
+            afi=round(general_indicators['omega_net_margin_service'], 2)
+        ),
     )
 
 

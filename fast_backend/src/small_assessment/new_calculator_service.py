@@ -6,6 +6,7 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+from matplotlib.pyplot import summer
 
 from src.core.models import Simulation
 from src.initial.population_service import save_population_data_given_simulation_info
@@ -295,6 +296,31 @@ class NewSimulation:
             ), axis=1)
             cvm = cv / last_cv_taylor
         return self.taylor_consumptions[num_periods]
+
+    def calculate_funding(self):
+
+
+        for i, value in enumerate(self.bcp_consumptions[self.simulation.launch.periods]):
+            decomposed_consumptions = decompose_value(value, list(map(lambda x: x.threshold, self.simulation.tariff.drinking_water.usage_tiers)))
+            sum_dummies = int(sum(map(lambda x: x != 0, decomposed_consumptions), [])) - 1
+            assert sum_dummies >= 0
+            d_nordin = self.simulation.potable_water_nordin_tiers[sum_dummies]
+            variable_prix = self.simulation.tariff.drinking_water.usage_tiers[sum_dummies].price
+            subtax_adjusted_access_rights = (self.simulation.tariff.drinking_water.subscription - d_nordin) - self.simulation.tbse_potable_water_base_prix
+
+            subtax_adjusted_amount_dae = variable_prix - self.simulation.tbse_potable_water_variable_prix
+            potable_water_subtax_adjusted_amount_dai = subtax_adjusted_access_rights + subtax_adjusted_amount_dae
+
+        for i, value in enumerate(self.bcp_consumptions[self.simulation.launch.periods]):
+            decomposed_consumptions = decompose_value(value, list(map(lambda x: x.threshold, self.simulation.tariff.sanitation.usage_tiers)))
+            sum_dummies = int(sum(map(lambda x: x != 0, decomposed_consumptions), [])) - 1
+            assert sum_dummies >= 0
+            d_nordin = self.simulation.sanitation_nordin_tiers[sum_dummies]
+            variable_prix = self.simulation.tariff.sanitation.usage_tiers[sum_dummies].price
+            subtax_adjusted_access_rights = (self.simulation.tariff.sanitation.subscription - d_nordin) - self.simulation.tbse_sanitation_base_prix
+            subtax_adjusted_amount_dae = variable_prix - self.simulation.tbse_sanitation_variable_prix
+            sanitation_subtax_adjusted_amount_dai = subtax_adjusted_access_rights + subtax_adjusted_amount_dae
+
 
     def calculate_bcp_consumption(self):
         if self.simulation.launch.periods == 0:

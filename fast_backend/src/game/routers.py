@@ -65,7 +65,7 @@ async def link_round_to_simulation(game_round_id: int, simulation_id: int,
     simulation_payload = await get_simulation_payload_from_db(current_user, db, simulation_id)
     calculation = await get_or_create_simulation_from_payload(simulation_id, simulation, simulation_payload)
 
-    rex_value = (await calculate_rex(calculation))['total_cost']
+    rex_value = (calculate_rex(calculation))['total_cost']
     if abs(rex_value) > game_round.threshold_res:
         score = 9999999999999999
     else:

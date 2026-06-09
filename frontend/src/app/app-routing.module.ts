@@ -105,10 +105,6 @@ const routes: Routes = [
         path: 'game-detail/:id',
         component: GameDetailComponent,
     },
-    {
-        path: '**',
-        component: NotFoundComponent,
-    },
 ];
 
 @NgModule({

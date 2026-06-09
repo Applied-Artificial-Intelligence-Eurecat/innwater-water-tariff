@@ -23,7 +23,7 @@ app = FastAPI(
     title="Water Tariff API",
     description="API for water tariff calculations and affordability indicators",
     version="1.0.0",
-    root_path="/api/v1",
+    root_path="/water-tariff-api/api/v1",
     lifespan=lifespan,
 )
 

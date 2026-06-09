@@ -25,7 +25,6 @@ async def get_economic_efficiency_details(simulation_id: int, current_user: User
                                                                           get_simulation_db=True)
     simulation_calculator = await get_or_create_simulation_from_payload(simulation.id, simulation, simulation_payload)
 
-    # Mock data for now
     ibt_win = simulation_calculator.ibt_surplus_consumption > 0
     ibt_lose = simulation_calculator.ibt_surplus_consumption <= 0
     ibt_pp_win = simulation_calculator.ibt_pp_surplus_consumption > 0

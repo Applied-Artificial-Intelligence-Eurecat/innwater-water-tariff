@@ -68,6 +68,8 @@ export class AffordabilityDetailsComponent implements OnInit {
     excessGiniIbtTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
     excessGiniTbseTableRows: Array<{ label: string; value?: number; percent?: number }> = [];
 
+
+
     constructor(
         private route: ActivatedRoute,
         private router: Router,

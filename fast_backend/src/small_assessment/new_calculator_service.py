@@ -35,11 +35,11 @@ def decompose_value_carry(thresholds):
 
         for i in range(len(thresholds) - 1):
             lower, upper = thresholds[i], thresholds[i + 1]
-            segment = max(0, min(remaining, upper - lower))
+            segment = np.maximum(0, np.minimum(remaining, upper - lower))
             decomposed.append(segment)
             remaining -= segment
 
-        decomposed.append(max(0, remaining))
+        decomposed.append(np.maximum(0, remaining))
         return decomposed
 
     return apply
@@ -93,6 +93,7 @@ class NewSimulation:
         self.calculate_overconsumption_approximate()
         self.calculate_environmental_costs()
         self.calculate_rex()
+
 
     def calculate_poor(self):
         uc_oecd = 1 + (self.df['nbpers'] - self.df['nenf'] - 1) * 0.5 + self.df['nenf'] * 0.3
@@ -148,7 +149,6 @@ class NewSimulation:
                                     self.simulation.demand.coefficients.a2 * self.df['SNWA'] +
                                     self.simulation.demand.coefficients.a3 * self.df['Piscine (1 = oui)'] +
                                     self.simulation.demand.coefficients.a4 * self.df['Garden * Wheather'])
-        print("LEN, DF", len(self.df))
         self.captive_consumption_per_day = self.captive_consumption.apply(np.exp)
         self.captive_consumption_per_trim = self.captive_consumption_per_day * 90
 
@@ -206,12 +206,12 @@ class NewSimulation:
             th_extended = th + [float('inf')]
             for j in range(len(results)):
                 ibt_pp = results[j]
-                if th_extended[j] <= ibt_pp < th_extended[j + 1]:
+                if ((ibt_pp >= th_extended[j]) & (ibt_pp < th_extended[j + 1])).all():
                     consumptions.append(ibt_pp)
                     found = True
                     break
                 elif j < len(results) - 1:
-                    if ibt_pp >= th_extended[j + 1] > results[j + 1]:
+                    if ((ibt_pp >= th_extended[j + 1]) & (th_extended[j + 1] > results[j + 1])).all():
                         consumptions.append(th_extended[j + 1])
                         found = True
                         break
@@ -281,11 +281,10 @@ class NewSimulation:
             lambda x: self.simulation.epa_prix_base_ttc if x else self.simulation.potable_water_prix_base_ttc)) / 90
 
         for i in range(num_periods):
-            log_revenue = (self.df['Revenu_Imputé_2'] / 30 - daily_subscription_ttc).apply(
-                np.log) * self.simulation.demand.coefficients.a6
-            log_avg_price = cvm.apply(np.log) * self.simulation.demand.coefficients.a5
+            log_revenue = np.log((self.df['Revenu_Imputé_2'] / 30 - daily_subscription_ttc)) * self.simulation.demand.coefficients.a6
+            log_avg_price = np.log(cvm.values) * self.simulation.demand.coefficients.a5
 
-            last_cv_taylor = (log_revenue + log_avg_price + self.captive_consumption).apply(np.exp) * 90
+            last_cv_taylor = np.exp(log_revenue + log_avg_price + self.captive_consumption) * 90
             self.taylor_consumptions.append(last_cv_taylor)
             current_df = pd.DataFrame({"consumption": last_cv_taylor, "sanitation": self.is_sanitation()})
             cv = current_df.apply(decompose_value_carry_and_prix(

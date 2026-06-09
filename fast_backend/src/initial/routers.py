@@ -245,6 +245,7 @@ async def edit_simulation(simulation_id: int, payload: SimulationPayload,
         simulation.population.eps = payload.population.eps
         simulation.population.std = payload.population.std
         simulation.population.database_path = payload.population.bd
+        simulation.population.original_datasource = payload.population.original_datasource
         db.add(simulation.population)
     else:
         await create_population(db, payload, simulation)

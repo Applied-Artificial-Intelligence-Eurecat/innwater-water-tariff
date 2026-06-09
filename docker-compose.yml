@@ -3,8 +3,6 @@ services:
     build:
       context: ./fast_backend
       dockerfile: Dockerfile
-      args:
-        base_href: /msm/
     image: water-tariff-api
     hostname: water-tariff-backend
     container_name: water-tariff-api
@@ -41,6 +39,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        base_href: /msm/
     restart: unless-stopped
     environment:
       - API_URL=http://water-tariff-backend:8000
